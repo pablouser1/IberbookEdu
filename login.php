@@ -5,6 +5,9 @@ if (isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
     if($_SESSION["loggedin"] == "user"){
         header("Location: users/dashboard.php");
     }
+    elseif($_SESSION["loggedin"] == "admin"){
+        header("Location: profiles/admin.php");
+    }
 }
 $login_error = $password_err = $username_err = "";
 require_once("helpers/db.php");
@@ -52,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 switch ($userinfo["typeuser"]){
                     case "ALU":
                         $_SESSION["userinfo"] = $userinfo;
+                        die(header("Location: profiles/admin.php"));
                     break;
                     case "TUT_LEGAL":
                         $_SESSION["tutorinfo"] = $userinfo;
@@ -61,22 +65,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
                 }
             }
-            else{
-                $_SESSION["loggedin"] = "user";
-                switch ($userinfo["typeuser"]){
-                    case "ALU":
-                        $_SESSION["userinfo"] = $userinfo;
-                        header("Location: users/dashboard.php");
-                    break;
-                    case "TUT_LEGAL":
-                        $_SESSION["tutorinfo"] = $userinfo;
-                        header("Location: users/tutorlegal.php");
-                    break;
-                    case "P":
-                        $_SESSION["teacherinfo"] = $userinfo;
-                        header("Location: users/teachers.php");
-                    break;
-                }
+            else{$_SESSION["loggedin"] = "user";}
+            switch ($userinfo["typeuser"]){
+                case "ALU":
+                    $_SESSION["userinfo"] = $userinfo;
+                    header("Location: users/dashboard.php");
+                break;
+                case "TUT_LEGAL":
+                    $_SESSION["tutorinfo"] = $userinfo;
+                    header("Location: profiles/tutorlegal.php");
+                break;
+                case "P":
+                    $_SESSION["teacherinfo"] = $userinfo;
+                    header("Location: profiles/teachers.php");
+                break;
             }
         }
         else{
@@ -156,22 +158,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </section>
-    <div id="select_modal" class="modal animate__animated animate__fadeIn <?php if (isset($_SESSION["loggedin"]) &&  $_SESSION["loggedin"] == "admin") echo("is-active");?>">
-        <div onclick="closechoose()" class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">Bienvenido: <?php if(isset($userinfo)) echo($userinfo["nameuser"]);?></p>
-                <button onclick="closechoose()" class="delete" aria-label="close"></button>
-            </header>
-            <section class="modal-card-body">
-                Iniciar sesión como:
-            </section>
-            <footer class="modal-card-foot">
-                <a href="<?php if (isset($userinfo) && $userinfo["typeuser"] == "P") echo("users/dashboard.php"); else echo("users/dashboard.php");?>" class="button">Usuario</a>
-                <a href="admins/dashboard.php" class="button">Administrador</a>
-            </footer>
-        </div>
-    </div>
     <script src="scripts/login.js"></script>
 </body>
 

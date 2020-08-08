@@ -22,7 +22,7 @@ if(isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
         }
         $stmt->close();
         // Ficheros
-        delete_files('../uploads/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/".$table_name."/".$userinfo["iduser"]);
+        delete_files('../yearbooks/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/".$userinfo["iduser"]);
         header("Location: dashboard.php");
     }
     // Check if yearbook is available
@@ -202,7 +202,7 @@ else{
                 </form>
             </div>
         </div>
-        <script src="scripts/dashboard.js"></script>
+        <script src="../assets/scripts/users/dashboard.js"></script>
         <footer class="footer">
             <div class="content has-text-centered">
                 <a href="../logout.php">Cerrar sesión</a>

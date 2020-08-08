@@ -11,7 +11,7 @@ if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
         $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
         $allowed_vid = array('mp4', 'webm');
         // Upload directory
-        $baseurl = '../uploads/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/".$table_name."/";
+        $baseurl = '../yearbooks'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/";
 
         // Pic upload
         if(isset($_FILES['pic'])){
@@ -189,6 +189,6 @@ else{
                 </div>
             </form>
         </section>
-        <script src="scripts/upload.js"></script>
+        <script src="../assets/scripts/users/upload.js"></script>
     </body>
 </html>

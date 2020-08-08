@@ -10,14 +10,14 @@ $userinfo = $_SESSION["userinfo"];
 $gallery = $_SESSION["gallery"];
 $baseurl = $_SESSION["baseurl"];
 // Copying files
-copy("styles/generate.css", $baseurl.'styles/yearbook.css');
-copy("scripts/generate.js", $baseurl.'scripts/yearbook.js');
-copy("scripts/lang.js", $baseurl.'scripts/lang.js');
-copy("scripts/splashscreen.js", $baseurl.'scripts/splashscreen.js');
-copy("../scripts/vendor/fontawesome.js", $baseurl.'scripts/vendor/fontawesome.js');
-copy("../scripts/vendor/confetti.min.js", $baseurl.'scripts/vendor/confetti.min.js');
-copy("../styles/vendor/bulma.min.css", $baseurl.'styles/vendor/bulma.min.css');
-copy("../styles/vendor/animate.min.css", $baseurl.'styles/vendor/animate.min.css');
+copy("../assets/styles/yearbook/generate.css", $baseurl.'styles/yearbook.css');
+copy("../assets/scripts/yearbook/generate.js", $baseurl.'scripts/yearbook.js');
+copy("../assets/scripts/yearbook/lang.js", $baseurl.'scripts/lang.js');
+copy("../assets/scripts/yearbook/splashscreen.js", $baseurl.'scripts/splashscreen.js');
+copy("../assets/scripts/yearbook/vendor/fontawesome.js", $baseurl.'scripts/vendor/fontawesome.js');
+copy("../assets/scripts/yearbook/vendor/confetti.min.js", $baseurl.'scripts/vendor/confetti.min.js');
+copy("../assets/styles/yearbook/vendor/bulma.min.css", $baseurl.'styles/vendor/bulma.min.css');
+copy("../assets/styles/yearbook/vendor/animate.min.css", $baseurl.'styles/vendor/animate.min.css');
 copy("externalprojects_licenses.txt", $baseurl.'externalprojects_licenses.txt');
 copy("../LICENSE",  $baseurl.'LICENSE.txt');
 ?>

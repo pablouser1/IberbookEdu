@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </form>
     </section>
-    <script src="scripts/gallery.js"></script>
+    <script src="../assets/scripts/admins/gallery.js"></script>
 </body>
 
 </html>

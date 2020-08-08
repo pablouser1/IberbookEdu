@@ -85,6 +85,7 @@ function viewvideo(id, type){
     video["bgvid"].play();
 }
 
+// User wants to see video
 video["link"].addEventListener("click", function (){
     if (video["bgvid"].requestFullscreen) {
         video["bgvid"].requestFullscreen();
@@ -96,7 +97,8 @@ video["link"].addEventListener("click", function (){
         video["bgvid"].msRequestFullscreen();
     }
 })
-
+var video_seen = 0;
+// User exits video
 video["exit"].addEventListener("click", function(){
     video["section"].classList.add("is-hidden");
     // Show everything
@@ -105,19 +107,29 @@ video["exit"].addEventListener("click", function(){
     document.getElementById("yearbook").classList.remove("is-hidden");
     document.getElementById("footer").classList.remove("is-hidden");
     // Stop video
+    video["bgvid"].muted = true;
     video["bgvid"].pause()
+    document.getElementById("video_link").innerHTML = lang["yearbook"]["video_view"]
+    video_seen = 0;
 })
 
 video["bgvid"].addEventListener('fullscreenchange',function() {
     if (document.fullscreenElement && document.fullscreenElement.nodeName == 'VIDEO'){
         document.getElementsByClassName("hero-video")[0].style["pointer-events"] = "auto"
-        video["bgvid"].currentTime = 0;
+        if (video_seen == 0){
+            video["bgvid"].currentTime = 0;
+            document.getElementById("video_link").innerHTML = lang["yearbook"]["video_continue"]
+            video_seen = 1;
+        }
+        else {
+            video["bgvid"].play()
+        }
         video["bgvid"].muted = false;
         video["bdvid"].controls = true;
     }
     else{
         document.getElementsByClassName("hero-video")[0].style["pointer-events"] = "none"
-        video["bgvid"].muted = true;
+        video["bgvid"].pause()
         video["bdvid"].controls = false;
     }
 })

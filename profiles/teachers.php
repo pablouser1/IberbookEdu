@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "user" && !isset($_SESSION["teacherinfo"])){
+if (!isset($_SESSION["loggedin"]) && !isset($_SESSION["teacherinfo"])){
     header("Location: ../login.php");
 }
 require_once("../helpers/api.php");
@@ -58,12 +58,17 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
       "typeuser" => $teacherinfo["typeuser"],
       "subject" => $groupform[1],
       "yearuser" => $groupform[0],
-      "photouser" => null, // SENECA doesn't have photos
+      "photouser" => base64_encode(file_get_contents("../assets/img/PortraitPlaceholder.png")), // SENECA doesn't have photos
       "idcentro" => $_GET["schoolid"],
       "namecentro" => $_GET["schoolname"]
     );
     $_SESSION["userinfo"] = $userinfo;
-    header("Location: dashboard.php");
+    if($_SESSION["loggedin"] == "admin"){
+      header("Location: ../profiles/admin.php");
+    }
+    else{
+      header("Location: ../users/dashboard.php");
+    }
   }
 }
 ?>
@@ -152,6 +157,6 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
         }
         ?>
     </section>
-    <script src="scripts/teachers.js"></script>
+    <script src="../assets/scripts/profiles/teachers.js"></script>
   </body>
 </html>

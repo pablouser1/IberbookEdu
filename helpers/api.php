@@ -146,7 +146,6 @@ function getidteacher($cookies){
 
 function getgroupsteachers($cookies){
     $url = "https://seneca.juntadeandalucia.es/seneca/jsp/senecadroid/getGrupos";
-    $cafile = "../helpers/cert/juntadeandalucia-es-chain.pem";
     $response = json_decode(utf8_encode(post($url, [], $cookies)), true);
     // Get each course, split all groups and if there are any 4º ESO or 2º BCT, add it to array
     foreach($response["RESULTADO"] as $id => $grupo){

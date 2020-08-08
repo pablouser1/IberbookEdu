@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "user" && !isset($_SESSION["tutorinfo"])){
-    header("Location: ../login.php");
+    header("Location: login.php");
 }
 require_once("../helpers/api.php");
 $cookies = $_SESSION["cookies"];

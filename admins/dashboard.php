@@ -82,7 +82,7 @@ if (isset($_GET["deleteyearbook"]) && $_GET["deleteyearbook"] == "true"){
         die("Error updating record: " . $conn->error);
     }
     $stmt->close();
-    delete_files("../yearbooks/".$userinfo["idcentro"]."/".$userinfo["yearuser"]);
+    delete_files("../yearbooks/".$userinfo["idcentro"]."/".$userinfo["yearuser"]."/generated");
 }
 
 // Check if admin generated yearbook before
@@ -149,8 +149,8 @@ if ($stmt->num_rows == 1) {
                         <tr>
                         <td>$individual[0]</td>
                         <td>$individual[1]</td>
-                        <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/teachers/$individual[0]/$individual[2]' target='_blank'>$individual[2]</a></td>
-                        <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/teachers/$individual[0]/$individual[3]' target='_blank'>$individual[3]</a></td>
+                        <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/teachers/$individual[0]/$individual[2]' target='_blank'>$individual[2]</a></td>
+                        <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/teachers/$individual[0]/$individual[3]' target='_blank'>$individual[3]</a></td>
                         <td>$individual[4]</td>
                         </tr>
                         EOL;
@@ -183,8 +183,8 @@ if ($stmt->num_rows == 1) {
                         <tr>
                             <td>$individual[0]</td>
                             <td>$individual[1]</td>
-                            <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/students/$individual[0]/$individual[2]' target='_blank'>$individual[2]</a></td>
-                            <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/students/$individual[0]/$individual[3]' target='_blank'>$individual[3]</a></td>
+                            <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/students/$individual[0]/$individual[2]' target='_blank'>$individual[2]</a></td>
+                            <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/students/$individual[0]/$individual[3]' target='_blank'>$individual[3]</a></td>
                         </tr>
                         EOL;
                     }
@@ -215,7 +215,7 @@ if ($stmt->num_rows == 1) {
                         echo <<<EOL
                         <tr>
                             <td>$individual[0]</td>
-                            <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/gallery/$individual[1]' target='_blank'>$individual[1]</a></td>
+                            <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/gallery/$individual[1]' target='_blank'>$individual[1]</a></td>
                             <td>$individual[2]</td>
                         </tr>
                         EOL;

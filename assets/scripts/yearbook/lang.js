@@ -12,6 +12,7 @@ const lang_en = {
         students: "Students",
         teachers: "Teachers",
         video_view: "View video",
+        video_continue: "Continue watching",
         video_exit: "Exit"
     },
     gallery: {
@@ -46,6 +47,7 @@ const lang_es = {
         students: "Alumnos",
         teachers: "Profesores",
         video_view: "Ver vídeo",
+        video_continue: "Continuar vídeo",
         video_exit: "Salir"
     },
     gallery: {
