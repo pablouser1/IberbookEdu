@@ -26,7 +26,7 @@ const lang_en = {
         <br>
         confetti.js (https://github.com/mathusummut/confetti.js)`,
         credits: `This yearbook was made using 
-        <a href="https://github.com/pablouser1/yearbook-builder" target="_blank">Yearbook Builder</a>, distributed under the
+        <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, distributed under the
         <a href="LICENSE.txt" target="_blank">GPLv3 license</a>`,
         contributors_button: "See contributors",
         madewith: "Made with <span style='color: #e25555;'> &#9829; </span> in Github"
@@ -60,7 +60,7 @@ const lang_es = {
         <br>
         confetti.js (https://github.com/mathusummut/confetti.js)`,
         credits: `Este yearbook fue generado usando
-        <a href="https://github.com/pablouser1/yearbook-builder" target="_blank">Yearbook Builder</a>, distribuido bajo la
+        <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, distribuido bajo la
         <a href="LICENSE.txt">licencia GPLv3</a>`,
         contributors_button: "Ver contribuidores",
         madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> en Github"
