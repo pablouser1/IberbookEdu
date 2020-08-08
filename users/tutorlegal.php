@@ -11,7 +11,7 @@ $tutorinfo = $_SESSION["tutorinfo"];
 $picschildren = array();
 foreach($tutorinfo["children"] as $id => $child){
     $datapic = array('X_MATRICULA' => $child["MATRICULAS"][0]["X_MATRICULA"]);
-    $picschildren[$id] = getpicchildren($cookies, $datapic);
+    $picschildren[$id] = getpicstudent($cookies, $datapic);
 }
 
 if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){

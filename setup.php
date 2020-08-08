@@ -5,11 +5,12 @@ if (!extension_loaded('mysqli') || !extension_loaded('zip')) {
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db_config = $_POST["db"]; // DB data
+    $global_config = $_POST["global"]; // Server-level config
     $owner = $_POST["owner"];
     $allowed_school = test_input($_POST["allowed_school"]);
+
     // DB connection info
-    $config_data =
-    '
+    $db_file = '
     <?php
     $db_name = "'.$db_config[0].'";
     $host = "'.$db_config[1].'";
@@ -17,8 +18,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = "'.$db_config[3].'";
     $password = "'.$db_config[4].'";
     ?>';
-    file_put_contents("helpers/db_config.php", $config_data);
+    file_put_contents("helpers/db_config.php", $db_file);
 
+    // Config info
+    if($global_config[0] == "andalucia"){
+        $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
+        $ssloptions = 'array(
+            // The cafile is necessary only in Andalucia
+            "cafile" => $base_path."/helpers/cert/juntadeandalucia-es-chain.pem",
+            "verify_peer"=> true,
+            "verify_peer_name"=> true,
+        );';
+    }
+    elseif($global_config[0] == "madrid"){
+        $base_url = "https://raices.madrid.org/raiz_app/jsp/";
+        $ssloptions = '
+        array(
+            "verify_peer"=> true,
+            "verify_peer_name"=> true,
+        );';
+    }
+    $global_config_file =
+    '<?php
+    $base_url = "'.$base_url.'";
+    $base_path = "'.dirname(__FILE__).'/";
+    $ssloptions = '.$ssloptions.'
+    ?>';
+    // Add global config file
+    file_put_contents("helpers/api_config.php", $global_config_file);
     // Now that we have the config available, import database helper
     require_once("helpers/db.php");
 
@@ -215,7 +242,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="field">
                     <label class="label">Contraseña</label>
                     <div class="control">
-                        <input name="owner[]" id="password" class="input" type="text" placeholder="Ej: usuario" required>
+                        <input name="owner[]" id="password" class="input" type="password" placeholder="***********" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="select">
+                        <label class="label">Selecciona tu comunidad autónoma</label>
+                        <select name="global[]" id="comunidadaut">
+                            <option value="andalucia">Andalucía</option>
+                            <option value="madrid">Madrid</option>
+                        </select>
                     </div>
                 </div>
                 <h2 class="title">Centros admitidos</h2>
@@ -224,7 +260,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="control">
                         <input name="allowed_school" class="input" type="text" placeholder="Ej: I.E.S Al-Baytar" required>
                     </div>
-                    <p class="help"><b class="has-text-danger">ADVERTENCIA</b>: El nombre del centro tiene que escribirse <u><b>de la misma manera</b></u> de la que sale en PASEN/SENECA</p>
+                    <p class="help"><b class="has-text-danger">ADVERTENCIA</b>: El nombre del centro tiene que escribirse <u><b>de la misma manera</b></u> de la que sale en PASEN/SENECA o ROBLE</p>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">

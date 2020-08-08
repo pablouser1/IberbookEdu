@@ -2,7 +2,7 @@
 session_start();
 require("../helpers/common.php");
 require_once("../helpers/db.php");
-if(isset($_SESSION["loggedin"])){
+if(isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     // User data
     $userinfo = $_SESSION["userinfo"];
     if ($userinfo["typeuser"] == "P"){
@@ -61,7 +61,7 @@ else{
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Dashboard Iberbook</title>
+        <title>Dashboard IberbookEdu</title>
         <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     </head>
@@ -74,19 +74,15 @@ else{
                 </figure>
                 <br>
                 <div class="container">
-                    <h1 class="title">
-                        <?php echo($userinfo["nameuser"]);?>
-                    </h1>
-                    <h2 class="subtitle">
-                        <?php echo($userinfo["yearuser"]);?>
-                    </h2>
+                    <h1 class="title"><?php echo($userinfo["nameuser"]);?></h1>
+                    <h2 class="subtitle"><?php echo($userinfo["yearuser"]);?></h2>
                 </div>
             </div>
         </section>
         <section id="dashboard" class="section">
             <?php
             if(isset($yearbook)){
-                echo <<<EOL
+                echo <<<END
                 <section class="hero is-medium is-success is-bold">
                     <div class="hero-body">
                         <div class="container">
@@ -105,10 +101,10 @@ else{
                     </div>
                 </section>
                 <hr>
-                EOL;
+                END;
             }
             if ($result->num_rows == 0){
-                echo <<<EOL
+                echo <<<END
                 <div class="content has-text-centered">
                     <h1 class="title">¡Hola! Bienvenido</h1>
                     <p>Parece ser que no tienes ninguna foto o vídeo subido, puedes comenzar pulsando el botón:</p>
@@ -119,7 +115,7 @@ else{
                         <span>Agregar foto y vídeo</span>
                     </a>
                 </div>
-            EOL;
+            END;
             }
             elseif ($result->num_rows == 1) {
                 $user_values = array();
@@ -153,7 +149,7 @@ else{
                         // Get all values from user' table
                         if (!empty($user_values)) {
                             foreach($user_values as $value => $individual){
-                                echo <<<EOL
+                                echo <<<END
                                 <tr>
                                     <td>$individual[0]</td>
                                     <td>$individual[1]</td>
@@ -161,11 +157,9 @@ else{
                                     target='_blank'>$individual[2]</a></td>
                                     <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/$table_name/$individual[0]/$individual[3]' 
                                     target='_blank'>$individual[3]</a></td>
-                                EOL;
+                                END;
                                 if($userinfo["typeuser"] == "P"){
-                                    echo <<<EOL
-                                    <td>$individual[4]</td>
-                                    EOL;
+                                    echo("<td>$individual[4]</td>");
                                 }
                                 echo("</tr>");
                             }
@@ -194,18 +188,18 @@ else{
         <div id="delete_modal" class="modal">
             <div class="modal-background"></div>
             <div class="modal-card">
-              <header class="modal-card-head">
-                <p class="modal-card-title">¿Seguro?</p>
-              </header>
-              <section class="modal-card-body">
-                <p>Al eliminar los datos tendrás que <strong>volver a subir tus datos otra vez</strong></p>
-              </section>
-              <footer class="modal-card-foot">
-                <form method="post">
-                    <button name="reset" type="submit" class="button">Continuar</button>
+                <header class="modal-card-head">
+                    <p class="modal-card-title">¿Seguro?</p>
+                </header>
+                <section class="modal-card-body">
+                    <p>Al eliminar los datos tendrás que <b>volver a subir tus datos otra vez</b></p>
+                </section>
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                    <footer class="modal-card-foot">
+                        <button name="reset" type="submit" class="button">Continuar</button>
+                        <button id="delete_cancel" type="button" class="button">Cancelar</button>
+                    </footer>
                 </form>
-                <button id="delete_cancel" class="button">Cancelar</button>
-              </footer>
             </div>
         </div>
         <script src="scripts/dashboard.js"></script>

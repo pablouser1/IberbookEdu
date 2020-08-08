@@ -1,5 +1,5 @@
 <?php
-$base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
+require_once("api_config.php");
 
 // Get requests
 function get($url, $cookies){
@@ -12,18 +12,14 @@ function get($url, $cookies){
                 "Cookie: ".array_keys($cookies)[1]."=".$cookies[array_keys($cookies)[1]]
             )
         ),
-        "ssl"=>array(
-            "cafile" => "helpers/cert/juntadeandalucia-es-chain.pem",
-            "verify_peer"=> true,
-            "verify_peer_name"=> true,
-        ),
+        "ssl"=>$GLOBALS["ssloptions"],
     );
     $context = stream_context_create($options);
     return(json_decode(utf8_encode(file_get_contents($url, false, $context)), true));
 }
 
 // Post requests
-function post($url, $data, $cafile, $cookies){
+function post($url, $data, $cookies){
     $options = array(
         'http' => array(
             'method'  => 'POST',
@@ -34,11 +30,7 @@ function post($url, $data, $cafile, $cookies){
                 "Cookie: ".array_keys($cookies)[1]."=".$cookies[array_keys($cookies)[1]]
             )
         ),
-        "ssl"=>array(
-            "cafile" => $cafile,
-            "verify_peer"=> true,
-            "verify_peer_name"=> true,
-        ),
+        "ssl"=>$GLOBALS["ssloptions"],
     );
     $context = stream_context_create($options);
     return(file_get_contents($url, false, $context));
@@ -60,11 +52,7 @@ function login($username, $password, $type){
             'method'  => 'POST',
             'content' => http_build_query($data)
         ),
-        "ssl"=>array(
-            "cafile" => "helpers/cert/juntadeandalucia-es-chain.pem",
-            "verify_peer"=> true,
-            "verify_peer_name"=> true,
-        ),
+        "ssl"=>$GLOBALS["ssloptions"],
     );
     $context = stream_context_create($options);
     $result = json_decode(file_get_contents($url, false, $context), true);
@@ -145,29 +133,21 @@ function getinfo($cookies, $type){
 // Get pic of student
 function getpicstudent($cookies, $data){
     $url = $GLOBALS["base_url"].'pasendroid/imageAlumno';
-    $cafile = "helpers/cert/juntadeandalucia-es-chain.pem";
-    return base64_encode(post($url, $data, $cafile, $cookies));
-}
-
-// Get pic of children
-function getpicchildren($cookies, $data){
-    $url = $GLOBALS["base_url"].'pasendroid/imageAlumno';
-    $cafile = "../helpers/cert/juntadeandalucia-es-chain.pem";
-    return base64_encode(post($url, $data, $cafile, $cookies));
+    return base64_encode(post($url, $data, $cookies));
 }
 
 // Get id of teacher
 function getidteacher($cookies){
     $url = "https://seneca.juntadeandalucia.es/seneca/jsp/senecadroid/getDatosUsuario";
     $cafile = "helpers/cert/juntadeandalucia-es-chain.pem";
-    $response = json_decode(utf8_encode(post($url, [], $cafile, $cookies)), true);
+    $response = json_decode(utf8_encode(post($url, [], $cookies)), true);
     return $response["RESULTADO"][0]["DATOS"][0]["C_NUMIDE"]; // Teacher's id
 }
 
 function getgroupsteachers($cookies){
     $url = "https://seneca.juntadeandalucia.es/seneca/jsp/senecadroid/getGrupos";
     $cafile = "../helpers/cert/juntadeandalucia-es-chain.pem";
-    $response = json_decode(utf8_encode(post($url, [], $cafile, $cookies)), true);
+    $response = json_decode(utf8_encode(post($url, [], $cookies)), true);
     // Get each course, split all groups and if there are any 4º ESO or 2º BCT, add it to array
     foreach($response["RESULTADO"] as $id => $grupo){
         $grupos_split[] = str_split($grupo["UNIDADES"], 10);

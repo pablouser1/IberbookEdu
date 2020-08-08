@@ -271,12 +271,6 @@ if ($stmt->num_rows == 1) {
                 </span>
                 <span>Generar Yearbook</span>
             </a>
-            <!--<a class="button is-info" href="teachers.php">
-                <span class="icon">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </span>
-                <span>Establecer profesores</span>
-            </a>-->
             <a class="button is-info" href="gallery.php">
                 <span class="icon">
                     <i class="far fa-images"></i>

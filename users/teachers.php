@@ -73,8 +73,8 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
   <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Selección profesores</title>
-      <link rel="stylesheet" href="../styles/vendor/bulma.min.css">
+      <title>Selección profesores - IberbookEdu</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   </head>
   <body>
     <section class="hero is-primary">

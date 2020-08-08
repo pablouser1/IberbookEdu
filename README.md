@@ -1,12 +1,14 @@
 # IberbookEdu
 
-Genera orlas utilizando datos de las plataformas escolares (disponible sólo para 2º Bachillerato y 4º ESO de momento):
+Genera orlas utilizando datos de las plataformas escolares:
 
 PASEN/SÉNECA (Andalucía)
 
-ROBLE (Madrid) (WIP)
+ROBLE (Madrid) (Sin verificar su funcionamiento)
 
-Todos los datos se extraen a partir de los datos de los servidores.
+Este programa solo funciona para 2º de Bachillerato y 4º ESO por el momento.
+
+Todos los datos del usuario se extraen a partir de la información de los servidores de PASEN/SENECA o ROBLE.
 
 # Features
 
@@ -15,6 +17,7 @@ Todos los datos se extraen a partir de los datos de los servidores.
 * Genera un ZIP preparado para extraer y colocar en cualquier parte.
 * Acepta agregar tanto profesores como alumnos.
   * Pueden añadir una foto y un vídeo
+  * También los tutores legales pueden subir la foto y el vídeo de sus hijos
 * Galería general, puedes subir fotos del grupo aquí.
 * Gestión de cuentas:
   * Usuario: Puede subir y administrar sus datos
@@ -29,7 +32,7 @@ Error handling
 
 Terminar cuenta de dueño
 
-Agregar soporte a ROBLE
+Handle límite de tamaño de archivo
 
 # Credits
 
@@ -37,5 +40,4 @@ Este proyecto no sería posible sin la ayuda de los siguientes proyectos:
 
 * Bulma (https://bulma.io) | [LICENSE](https://github.com/jgthms/bulma/blob/master/LICENSE)
 * Animate.css (https://animate.style) | [LICENSE](https://github.com/animate-css/animate.css/blob/master/LICENSE)
-
 * Confetti.js (https://github.com/mathusummut/confetti.js) | [LICENSE](https://github.com/mathusummut/confetti.js/blob/master/LICENSE)
