@@ -1,5 +1,5 @@
 <?php
-require_once("api_config.php");
+require_once("config.php");
 
 // Get requests
 function get($url, $cookies){
@@ -92,7 +92,7 @@ function getinfo($cookies, $type){
     switch($type){
         case 'alumno':
             // Get Pic
-            $datapic = array('X_MATRICULA' => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"]);
+            $datapic = array('X_MATRICULA' => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"], 'ANCHO' => 64, 'ALTO' => 64);
             $photo = getpicstudent($cookies, $datapic);
             // Set user info
             $userinfo = array(

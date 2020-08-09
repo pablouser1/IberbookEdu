@@ -40,19 +40,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $global_config_file =
     '<?php
-    $base_url = "'.$base_url.'";
-    $base_path = "'.dirname(__FILE__).'/";
-    $ssloptions = '.$ssloptions.'
+    // General
+    $base_url = "'.$base_url.'"; // Remote server url
+    $base_path = "'.dirname(__FILE__).'/"; // Program base dir
+    $ybpath = '.$global_config[1].'; // Base dir for user uploads and generated yearbooks
+    // Api
+    $ssloptions = '.$ssloptions.' // Andalucia needs cafile for https requests
     ?>';
     // Add global config file
-    file_put_contents("helpers/api_config.php", $global_config_file);
+    file_put_contents("helpers/config.php", $global_config_file);
     // Now that we have the config available, import database helper
     require_once("helpers/db.php");
 
     // Creating tables
     // Students
     $sql = "CREATE TABLE students(
-        id int(10) not null UNIQUE,
+        id int(8) not null UNIQUE,
         fullname varchar(255) not null,
         schoolid varchar(10) not null,
         schoolyear varchar(56) not null,
@@ -66,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Teachers
     $sql = "CREATE TABLE teachers(
-        id varchar(10) not null,
+        id varchar(9) not null,
         fullname varchar(255) not null,
         schoolid varchar(10) not null,
         schoolyear varchar(10) not null,
@@ -94,12 +97,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Yearbook
     $sql = "CREATE TABLE `yearbooks` (
-        `id` int(11) NOT NULL,
+        `id` int NOT NULL,
         `schoolid` varchar(32) NOT NULL,
         `schoolyear` varchar(32) NOT NULL,
         `zipname` varchar(32) NOT NULL,
         `generated` datetime NOT NULL,
-        `available` tinyint(1) NOT NULL
+        `available` varchar(5) NOT NULL
         )";
     if ($conn->query($sql) !== TRUE) {
         die("Error creating yearbooks' table: " . $conn->error);
@@ -107,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Staff (admins and owner)
     $sql = "CREATE TABLE `staff` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `id` int NOT NULL AUTO_INCREMENT,
         `username` varchar(14) NOT NULL UNIQUE,
         `password` varchar(256),
         `permissions` varchar(14) NOT NULL,
@@ -119,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Schools
     $sql = "CREATE TABLE `schools` (
-        `id` int(8) NOT NULL,
+        `id` int NOT NULL,
         `name` varchar(128) NOT NULL
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -144,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Elimina setup
-    //unlink("scripts/setup.php");
+    //unlink("assets/scripts/setup.js);
     //unlink("setup.php");
     header("Location: index.php");
 }
@@ -245,17 +248,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input name="owner[]" id="password" class="input" type="password" placeholder="***********" required>
                     </div>
                 </div>
+                <hr>
                 <div class="field">
-                    <div class="select">
-                        <label class="label">Selecciona tu comunidad autónoma</label>
-                        <select name="global[]" id="comunidadaut">
-                            <option value="andalucia">Andalucía</option>
-                            <option value="madrid">Madrid</option>
-                        </select>
+                    <label class="label">Selecciona tu comunidad autónoma</label>
+                    <div class="control">
+                        <div class="select">
+                            <select name="global[]" id="comunidadaut">
+                                <option value="andalucia">Andalucía</option>
+                                <option value="madrid">Madrid</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <h2 class="title">Centros admitidos</h2>
                 <div class="field">
+                    <label class="label">Ubicación de los yearbooks</label>
+                    <div class="control">
+                        <input name="global[]" id="yearbook" class="input" type="text" value="<?php echo(dirname(__FILE__)."/yearbooks/");?>" required>
+                    </div>
+                    <p class="help">Recomedable que <b>no</b> sea un directorio público</p>
+                </div>
+                <div class="field">
+                    <h2 class="title">Centro admitido</h2>
                     <label class="label">Nombre del centro</label>
                     <div class="control">
                         <input name="allowed_school" class="input" type="text" placeholder="Ej: I.E.S Al-Baytar" required>
@@ -284,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </section>
     </form>
-    <script src="scripts/setup.js"></script>
+    <script src="assets/scripts/setup.js"></script>
 </body>
 
 </html>

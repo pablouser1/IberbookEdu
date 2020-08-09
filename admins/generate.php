@@ -250,59 +250,62 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
 <?php
 // Generate HTML file
 file_put_contents($baseurl.'index.html', ob_get_contents());
+// https://stackoverflow.com/a/19730838 Literally have no clue how this works, but it just works
+class HZip 
+{ 
+  /** 
+   * Add files and sub-directories in a folder to zip file. 
+   * @param string $folder 
+   * @param ZipArchive $zipFile 
+   * @param int $exclusiveLength Number of text to be exclusived from the file path. 
+   */ 
+  private static function folderToZip($folder, &$zipFile, $exclusiveLength) { 
+    $handle = opendir($folder); 
+    while (false !== $f = readdir($handle)) { 
+      if ($f != '.' && $f != '..') { 
+        $filePath = "$folder/$f"; 
+        // Remove prefix from file path before add to zip. 
+        $localPath = substr($filePath, $exclusiveLength); 
+        if (is_file($filePath)) { 
+          $zipFile->addFile($filePath, $localPath); 
+        } elseif (is_dir($filePath)) { 
+          // Add sub-directory. 
+          $zipFile->addEmptyDir($localPath); 
+          self::folderToZip($filePath, $zipFile, $exclusiveLength); 
+        } 
+      } 
+    } 
+    closedir($handle); 
+  } 
 
-// https://stackoverflow.com/a/1334949
-function Zip($source, $destination)
-{
-    if (!extension_loaded('zip') || !file_exists($source)) {
-        return false;
-    }
+  /** 
+   * Zip a folder (include itself). 
+   * Usage: 
+   *   HZip::zipDir('/path/to/sourceDir', '/path/to/out.zip'); 
+   * 
+   * @param string $sourcePath Path of directory to be zip. 
+   * @param string $outZipPath Path of output zip file. 
+   */ 
+  public static function zipDir($sourcePath, $outZipPath) 
+  { 
+    $pathInfo = pathInfo($sourcePath); 
+    $parentPath = $pathInfo['dirname']; 
+    $dirName = $pathInfo['basename']; 
 
-    $zip = new ZipArchive();
-    if (!$zip->open($destination, ZIPARCHIVE::CREATE)) {
-        return false;
-    }
+    $z = new ZipArchive(); 
+    $z->open($outZipPath, ZIPARCHIVE::CREATE); 
+    $z->addEmptyDir($dirName); 
+    self::folderToZip($sourcePath, $z, strlen("$parentPath/")); 
+    $z->close(); 
+  } 
+} 
 
-    $source = str_replace('\\', '/', realpath($source));
-
-    if (is_dir($source) === true)
-    {
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
-
-        foreach ($files as $file)
-        {
-            $file = str_replace('\\', '/', $file);
-
-            // Ignore "." and ".." folders
-            if( in_array(substr($file, strrpos($file, '/')+1), array('.', '..')) )
-                continue;
-
-            $file = realpath($file);
-
-            if (is_dir($file) === true)
-            {
-                $zip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
-            }
-            else if (is_file($file) === true)
-            {
-                $zip->addFromString(str_replace($source . '/', '', $file), file_get_contents($file));
-            }
-        }
-    }
-    else if (is_file($source) === true)
-    {
-        $zip->addFromString(basename($source), file_get_contents($source));
-    }
-
-    return $zip->close();
-}
 // Makes zip from folder
 $date_file = date('d-m-Y_his');
 $date_db = date("Y-m-d H:i:s");
 $zip_name = "yearbook_".$date_file.'.zip';
 $zip_path = $baseurl.$zip_name;
-
-Zip($baseurl, $zip_path);
+HZip::zipDir($baseurl, $zip_path);
 
 // Writes data to DB
 $stmt = $conn->prepare("INSERT IGNORE INTO yearbooks(schoolid, schoolyear, zipname, generated, available) VALUES(?, ?, ?, ?, 0)");

@@ -1,17 +1,19 @@
 <?php
 session_start();
 require_once("../helpers/db.php");
+require_once("../helpers/config.php");
+$max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
     $userinfo = $_SESSION["userinfo"];
     $table_name = $_SESSION["table_name"];
-    $pic_error = $vid_error = "";
+    $pic_error = $vid_error = $general_error = "";
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Prepare
         // Allowed formats
         $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
         $allowed_vid = array('mp4', 'webm');
         // Upload directory
-        $baseurl = '../yearbooks'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/";
+        $baseurl = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/";
 
         // Pic upload
         if(isset($_FILES['pic'])){
@@ -21,7 +23,7 @@ if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
                 $ext = pathinfo($picPath, PATHINFO_EXTENSION);
                 // If the extension is not in the array create error message
                 if (!in_array($ext, $allowed_pic)) {
-                    $pic_error = "$ext no es un formato admitido.";
+                    $pic_error = "$ext no es un formato admitido.<br>";
                 }
                 else{
                     if (!is_dir($baseurl.$userinfo["iduser"])){
@@ -32,6 +34,9 @@ if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
                 }
             }
         }
+        else{
+            $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
+        }
         // Vid upload
         if(isset($_FILES['vid'])){
             $tmpFilePath = $_FILES['vid']['tmp_name'];
@@ -40,7 +45,7 @@ if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
                 $ext = pathinfo($vidPath, PATHINFO_EXTENSION);
                 // If the extension is not in the array create error message
                 if (!in_array($ext, $allowed_vid)) {
-                    $vid_error = "$ext no es un formato admitido.";
+                    $vid_error = "$ext no es un formato admitido.<br>";
                 }
                 else{
                     if (!is_dir($baseurl.$userinfo["iduser"])){
@@ -51,8 +56,11 @@ if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
                 }
             }
         }
+        else{
+            $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
+        }
         // Inject to DB
-        if (empty($vid_error) && empty($pic_error)){
+        if (empty($vid_error) && empty($pic_error) && empty($general_error)){
             // Create row with user data
             if (isset($userinfo["subject"])){
                 $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, subject, schoolid, schoolyear, picname, vidname) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -172,19 +180,21 @@ else{
                     <progress id="upload_progress" class="progress is-primary is-hidden" max="100"></progress>
                     <hr>
                     <?php
-                    if ($pic_error || $vid_error !== ""){
+                    if ($pic_error || $vid_error || $general_error !== ""){
                         echo <<<EOL
                         <div class="notification is-danger">
-                            $pic_error<br>
+                            $general_error
+                            $pic_error
                             $vid_error
                         </div>
                         EOL;
                     }
                     ?>
                     <div class="notification is-info">
-                        <strong>Formatos admitidos:</strong><br>
-                        Fotos: gif, png, jpg, jpeg. Máximo 5MB<br>
-                        Vídeos: mp4, webm. Máximo 100MB
+                        <b>Formatos admitidos:</b><br>
+                        Fotos: gif, png, jpg, jpeg.<br>
+                        Vídeos: mp4, webm.<br>
+                        <span class="has-background-danger">Tamaño máximo <?php echo($max_mb);?> MB</span>
                     </div>
                 </div>
             </form>

@@ -16,11 +16,12 @@ function separetename($part, $string){
     }
 }
 require_once("../helpers/db.php");
+require_once("../helpers/config.php");
 require("../helpers/common.php");
 $userinfo = $_SESSION["userinfo"];
 
 // Zip files location
-$baseurl = '../yearbooks/'.$userinfo["idcentro"].'/'.$userinfo["yearuser"].'/generated/';
+$baseurl = $ybpath.$userinfo["idcentro"].'/'.$userinfo["yearuser"].'/generated/';
 $_SESSION["baseurl"] = $baseurl;
 
 // Students
@@ -83,7 +84,7 @@ $_SESSION["teachers"] = $teachers;
 $_SESSION["gallery"] = $gallery;
 
 // Copying all files to final folder
-$source = "../yearbooks/".$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/";
+$source = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/";
 $dest = $baseurl;
 
 if (!is_dir($dest."scripts/vendor")){

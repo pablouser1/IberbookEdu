@@ -1,5 +1,4 @@
 .vscode
-uploads/
 yearbooks/
 helpers/db_config.php
-helpers/api_config.php
+helpers/config.php

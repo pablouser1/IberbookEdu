@@ -2,6 +2,7 @@
 // Initialize the session
 session_start();
 require_once("../helpers/db.php");
+require_once("../helpers/config.php");
 require_once("../helpers/common.php");
 // Check if the user is logged in, if not then redirect him to login page
 if($_SESSION["loggedin"] !== "admin"){
@@ -82,7 +83,7 @@ if (isset($_GET["deleteyearbook"]) && $_GET["deleteyearbook"] == "true"){
         die("Error updating record: " . $conn->error);
     }
     $stmt->close();
-    delete_files("../yearbooks/".$userinfo["idcentro"]."/".$userinfo["yearuser"]."/generated");
+    delete_files($ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/generated");
 }
 
 // Check if admin generated yearbook before
@@ -149,8 +150,8 @@ if ($stmt->num_rows == 1) {
                         <tr>
                         <td>$individual[0]</td>
                         <td>$individual[1]</td>
-                        <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/teachers/$individual[0]/$individual[2]' target='_blank'>$individual[2]</a></td>
-                        <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/teachers/$individual[0]/$individual[3]' target='_blank'>$individual[3]</a></td>
+                        <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=P' target='_blank'>$individual[2]</a></td>
+                        <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=P' target='_blank'>$individual[3]</a></td>
                         <td>$individual[4]</td>
                         </tr>
                         EOL;
@@ -183,8 +184,8 @@ if ($stmt->num_rows == 1) {
                         <tr>
                             <td>$individual[0]</td>
                             <td>$individual[1]</td>
-                            <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/students/$individual[0]/$individual[2]' target='_blank'>$individual[2]</a></td>
-                            <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/students/$individual[0]/$individual[3]' target='_blank'>$individual[3]</a></td>
+                            <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=ALU' target='_blank'>$individual[2]</a></td>
+                            <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=ALU' target='_blank'>$individual[3]</a></td>
                         </tr>
                         EOL;
                     }
@@ -215,7 +216,7 @@ if ($stmt->num_rows == 1) {
                         echo <<<EOL
                         <tr>
                             <td>$individual[0]</td>
-                            <td><a href='../yearbooks/$userinfo[idcentro]/$userinfo[yearuser]/uploads/gallery/$individual[1]' target='_blank'>$individual[1]</a></td>
+                            <td><a href='../getgallery.php?id=$individual[0]' target='_blank'>$individual[1]</a></td>
                             <td>$individual[2]</td>
                         </tr>
                         EOL;
@@ -238,26 +239,24 @@ if ($stmt->num_rows == 1) {
             }
             echo '
             <div class="buttons">
-                <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'" method="GET">
-                    <a href="../download.php" class="button is-primary">
-                        <span class="icon">
-                            <i class="fas fa-download"></i>
-                        </span>
-                        <span>Descargar yearbook</span>
-                    </a>
-                    <button name="makeavailable" value="true" type="submit" class="button is-info">
-                        <span class="icon">
-                            <i class="fas fa-user"></i>
-                        </span>
-                        <span>Alternar permisos de visionado a usuarios</span>
-                    </button>
-                    <button name="deleteyearbook" value="true" type=submit" class="button is-danger">
-                        <span class="icon">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                        <span>Eliminar yearbook</span>
-                    </button>
-                </form>
+                <a href="../getyearbook.php" class="button is-primary">
+                    <span class="icon">
+                        <i class="fas fa-download"></i>
+                    </span>
+                    <span>Descargar yearbook</span>
+                </a>
+                <a href="dashboard.php?makeavailable=true" class="button is-link">
+                    <span class="icon">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <span>Alternar permisos de visionado a usuarios</span>
+                </a>
+                <a href="dashboard.php?deleteyearbook=true" class="button is-danger">
+                    <span class="icon">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                    <span>Eliminar yearbook</span>
+                </a>
             </div>
             ';
         }

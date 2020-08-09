@@ -72,7 +72,6 @@ else{
                 <figure class="image container is-64x64">
                     <img src="data:image/png;base64, <?php echo($userinfo["photouser"]);?>" alt="Foto Perfil">
                 </figure>
-                <br>
                 <div class="container">
                     <h1 class="title"><?php echo($userinfo["nameuser"]);?></h1>
                     <h2 class="subtitle"><?php echo($userinfo["yearuser"]);?></h2>
@@ -153,10 +152,8 @@ else{
                                 <tr>
                                     <td>$individual[0]</td>
                                     <td>$individual[1]</td>
-                                    <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/$table_name/$individual[0]/$individual[2]' 
-                                    target='_blank'>$individual[2]</a></td>
-                                    <td><a href='../uploads/$userinfo[idcentro]/$userinfo[yearuser]/$table_name/$individual[0]/$individual[3]' 
-                                    target='_blank'>$individual[3]</a></td>
+                                    <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=$userinfo[typeuser]' target='_blank'>$individual[2]</a></td>
+                                    <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
                                 END;
                                 if($userinfo["typeuser"] == "P"){
                                     echo("<td>$individual[4]</td>");

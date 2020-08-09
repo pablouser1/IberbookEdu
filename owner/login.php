@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="field">
                                 <label for="" class="label">Usuario</label>
                                 <div class="control has-icons-left">
-                                    <input name="username" type="text" placeholder="usuario" value="<?php echo($username);?>" class="input" required>
+                                    <input name="username" type="text" placeholder="usuario" class="input" required>
                                     <span class="icon is-small is-left">
                                         <i class="fas fa-user"></i>
                                     </span>
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="field">
                                 <label for="" class="label">Contraseña</label>
                                 <div class="control has-icons-left">
-                                    <input name="password" type="password" placeholder="*******" value="<?php echo($password);?>" class="input" required>
+                                    <input name="password" type="password" placeholder="*******" class="input" required>
                                     <span class="icon is-small is-left">
                                         <i class="fa fa-lock"></i>
                                     </span>
