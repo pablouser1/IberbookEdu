@@ -147,8 +147,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Elimina setup
-    //unlink("assets/scripts/setup.js);
-    //unlink("setup.php");
+    unlink("assets/scripts/setup.js");
+    unlink("setup.php");
     header("Location: index.php");
 }
 ?>
