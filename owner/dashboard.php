@@ -5,36 +5,6 @@ if (!isset($_SESSION["owner"])){
     header("Location: login.php");
 }
 
-if (isset($_POST["username"])){
-    if (isset($_POST["addstaff"])){
-        $stmt = $conn->prepare("INSERT INTO `staff` (`username`, `password`, `permissions`) VALUES (?, ?, ?)");
-        if ($_POST["addstaff"] == "admin"){
-            $staff_password = null;
-        }
-        elseif($_POST["addstaff"] == "owner"){
-            $staff_password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        }
-        $stmt->bind_param("sss", $_POST["username"], $staff_password, $_POST["addstaff"]);
-        if ($stmt->execute() !== true) {
-            die("Error writing staff info: " . $conn->error);
-        }
-    }
-    elseif(isset($_POST["removestaff"])){
-        if ($_POST["removestaff"] == "admin"){
-            $staff_password = null;
-        }
-        elseif($_POST["removestaff"] == "owner"){
-            $staff_password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        }
-        $stmt = $conn->prepare("DELETE FROM `staff` WHERE username=?");
-        $stmt->bind_param("ss", $_POST["username"]);
-        if ($stmt->execute() !== true) {
-            die("Error deleting staff info: " . $conn->error);
-        }
-    }
-    header('Location: dashboard.php');
-}
-
 $ownerinfo = $_SESSION["ownerinfo"];
 $stmt = $conn->prepare("SELECT id, username, permissions FROM staff");
 $stmt->execute();
@@ -103,28 +73,48 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </table>
             </div>
         </div>
-        <hr>
-        <h1 class="title">Administrar</h1>
         <div class="buttons">
             <button id="managestaff" type="button" class="button">Agregar/eliminar staff</button>
         </div>
     </section>
+    <hr>
     <div id="modalstaff" class="modal">
-        <div class="modal-background"></div>
+        <div onclick="closestaff()" class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">Agregar staff</p>
-                <button class="delete" aria-label="close"></button>
+                <p class="modal-card-title">Agregar/eliminar staff</p>
+                <button onclick="closestaff()" class="delete" aria-label="close"></button>
             </header>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+            <form action="managestaff.php" method="POST">
                 <section class="modal-card-body">
-                    <input class="input" type="text" name="username" placeholder="Nombre de usuario" required>
-                    <input class="input is-hidden" type="text" id="password" name="password" placeholder="Contraseña">
-                    <div class="select">
-                        <select id="typestaff">
-                            <option value="admin">Administrador</option>
-                            <option value="owner">Dueño</option>
-                        </select>
+                    <div class="field">
+                        <label class="label">Nombre de usuario</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="username" placeholder="usuario" required>
+                            <span class="icon is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="password" class="field is-hidden">
+                        <label class="label">Contraseña</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="password" name="password" placeholder="***********">
+                            <span class="icon is-left">
+                                <i class="fas fa-key"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Tipo de usuario</label>
+                        <div class="control">
+                            <div class="select">
+                                <select id="typestaff">
+                                    <option value="admin">Administrador</option>
+                                    <option value="owner">Dueño</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </section>
                 <footer class="modal-card-foot">

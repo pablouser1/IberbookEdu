@@ -26,13 +26,11 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 
 # TODO
 
-Mejorar estructura del proyecto
-
 Error handling
 
 Terminar cuenta de dueño
 
-Handle límite de tamaño de archivo
+setup.php - Usando placeholder para el id del centro
 
 # Credits
 

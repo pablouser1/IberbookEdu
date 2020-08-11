@@ -2,6 +2,7 @@
 // Initialize the session
 session_start();
 require_once("../helpers/db.php");
+require_once("../helpers/config.php");
 require("../helpers/common.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
@@ -11,13 +12,10 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userinfo = $_SESSION["userinfo"];
-    $baseurl = "../uploads/".$userinfo["idcentro"]."/".$userinfo["yearuser"];
+    $baseurl = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads";
     $gallery_dir = '/gallery/';
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
     if(count($_FILES['gallery']['name']) > 0){
-        if (!is_dir($baseurl)){
-            mkdir($baseurl, 0700, true);
-        }
         if (!is_dir($baseurl.$gallery_dir)){
             mkdir($baseurl.$gallery_dir, 0700, true);
         }

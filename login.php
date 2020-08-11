@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($userinfo["typeuser"] == "ALU"){
                 $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
                 $result = $conn->query($sql);
-                if ($result->num_rows == 0) {
+                if ($result !== false && $result->num_rows == 0) {
                     $login_error = "Su centro no está permitido";
                 }
             }
@@ -50,12 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
             $result = $conn->query($sql);
             if ($result->num_rows == 1) {
-                // User is admin, redirecting to admin dashboard
+                // User is admin
                 $_SESSION["loggedin"] = "admin";
                 switch ($userinfo["typeuser"]){
                     case "ALU":
                         $_SESSION["userinfo"] = $userinfo;
-                        die(header("Location: profiles/admin.php"));
+                        header("Location: profiles/admin.php");
                     break;
                     case "TUT_LEGAL":
                         $_SESSION["tutorinfo"] = $userinfo;
@@ -65,9 +65,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
                 }
             }
-            else{$_SESSION["loggedin"] = "user";}
+            else{
+                // User is not admin
+                $_SESSION["loggedin"] = "user";
+            }
+
             switch ($userinfo["typeuser"]){
                 case "ALU":
+                    // Only if user is student and regular user.
                     $_SESSION["userinfo"] = $userinfo;
                     header("Location: users/dashboard.php");
                 break;

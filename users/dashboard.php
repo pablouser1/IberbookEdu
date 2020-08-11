@@ -85,11 +85,9 @@ else{
                 <section class="hero is-medium is-success is-bold">
                     <div class="hero-body">
                         <div class="container">
-                            <h1 class="title">
-                                Tu yearbook está listo
-                            </h1>
+                            <h1 class="title">Tu yearbook está listo</h1>
                             <p class="subtitle">
-                                <a href="../download.php" class="button is-success">
+                                <a href="../getyearbook.php" class="button is-success">
                                     <span class="icon">
                                         <i class="fas fa-download"></i>
                                     </span>
@@ -201,9 +199,44 @@ else{
         </div>
         <script src="../assets/scripts/users/dashboard.js"></script>
         <footer class="footer">
-            <div class="content has-text-centered">
-                <a href="../logout.php">Cerrar sesión</a>
-            </div>
-        </footer>
+        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+            <ul>
+            <?php
+            if(isset($_SESSION["tutorinfo"])){
+                echo <<<EOL
+                <li>
+                    <a href="../profiles/tutorlegal.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cambiar hijo</span>
+                    </a>
+                </li>
+                EOL;
+            }
+            if($_SESSION["loggedin"] == "admin"){
+                echo <<<EOL
+                <li>
+                    <a href="../admins/dashboard.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cambiar a administrador</span>
+                    </a>
+                </li>
+                EOL;
+            }
+            ?>
+                <li>
+                    <a href="../logout.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </footer>
     </body>
 </html>

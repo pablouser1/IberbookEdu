@@ -12,7 +12,7 @@ foreach($teacherinfo["centros"] as $id => $centro){
   $stmt->bind_param("i", $centro["id"]);
   $stmt->execute();
   $stmt->store_result();    
-  $stmt->bind_result($allowed_name, $allowed_id);  // <- Add; #args = #cols in SELECT
+  $stmt->bind_result($allowed_name, $allowed_id);
   if($stmt->num_rows == 1) {
       while ($stmt->fetch()) {
           $allowed_schools[$id]["name"] = $allowed_name;

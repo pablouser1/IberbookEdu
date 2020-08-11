@@ -7,16 +7,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db_config = $_POST["db"]; // DB data
     $global_config = $_POST["global"]; // Server-level config
     $owner = $_POST["owner"];
-    $allowed_school = test_input($_POST["allowed_school"]);
+    $schoolinfo = $_POST["schoolinfo"];
 
     // DB connection info
     $db_file = '
     <?php
     $db_name = "'.$db_config[0].'";
-    $host = "'.$db_config[1].'";
-    $port = '.(int)$db_config[2].';
-    $username = "'.$db_config[3].'";
-    $password = "'.$db_config[4].'";
+    $db_host = "'.$db_config[1].'";
+    $db_port = '.(int)$db_config[2].';
+    $db_username = "'.$db_config[3].'";
+    $db_password = "'.$db_config[4].'";
     ?>';
     file_put_contents("helpers/db_config.php", $db_file);
 
@@ -43,13 +43,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // General
     $base_url = "'.$base_url.'"; // Remote server url
     $base_path = "'.dirname(__FILE__).'/"; // Program base dir
-    $ybpath = '.$global_config[1].'; // Base dir for user uploads and generated yearbooks
+    $ybpath = "'.$global_config[1].'"; // Base dir for user uploads and generated yearbooks
     // Api
-    $ssloptions = '.$ssloptions.' // Andalucia needs cafile for https requests
+    $ssloptions = '.$ssloptions.'
     ?>';
     // Add global config file
     file_put_contents("helpers/config.php", $global_config_file);
-    // Now that we have the config available, import database helper
+    // Now that we have the config available, import helpers
     require_once("helpers/db.php");
 
     // Creating tables
@@ -57,8 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "CREATE TABLE students(
         id int(8) not null UNIQUE,
         fullname varchar(255) not null,
-        schoolid varchar(10) not null,
-        schoolyear varchar(56) not null,
+        schoolid varchar(12) not null,
+        schoolyear varchar(12) not null,
         picname varchar(255) not null,
         vidname varchar(255) not null,
         primary key(id)
@@ -71,11 +71,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "CREATE TABLE teachers(
         id varchar(9) not null,
         fullname varchar(255) not null,
-        schoolid varchar(10) not null,
-        schoolyear varchar(10) not null,
+        schoolid varchar(12) not null,
+        schoolyear varchar(12) not null,
         picname varchar(255) not null,
         vidname varchar(255) not null,
-        subject varchar(12) not null
+        subject varchar(24) not null,
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -132,16 +132,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Writes data to DB
 
     // School info
-    $stmt = $conn->prepare("INSERT INTO schools (id, name) VALUES  (?, ?);");
-    $placeholder = 2208;
-    $stmt->bind_param("is", $placeholder, $allowed_school);
+    // First we need to get the school's name
+    $stmt = $conn->prepare("INSERT INTO schools (id, name) VALUES (?, ?);");
+    $stmt->bind_param("is", $schoolinfo[0], $schoolinfo[1]);
     if ($stmt->execute() !== true) {
         die("Error writing school: " . $conn->error);
     }
-
+    $owner_password = password_hash($owner[1], PASSWORD_DEFAULT);
     // Staff info
-    $stmt = $conn->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, owner);");
-    $stmt->bind_param("s", test_input($owner[0]), $owner[1]);
+    $stmt = $conn->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
+    $stmt->bind_param("ss", $owner[0], $owner_password);
     if ($stmt->execute() !== true) {
         die("Error writing owners' info: " . $conn->error);
     }
@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Elimina setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
-    header("Location: index.php");
+    header("Location: index.html");
 }
 ?>
 <!DOCTYPE html>
@@ -269,11 +269,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="field">
                     <h2 class="title">Centro admitido</h2>
+                    <label class="label">ID del centro</label>
+                    <div class="control">
+                        <input name="schoolinfo[]" class="input" type="number" placeholder="Ej: 181206713" required>
+                    </div>
                     <label class="label">Nombre del centro</label>
                     <div class="control">
-                        <input name="allowed_school" class="input" type="text" placeholder="Ej: I.E.S Al-Baytar" required>
+                        <input name="schoolinfo[]" class="input" type="text" required>
                     </div>
-                    <p class="help"><b class="has-text-danger">ADVERTENCIA</b>: El nombre del centro tiene que escribirse <u><b>de la misma manera</b></u> de la que sale en PASEN/SENECA o ROBLE</p>
+                    <p class="help">Puedes conseguir la información en <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">

@@ -16,7 +16,7 @@ $stmt->store_result();
 $stmt->bind_result($filename, $available);
 $stmt->fetch();
 if ($stmt->num_rows == 1) {
-    if($_SESSION["loggedin"] == "admin" || $available == "user"){
+    if($_SESSION["loggedin"] == "admin" || $available == "1"){
         $filepath = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/generated/";
         $fullname = $filepath.$filename;
         // https://stackoverflow.com/a/27805443 and https://stackoverflow.com/a/23447332

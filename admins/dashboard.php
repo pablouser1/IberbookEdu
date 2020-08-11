@@ -263,8 +263,12 @@ if ($stmt->num_rows == 1) {
         ?>
     </section>
     <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
+        <div id="progress" class="is-hidden container">
+            <p class="subtitle">Generando yearbook, este proceso puede tardar varios minutos</p>
+            <progress class="progress is-primary" max="100"></progress>
+        </div>
         <div class="buttons">
-            <a class="button is-success" href="send.php">
+            <a id="genyearbook" class="button is-success" href="send.php">
                 <span class="icon">
                     <i class="fas fa-check"></i>
                 </span>
@@ -300,5 +304,6 @@ if ($stmt->num_rows == 1) {
             </ul>
         </nav>
     </footer>
+    <script src="../assets/scripts/admins/dashboard.js"></script>
 </body>
 </html>

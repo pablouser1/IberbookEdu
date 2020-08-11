@@ -10,23 +10,25 @@ $tutorinfo = $_SESSION["tutorinfo"];
 // Get pics of children
 $picschildren = array();
 foreach($tutorinfo["children"] as $id => $child){
-    $datapic = array('X_MATRICULA' => $child["MATRICULAS"][0]["X_MATRICULA"]);
+    $datapic = array('X_MATRICULA' => $child["MATRICULAS"][0]["X_MATRICULA"], "ANCHO" => 64, "ALTO" => 64);
     $picschildren[$id] = getpicstudent($cookies, $datapic);
 }
 
 if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
     $child = $tutorinfo["children"][$_POST['childlogin']];
+    $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
+    $infocentro = getcentrostudent($cookies, $datacentro);
     $userinfo = array(
         "iduser" => $child["MATRICULAS"][0]["X_MATRICULA"],
         "nameuser" => $child["NOMBRE"],
         "typeuser" => "ALU",
         "yearuser" => $child["MATRICULAS"][0]["UNIDAD"],
         "photouser" => $picschildren[$_POST['childlogin']],
-        "idcentro" => $child["MATRICULAS"][0]["X_CENTRO"],
-        "namecentro" => $child["MATRICULAS"][0]["DENOMINACION"]
+        "idcentro" => $infocentro["idcentro"],
+        "namecentro" => $infocentro["namecentro"]
     );
     $_SESSION["userinfo"] = $userinfo;
-    header("Location: dashboard.php");
+    header("Location: ../users/dashboard.php");
 }
 ?>
 

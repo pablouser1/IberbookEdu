@@ -48,9 +48,11 @@ function login($username, $password, $type){
     }
     $options = array(
         'http' => array(
-            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
             'method'  => 'POST',
-            'content' => http_build_query($data)
+            'content' => http_build_query($data),
+            'header'  => array(
+                "Content-Type: application/x-www-form-urlencoded",
+            )
         ),
         "ssl"=>$GLOBALS["ssloptions"],
     );
@@ -94,6 +96,9 @@ function getinfo($cookies, $type){
             // Get Pic
             $datapic = array('X_MATRICULA' => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"], 'ANCHO' => 64, 'ALTO' => 64);
             $photo = getpicstudent($cookies, $datapic);
+            // Get school id and name
+            $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
+            $infocentro = getcentrostudent($cookies, $datacentro);
             // Set user info
             $userinfo = array(
                 "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
@@ -101,8 +106,8 @@ function getinfo($cookies, $type){
                 "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
                 "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
                 "photouser" => $photo,
-                "idcentro" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"],
-                "namecentro" => $info["RESULTADO"][0]["MATRICULAS"][0]["DENOMINACION"],
+                "idcentro" => $infocentro["idcentro"],
+                "namecentro" => $infocentro["namecentro"]
             );
             break;
         case 'tutorlegal':
@@ -122,12 +127,21 @@ function getinfo($cookies, $type){
                 "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
             );
             foreach ($info["RESULTADO"][0]["CENTROS"] as $id => $centro){
-                $userinfo["centros"][$id]["id"] = $centro["X_CENTRO"];
+                $userinfo["centros"][$id]["id"] = $centro["C_CODIGO"];
                 $userinfo["centros"][$id]["name"] = $centro["CENTRO"];
             }
             break;
     }
     return $userinfo;
+}
+
+function getcentrostudent($cookies, $data){
+    $url = $GLOBALS["base_url"].'pasendroid/datosCentro';
+    $response = json_decode(utf8_encode(post($url, $data, $cookies)), true);
+    return array(
+        "idcentro" => $response["RESULTADO"][0]["DATOS"][0][1],
+        "namecentro" => $response["RESULTADO"][0]["DATOS"][2][1]
+    );
 }
 
 // Get pic of student

@@ -1,5 +1,6 @@
+var modalstaff = document.getElementById("modalstaff")
 document.getElementById("managestaff").addEventListener("click", function (){
-    document.getElementById("modalstaff").classList.add("is-active")
+    modalstaff.classList.add("is-active")
 })
 
 var type_select = document.getElementById("typestaff")
@@ -26,3 +27,7 @@ type_select.addEventListener("change", function (){
             break;
     }
 })
+
+function closestaff(){
+    modalstaff.classList.remove("is-active")
+}
