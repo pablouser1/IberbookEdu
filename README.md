@@ -38,6 +38,7 @@ Este proyecto no sería posible sin la ayuda de los siguientes proyectos:
 
 * Bulma (https://bulma.io) | [LICENSE](https://github.com/jgthms/bulma/blob/master/LICENSE)
 * Animate.css (https://animate.style) | [LICENSE](https://github.com/animate-css/animate.css/blob/master/LICENSE)
+* zuck.js (https://github.com/ramon82/zuck.js) | [LICENSE](https://github.com/ramon82/zuck.js/blob/master/LICENSE)
 * Confetti.js (https://github.com/mathusummut/confetti.js) | [LICENSE](https://github.com/mathusummut/confetti.js/blob/master/LICENSE)
 
 Assets:

@@ -1,7 +1,21 @@
 <?php
 session_start();
-require("../helpers/common.php");
 require_once("../helpers/db.php");
+
+function delete_files($target) {
+    if(is_dir($target)){
+        $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
+
+        foreach($files as $file){
+            delete_files($file);
+        }
+
+        rmdir($target);
+    } elseif(is_file($target)) {
+        unlink($target);  
+    }
+}
+
 if(isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     // User data
     $userinfo = $_SESSION["userinfo"];
@@ -42,10 +56,12 @@ if(isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     $stmt->close();
     // Check if user uploaded pic and vid before
     if (isset($userinfo["subject"])){
-        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, subject FROM $table_name where schoolid=? and schoolyear=?");
+        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
+        FROM $table_name where schoolid=? and schoolyear=?");
     }
     else{
-        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname FROM $table_name where schoolid=? and schoolyear=?");
+        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
+        FROM $table_name where schoolid=? and schoolyear=?");
     }
     $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
     $stmt->execute();
@@ -116,7 +132,6 @@ else{
             }
             elseif ($result->num_rows == 1) {
                 $user_values = array();
-                $user_fields = mysqli_fetch_fields($result);
                 while ($row = mysqli_fetch_assoc($result)) {
                     $id = $row["id"];
                     $user_values[$id] = array();
@@ -132,11 +147,16 @@ else{
                     <thead>
                         <tr>
                             <?php
-                            // Get all fields from user's table
-                            if(!empty($user_fields)) {
-                                foreach($user_fields as $val){
-                                    echo ("<th>$val->name</th>");
-                                }
+                            if(!empty($user_values)){
+                                echo <<<EOL
+                                <th>ID</th>
+                                <th>Nombre y apellidos</th>
+                                <th>Foto</th>
+                                <th>Vídeo</th>
+                                <th>Enlace</th>
+                                <th>Fecha de subida</th>
+                                EOL;
+                                if($userinfo["typeuser"] == "P") echo("<th>Asignatura</th>");
                             }
                             ?>
                         </tr>
@@ -152,9 +172,11 @@ else{
                                     <td>$individual[1]</td>
                                     <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=$userinfo[typeuser]' target='_blank'>$individual[2]</a></td>
                                     <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
+                                    <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
+                                    <td>$individual[5]</td>
                                 END;
                                 if($userinfo["typeuser"] == "P"){
-                                    echo("<td>$individual[4]</td>");
+                                    echo("<td>$individual[6]</td>");
                                 }
                                 echo("</tr>");
                             }

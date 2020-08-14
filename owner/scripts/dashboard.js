@@ -1,6 +1,16 @@
 var modalstaff = document.getElementById("modalstaff")
+var modalschool = document.getElementById("modalschool")
+var modaldb = document.getElementById("modaldb")
 document.getElementById("managestaff").addEventListener("click", function (){
     modalstaff.classList.add("is-active")
+})
+
+document.getElementById("manageschool").addEventListener("click", function (){
+    modalschool.classList.add("is-active")
+})
+
+document.getElementById("cleardb").addEventListener("click", function (){
+    modaldb.classList.add("is-active")
 })
 
 var type_select = document.getElementById("typestaff")
@@ -30,4 +40,12 @@ type_select.addEventListener("change", function (){
 
 function closestaff(){
     modalstaff.classList.remove("is-active")
+}
+
+function closeschool(){
+    modalschool.classList.remove("is-active")
+}
+
+function closedb(){
+    modaldb.classList.remove("is-active")
 }

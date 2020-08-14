@@ -61,6 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         schoolyear varchar(12) not null,
         picname varchar(255) not null,
         vidname varchar(255) not null,
+        link varchar(255),
+        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -69,12 +71,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Teachers
     $sql = "CREATE TABLE teachers(
-        id varchar(9) not null,
+        id varchar(9) not null UNIQUE,
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
         picname varchar(255) not null,
         vidname varchar(255) not null,
+        link varchar(255),
+        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         subject varchar(24) not null,
         primary key(id)
         )";
@@ -101,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `schoolid` varchar(32) NOT NULL,
         `schoolyear` varchar(32) NOT NULL,
         `zipname` varchar(32) NOT NULL,
-        `generated` datetime NOT NULL,
+        `generated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `available` varchar(5) NOT NULL
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -122,8 +126,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Schools
     $sql = "CREATE TABLE `schools` (
-        `id` int NOT NULL,
-        `name` varchar(128) NOT NULL
+        `id` int NOT NULL UNIQUE,
+        `name` varchar(128) NOT NULL,
+        primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
         die("Error creating admins' table: " . $conn->error);

@@ -3,7 +3,6 @@
 session_start();
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
-require_once("../helpers/common.php");
 // Check if the user is logged in, if not then redirect him to login page
 if($_SESSION["loggedin"] !== "admin"){
     header("location: ../login.php");
@@ -13,12 +12,11 @@ if($_SESSION["loggedin"] !== "admin"){
 $userinfo = $_SESSION["userinfo"];
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject FROM teachers where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
 $teachers_values = array();
-$teachers_fields = mysqli_fetch_fields($result);
 
 while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
@@ -30,12 +28,11 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
 $students_values = array();
-$students_fields = mysqli_fetch_fields($result);
 
 while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
@@ -53,7 +50,6 @@ $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
 $gallery_values = array();
-$gallery_fields = mysqli_fetch_fields($result);
 $gallery_i = 0;
 while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
@@ -77,6 +73,19 @@ if (isset($_GET["makeavailable"]) && $_GET["makeavailable"] == "true"){
 
 if (isset($_GET["deleteyearbook"]) && $_GET["deleteyearbook"] == "true"){
     // Delete yearbook
+    function delete_files($target) {
+        if(is_dir($target)){
+            $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
+    
+            foreach($files as $file){
+                delete_files($file);
+            }
+    
+            rmdir($target);
+        } elseif(is_file($target)) {
+            unlink($target);  
+        }
+    }
     $stmt = $conn->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=?");
     $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
     if ($stmt->execute() !== true) {
@@ -87,7 +96,7 @@ if (isset($_GET["deleteyearbook"]) && $_GET["deleteyearbook"] == "true"){
 }
 
 // Check if admin generated yearbook before
-$stmt = $conn->prepare("SELECT generated, available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
+$stmt = $conn->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i'), available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $stmt->store_result();
@@ -134,12 +143,13 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <?php
-                        // Get all fields from teachers' table
-                        foreach($teachers_fields as $val){
-                            echo ("<th>$val->name</th>");
-                        }
-                        ?>
+                        <th>ID</th>
+                        <th>Nombre y apellidos</th>
+                        <th>Foto</th>
+                        <th>Vídeo</th>
+                        <th>Enlace</th>
+                        <th>Fecha de subida</th>
+                        <th>Asignatura</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,11 +158,13 @@ if ($stmt->num_rows == 1) {
                     foreach($teachers_values as $value => $individual){
                         echo <<<EOL
                         <tr>
-                        <td>$individual[0]</td>
-                        <td>$individual[1]</td>
-                        <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=P' target='_blank'>$individual[2]</a></td>
-                        <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=P' target='_blank'>$individual[3]</a></td>
-                        <td>$individual[4]</td>
+                            <td>$individual[0]</td>
+                            <td>$individual[1]</td>
+                            <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=P' target='_blank'>$individual[2]</a></td>
+                            <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=P' target='_blank'>$individual[3]</a></td>
+                            <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
+                            <td>$individual[5]</td>
+                            <td>$individual[6]</td>
                         </tr>
                         EOL;
                     }
@@ -168,12 +180,12 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <?php
-                        // Get all fields from students' table
-                        foreach($students_fields as $val){
-                            echo ("<th>$val->name</th>");
-                        }
-                        ?>
+                        <th>ID</th>
+                        <th>Nombre y apellidos</th>
+                        <th>Foto</th>
+                        <th>Vídeo</th>
+                        <th>Enlace</th>
+                        <th>Fecha de subida</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -186,6 +198,8 @@ if ($stmt->num_rows == 1) {
                             <td>$individual[1]</td>
                             <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=ALU' target='_blank'>$individual[2]</a></td>
                             <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=ALU' target='_blank'>$individual[3]</a></td>
+                            <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
+                            <td>$individual[5]</td>
                         </tr>
                         EOL;
                     }
@@ -201,12 +215,9 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <?php
-                        // Get all fields from gallery's table
-                        foreach($gallery_fields as $val){
-                            echo ("<th>$val->name</th>");
-                        }
-                        ?>
+                        <th>ID</th>
+                        <th>Foto</th>
+                        <th>Descripción</th>
                     </tr>
                 </thead>
                 <tbody>

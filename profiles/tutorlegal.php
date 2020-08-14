@@ -85,5 +85,19 @@ if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
             ?>
         </div>
     </section>
+    <footer class="footer">
+        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+            <ul>
+                <li>
+                    <a href="../logout.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </footer>
   </body>
 </html>

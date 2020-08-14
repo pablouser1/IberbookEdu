@@ -3,7 +3,6 @@
 session_start();
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
-require("../helpers/common.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("location: ../login.php");
@@ -31,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $gallery[] = $i;
                     $gallery[$i] = array();
                     $gallery[$i]["path"] = basename($filePath);
-                    $gallery[$i]["description"] = test_input($_POST["gallery_description"][$i]);
+                    $gallery[$i]["description"] = htmlspecialchars($_POST["gallery_description"][$i]);
                     move_uploaded_file($tmpFilePath, $filePath);
                 }
             }

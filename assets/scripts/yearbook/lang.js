@@ -11,9 +11,23 @@ const lang_en = {
     yearbook: {
         students: "Students",
         teachers: "Teachers",
-        video_view: "View video",
-        video_continue: "Continue watching",
-        video_exit: "Exit"
+    },
+    stories: {
+        unmute: 'Touch to unmute',
+        keyboardTip: 'Press space to see next',
+        visitLink: 'Visit link',
+        time: {
+          ago:'ago', 
+          hour:'hour', 
+          hours:'hours', 
+          minute:'minute', 
+          minutes:'minutes', 
+          fromnow: 'from now', 
+          seconds:'seconds', 
+          yesterday: 'yesterday', 
+          tomorrow: 'tomorrow', 
+          days:'days'
+        }
     },
     gallery: {
         modal_title: "Picture"
@@ -24,6 +38,8 @@ const lang_en = {
         Bulma (https://bulma.io)
         <br>
         Animate.css (https://animate.style)
+        <br>
+        zuck.js (https://github.com/ramon82/zuck.js)
         <br>
         confetti.js (https://github.com/mathusummut/confetti.js)`,
         credits: `This yearbook was made using 
@@ -46,9 +62,23 @@ const lang_es = {
     yearbook: {
         students: "Alumnos",
         teachers: "Profesores",
-        video_view: "Ver vídeo",
-        video_continue: "Continuar vídeo",
-        video_exit: "Salir"
+    },
+    stories: {
+        unmute: 'Toca para de-silenciar',
+        keyboardTip: 'Presiona espacio para ver la siguiente',
+        visitLink: 'Visitar enlace',
+        time: {
+          ago:'antes', 
+          hour:'hora', 
+          hours:'horas', 
+          minute:'minuto', 
+          minutes:'minutos', 
+          fromnow: 'desde ahora', 
+          seconds:'segundos', 
+          yesterday: 'ayer', 
+          tomorrow: 'mañana', 
+          days:'días'
+        }
     },
     gallery: {
         modal_title: "Foto"
@@ -60,10 +90,12 @@ const lang_es = {
         <br>
         Animate.css (https://animate.style)
         <br>
+        zuck.js (https://github.com/ramon82/zuck.js)
+        <br>
         confetti.js (https://github.com/mathusummut/confetti.js)`,
         credits: `Este yearbook fue generado usando
         <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
-        distribuido bajo la <a href="LICENSE.txt">licencia GPLv3</a>`,
+        distribuido bajo la <a href="LICENSE.txt" target="_blank">licencia GPLv3</a>`,
         contributors_button: "Ver contribuidores",
         madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> en Github"
     }
@@ -90,8 +122,6 @@ function translate(){
     // Yearbook
     document.getElementById("teachers_title").innerHTML = lang["yearbook"]["teachers"];
     document.getElementById("students_title").innerHTML = lang["yearbook"]["students"];
-    document.getElementById("video_link").innerHTML = lang["yearbook"]["video_view"];
-    document.getElementById("video_exit").innerHTML = lang["yearbook"]["video_exit"];
     // Gallery
     document.getElementById("gallery_modal_title").innerHTML = lang["gallery"]["modal_title"];
     // About

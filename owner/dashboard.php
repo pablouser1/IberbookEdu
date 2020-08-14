@@ -74,10 +74,16 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
         </div>
         <div class="buttons">
-            <button id="managestaff" type="button" class="button">Agregar/eliminar staff</button>
+            <button id="managestaff" type="button" class="button is-info">Agregar/eliminar staff</button>
+        </div>
+        <hr>
+        <h1 class="title">Administración general</h1>
+        <div class="buttons">
+            <button id="manageschool" type="button" class="button is-info">Agregar/eliminar centro</button>  
+            <button id="cleardb" type="button" class="button is-danger">Limpiar bases de datos</button>  
         </div>
     </section>
-    <hr>
+    <!-- Modal for adding/removing staff members -->
     <div id="modalstaff" class="modal">
         <div onclick="closestaff()" class="modal-background"></div>
         <div class="modal-card">
@@ -120,6 +126,70 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <footer class="modal-card-foot">
                     <button id="addstaff" name="addstaff" value="admin" class="button is-success" type="submit">Agregar</button>
                     <button id="removestaff" name="removestaff" value="admin" class="button is-danger" type="submit">Eliminar</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+    <!-- Modal for adding/removing schools -->
+    <div id="modalschool" class="modal">
+        <div onclick="closeschool()" class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Agregar/eliminar staff</p>
+                <button onclick="closeschool()" class="delete" aria-label="close"></button>
+            </header>
+            <form action="managestaff.php" method="POST">
+                <section class="modal-card-body">
+                    <div class="field">
+                        <label class="label">Código del centro</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="id" placeholder="124363123" required>
+                            <span class="icon is-left">
+                                <i class="fas fa-school"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Nombre del centro (Sólo necesario si estás <b>agregando</b> un centro)</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="schoolname" placeholder="I.E.S Pepito de los Palotes">
+                            <span class="icon is-left">
+                                <i class="fas fa-school"></i>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button name="addschool" class="button is-success" type="submit">Agregar</button>
+                    <button name="removeschool" class="button is-danger" type="submit">Eliminar</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+    <!-- Modal for deleting rows of specific school -->
+    <div id="modaldb" class="modal">
+        <div onclick="closedb()" class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Limpiar base de datos</p>
+                <button onclick="closedb()" class="delete" aria-label="close"></button>
+            </header>
+            <form action="cleardb.php" method="POST">
+                <section class="modal-card-body">
+                    <p><span class="has-background-danger"><b>ADVERTENCIA</b></span>, esta función elimina todos los datos
+                    subidos por los usuarios de un centro, <span class="has-background-danger">ESTA ACCIÓN ES IRREVERSIBLE</span></p>
+                    <div class="field">
+                        <label class="label">Código del centro</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="id" placeholder="124363123" required>
+                            <span class="icon is-left">
+                                <i class="fas fa-school"></i>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button name="cleardb" class="button is-danger" type="submit">Limpiar</button>
                 </footer>
             </form>
         </div>

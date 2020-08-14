@@ -51,7 +51,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
     $valid["schoolid"] = true;
   }
   // If everything is OK, continue
-  if(isset($valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"]) || isset($_GET["debug"])){
+  if(isset($valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"])){
     $userinfo = array(
       "iduser" => $teacherinfo["iduser"],
       "nameuser" => $teacherinfo["nameuser"],
@@ -157,6 +157,20 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
         }
         ?>
     </section>
+    <footer class="footer">
+        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+            <ul>
+                <li>
+                    <a href="../logout.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </footer>
     <script src="../assets/scripts/profiles/teachers.js"></script>
   </body>
 </html>

@@ -63,14 +63,14 @@ if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
         if (empty($vid_error) && empty($pic_error) && empty($general_error)){
             // Create row with user data
             if (isset($userinfo["subject"])){
-                $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, subject, schoolid, schoolyear, picname, vidname) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssisss",
-                $userinfo["iduser"], $userinfo["nameuser"], $userinfo["subject"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname);
+                $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssisssss",
+                $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $userinfo["subject"]);
             }
             else{
-                $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssisss",
-                $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname);
+                $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssissss",
+                $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"]);
             }
             if ($stmt->execute() !== true) {
                 die("Error inserting user data: " . $conn->error);
@@ -157,6 +157,12 @@ else{
                                     Ningún archivo elegido
                                 </span>
                             </label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">(Opcional) Enlace</label>
+                        <div class="control">
+                            <input name="link" class="input" type="text" placeholder="https://github.com/pablouser1/IberbookEdu">
                         </div>
                     </div>
                     <div class="field">

@@ -7,17 +7,22 @@ if($_SESSION["loggedin"] !== "admin"){
     header("location: login.php");
     exit;
 }
-function separetename($part, $string){
-    if ($part == "name"){
-        return substr($string, strpos($string, ",") + 2);
+function getname($type, $string){
+    if($type == "abbr"){
+        $nametemp = explode(",", $string);
+        $surnameabbr = $nametemp[0][0].".";
+        $finalname = trim($nametemp[1])." ".$surnameabbr;
+        return $finalname;
     }
-    else{
-        return strtok($string, ',');
+    elseif($type == "full"){
+        return array(
+            "name" => substr($string, strpos($string, ",") + 2),
+            "surname" => strtok($string, ',')
+        );
     }
 }
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
-require("../helpers/common.php");
 $userinfo = $_SESSION["userinfo"];
 
 // Zip files location
@@ -26,38 +31,59 @@ $_SESSION["baseurl"] = $baseurl;
 
 // Students
 
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, uploaded FROM students where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
-$students = array();
 $students_dir = 'students/';
 while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
-    $students[$id] = array();
-    $students[$id]["name"] = separetename("name", $row["fullname"]);
-    $students[$id]["surnames"] = separetename("surname", $row["fullname"]);
-    $students[$id]["pic"] = $students_dir.$id.'/'.$row["picname"];
-    $students[$id]["video"] = $students_dir.$id.'/'.$row["vidname"];
+    $students[] = [
+        "id" => $id,
+        "photo" => $students_dir.$id.'/'.$row["picname"],
+        "name" => getname("abbr", $row["fullname"]),
+        "items" => [
+            [
+                "id" => $id,
+                "type" => "video",
+                "src" => $students_dir.$id.'/'.$row["vidname"],
+                "time" => strtotime($row["uploaded"]),
+                "link" => $row["link"]
+            ]
+        ],
+        "fullname" => getname("full", $row["fullname"]),
+        "date" => $row["uploaded"], // Actual date
+    ];
 }
 $stmt->close();
 
 // Teachers
 
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, uploaded, subject FROM teachers where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
-$teachers = array();
 $teachers_dir = 'teachers/';
 while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
-    $teachers[$id] = array();
-    $teachers[$id]["name"] = separetename("name", $row["fullname"]);
-    $teachers[$id]["surnames"] = separetename("surname", $row["fullname"]);
-    $teachers[$id]["subject"] = $row["subject"];
-    $teachers[$id]["pic"] = $teachers_dir.$id.'/'.$row["picname"];
-    $teachers[$id]["video"] = $teachers_dir.$id.'/'.$row["vidname"];
+    $teachers[] = [
+        "id" => $id,
+        "photo" => $teachers_dir.$id.'/'.$row["picname"],
+        "name" => getname("abbr", $row["fullname"]),
+        "items" => [
+            [
+                "id" => $id,
+                "type" => "video",
+                "src" => $teachers_dir.$id.'/'.$row["vidname"],
+                "time" => strtotime($row["uploaded"]), // Change time to Unix Timestamp, used for "x hours ago"
+                "link" => $row["link"]
+            ]
+        ],
+        // Additional info not used by zuck.js
+        "subject" => $row["subject"],
+        "fullname" => getname("full", $row["fullname"]),
+        "date" => $row["uploaded"], // Actual date
+    ];
 }
 $stmt->close();
 
