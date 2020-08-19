@@ -16,7 +16,7 @@ foreach($tutorinfo["children"] as $id => $child){
 
 if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
     $child = $tutorinfo["children"][$_POST['childlogin']];
-    $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
+    $datacentro = array("X_CENTRO" => $child["MATRICULAS"][0]["X_CENTRO"]);
     $infocentro = getcentrostudent($cookies, $datacentro);
     $userinfo = array(
         "iduser" => $child["MATRICULAS"][0]["X_MATRICULA"],
@@ -38,6 +38,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <title>Selección tutor legal</title>
+      <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   </head>
   <body>

@@ -32,6 +32,7 @@ $dest = $baseurl.'scripts/';
 recursivecopy($source, $dest);
 copy("externalprojects_licenses.txt", $baseurl.'externalprojects_licenses.txt');
 copy("../LICENSE",  $baseurl.'LICENSE.txt');
+copy("../favicon.ico",  $baseurl.'favicon.ico');
 ?>
 
 <!DOCTYPE html>
@@ -41,10 +42,12 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yearbook <?php echo($userinfo["namecentro"]);?></title>
-
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico">
+    <!-- Scripts -->
     <script defer src="scripts/vendor/fontawesome.js"></script>
     <script src="scripts/vendor/confetti.min.js"></script>
-
+    <!-- Styles -->
     <link rel="stylesheet" href="styles/vendor/bulma.min.css">
     <link rel="stylesheet" href="styles/vendor/animate.min.css"/>
     <link rel="stylesheet" href="styles/vendor/zuck.min.css">
@@ -55,19 +58,11 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
         const students_js = <?php echo json_encode($students);?>;
         const teachers_js = <?php echo json_encode($teachers);?>;
         const gallery_js = <?php echo json_encode($gallery);?>;
-        const schoolyear_js = '<?php echo($userinfo["yearuser"]);?>';
     </script>
 </head>
 
-<body>
-    <section id="banner" class="hero is-primary is-hidden">
-        <div class="hero-body">
-            <div class="container">
-                <h1 class="title has-text-centered"><?php echo($userinfo["namecentro"]);?>:</h1>
-                <h2 id="hero_subtitle" class="subtitle has-text-centered"></h2>
-            </div>
-        </div>
-    </section>
+<body class="has-navbar-fixed-top">
+    <!-- NoScript Warning -->
     <noscript>This program needs Javascript</noscript>
     <!-- Splashscreen -->
     <section id="loading" class="hero is-fullheight">
@@ -82,84 +77,146 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
             </div>
         </div>
     </section>
+    <!-- Banner -->
+    <section id="banner" class="hero is-primary is-hidden">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title has-text-centered"><?php echo($userinfo["yearuser"]);?></h1>
+                <h2 class="subtitle has-text-centered"></h2>
+            </div>
+        </div>
+    </section>
     <!-- Navigation tabs -->
-    <div id="tabs" class="tabs is-centered is-hidden">
-        <ul id="tabs">
-            <li id="tab_yearbook" class="is-active">
-                <a onclick="tabchange('yearbook')">
-                    <span class="icon is-small"><i class="fas fa-book-open" aria-hidden="true"></i></span>
+    <nav id="navbar" class="navbar is-hidden is-primary is-bold is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span><?php echo($userinfo["namecentro"]);?></span>
+            </a>
+            <a id="navbar-burger" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <a href="#yearbook" class="navbar-item">
+                    <span class="icon">
+                        <i class="fas fa-book-open"></i>
+                    </span>
                     <span>Yearbook</span>
                 </a>
-            </li>
-            <li id="tab_gallery">
-                <a onclick="tabchange('gallery')">
-                    <span class="icon is-small"><i class="fas fa-image" aria-hidden="true"></i></span>
-                    <span id="span_gallery"></span>
+                <a href="#gallery" class="navbar-item">
+                    <span class="icon">
+                        <i class="fas fa-images"></i>
+                    </span>
+                    <span id="a_gallery"></span>
                 </a>
-            </li>
-            <li id="tab_about">
-                <a onclick="tabchange('about')">
-                    <span class="icon is-small"><i class="fas fa-info-circle" aria-hidden="true"></i></span>
-                    <span id="span_about"></span>
+                <a href="#about" class="navbar-item">
+                    <span class="icon">
+                        <i class="fas fa-info-circle"></i>
+                    </span>
+                    <span id="a_about"></span>
                 </a>
-            </li>
-        </ul>
-    </div>
+            </div>
+        </div>
+    </nav>
     <!-- Yearbook, includes stories and pics -->
-    <section id="yearbook" class="section is-hidden py-0">
-        <h1 id="teachers_title" class="title has-text-centered"></h1>
-        <div id="stories_teachers"></div>
+    <section id="yearbook" class="section is-hidden tab">
+        <h1 class="title has-text-centered">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <span id="teachers_title"></span>
+        </h1>
+        <p class="subtitle has-text-centered">Total: <?php echo(count($teachers));?></p>
+        <div class="container">
+            <div id="stories_teachers"></div>
+        </div>
+        <br>
         <div class="columns is-mobile is-centered is-multiline is-vcentered">
         <?php
         foreach($teachers as $teacher){
             echo '
-            <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
-                <div class="card">
-                    <div class="card-image">
-                        <figure class="image">
-                            <img src="'.$teacher["photo"].'" alt="Foto '.$teacher["name"].'">
-                            <figcaption style="top:auto;" class="has-text-centered is-overlay">
-                                <span class="tag">'.$teacher["subject"].'</span>
-                            </figcaption>
-                        </figure>
-                    </div>
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-content">
-                                <p class="title is-4">'.$teacher["fullname"]["name"].'</p>
-                                <p class="subtitle is-6">'.$teacher["fullname"]["surname"].'</p>
+            <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
+                <article class="media">
+                    <div class="media-content">
+                        <p>
+                            <strong>'.$teacher["fullname"]["name"]." ".$teacher["fullname"]["surname"].'</strong> <small>@'.str_replace(" ", "", $teacher["name"]).'</small>
+                            <a href="'.$teacher["photo"].'" target="_blank">
+                                <figure class="image figure_yearbook">
+                                    <img src="'.$teacher["photo"].'">
+                                    <figcaption style="top:auto;" class="has-text-centered is-overlay">
+                                        <span class="tag">'.$teacher["subject"].'</span>
+                                    </figcaption>
+                                </figure>
+                            </a>
+                            <span>'.$teacher["quote"].'</span>
+                            <br>
+                            <i><small>'.$teacher["date"].'</small></i>
+                        </p>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item">
+                                    <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                                </a>
+                                <a class="level-item">
+                                    <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                                </a>
+                                <a class="level-item">
+                                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                                </a>
                             </div>
-                        </div>
+                        </nav>
                     </div>
-                </div>
+                </article>
             </div>
             ';
         }
         ?>
         </div>
         <hr>
-        <h1 id="students_title" class="title has-text-centered"></h1>
-        <div id="stories_students"></div>
+        <h1 class="title has-text-centered">
+            <i class="fas fa-user-graduate"></i>
+            <span id="students_title"></span>
+        </h1>
+        <p class="subtitle has-text-centered">Total: <?php echo(count($students));?></p>
+        <div class="container">
+            <div id="stories_students"></div>
+        </div>
+        <br>
         <div class="columns is-mobile is-centered is-multiline is-vcentered">
         <?php
         foreach($students as $student){
             echo '
-            <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
-                <div class="card">
-                    <div class="card-image">
-                        <figure class="image">
-                            <img src="'.$student["photo"].'" alt="Foto '.$student["name"].'">
-                        </figure>
-                    </div>
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-content">
-                                <p class="title is-4">'.$student["fullname"]["name"].'</p>
-                                <p class="subtitle is-6">'.$student["fullname"]["surname"].'</p>
+            <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
+                <article class="media">
+                    <div class="media-content">
+                        <p>
+                            <strong>'.$student["fullname"]["name"]." ".$student["fullname"]["surname"].'</strong> <small>@'.str_replace(" ", "", $student["name"]).'</small>
+                            <a href="'.$student["photo"].'" target="_blank">
+                                <figure class="image figure_yearbook">
+                                    <img src="'.$student["photo"].'">
+                                </figure>
+                            </a>
+                            <span>'.$student["quote"].'</span>
+                            <br>
+                            <i><small>'.$student["date"].'</small></i>
+                        </p>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item">
+                                    <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                                </a>
+                                <a class="level-item">
+                                    <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                                </a>
+                                <a class="level-item">
+                                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                                </a>
                             </div>
-                        </div>
+                        </nav>
                     </div>
-                </div>
+                </article>
             </div>
             ';
         }
@@ -167,12 +224,12 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
         </div>
     </section>
     <!-- Gallery -->
-    <section id="gallery" class="section is-hidden">
+    <section id="gallery" class="section is-hidden tab">
         <div class="columns is-centered is-multiline">
             <?php
             foreach ($gallery as $id => $pic) {
                 echo <<<EOL
-                <div class="column is-one-quarter-desktop">
+                <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
                     <div class="container">
                         <div class="card">
                             <div class="card-content">
@@ -209,7 +266,7 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
         </div>
     </section>
     <!-- About section -->
-    <section id="about" class="section is-hidden">
+    <section id="about" class="section is-hidden tab">
         <div class="container">
             <p id="about_attribution">
             </p>
@@ -253,7 +310,7 @@ copy("../LICENSE",  $baseurl.'LICENSE.txt');
 <?php
 // Generate HTML file
 file_put_contents($baseurl.'index.html', ob_get_contents());
-// https://stackoverflow.com/a/19730838 Literally have no clue how this works, but it just works
+// https://stackoverflow.com/a/19730838 Literally have no clue how this works, but it just works. Generate ZIP
 class HZip 
 { 
   /** 

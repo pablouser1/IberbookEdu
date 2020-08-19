@@ -165,7 +165,7 @@ function getgroupsteachers($cookies){
     foreach($response["RESULTADO"] as $id => $grupo){
         $grupos_split[] = str_split($grupo["UNIDADES"], 10);
         foreach($grupos_split[$id] as $nameid => $name){
-            if(strpos($name, "4º ESO") !== false || strpos($name, "2º BCT") !== false){
+            if(strpos($name, "4º ESO") !== false || strpos($name, "2º BCT") !== false || strpos($name, "6EP")){
                 $grupos[$id]["name"] = trim($name);
                 $grupos[$id]["subject"] = $grupo["MATERIAS"];
             }

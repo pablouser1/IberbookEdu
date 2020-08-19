@@ -31,7 +31,7 @@ $_SESSION["baseurl"] = $baseurl;
 
 // Students
 
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, uploaded FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, uploaded FROM students where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -52,6 +52,7 @@ while ($row = $result->fetch_assoc()) {
             ]
         ],
         "fullname" => getname("full", $row["fullname"]),
+        "quote" => $row["quote"], // User quote
         "date" => $row["uploaded"], // Actual date
     ];
 }
@@ -59,7 +60,7 @@ $stmt->close();
 
 // Teachers
 
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, uploaded, subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, uploaded, subject FROM teachers where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -82,6 +83,7 @@ while ($row = $result->fetch_assoc()) {
         // Additional info not used by zuck.js
         "subject" => $row["subject"],
         "fullname" => getname("full", $row["fullname"]),
+        "quote" => $row["quote"], // User quote
         "date" => $row["uploaded"], // Actual date
     ];
 }

@@ -62,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         picname varchar(255) not null,
         vidname varchar(255) not null,
         link varchar(255),
+        quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         primary key(id)
         )";
@@ -78,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         picname varchar(255) not null,
         vidname varchar(255) not null,
         link varchar(255),
+        quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         subject varchar(24) not null,
         primary key(id)
@@ -92,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         picname varchar(255) not null,
         schoolid varchar(10) not null,
         schoolyear varchar(10) not null,
-        picdescription varchar(255) not null,
+        picdescription varchar(255),
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -116,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "CREATE TABLE `staff` (
         `id` int NOT NULL AUTO_INCREMENT,
         `username` varchar(14) NOT NULL UNIQUE,
-        `password` varchar(256),
+        `password` varchar(255),
         `permissions` varchar(14) NOT NULL,
         primary key(id)
         )";

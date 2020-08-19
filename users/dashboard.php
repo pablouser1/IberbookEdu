@@ -56,11 +56,11 @@ if(isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     $stmt->close();
     // Check if user uploaded pic and vid before
     if (isset($userinfo["subject"])){
-        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
+        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
         FROM $table_name where schoolid=? and schoolyear=?");
     }
     else{
-        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
+        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
         FROM $table_name where schoolid=? and schoolyear=?");
     }
     $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
@@ -77,7 +77,7 @@ else{
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Dashboard IberbookEdu</title>
+        <title>Dashboard Usuarios - IberbookEdu</title>
         <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     </head>
@@ -154,6 +154,7 @@ else{
                                 <th>Foto</th>
                                 <th>Vídeo</th>
                                 <th>Enlace</th>
+                                <th>Cita</th>
                                 <th>Fecha de subida</th>
                                 EOL;
                                 if($userinfo["typeuser"] == "P") echo("<th>Asignatura</th>");
@@ -174,9 +175,10 @@ else{
                                     <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
                                     <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
                                     <td>$individual[5]</td>
+                                    <td>$individual[6]</td>
                                 END;
                                 if($userinfo["typeuser"] == "P"){
-                                    echo("<td>$individual[6]</td>");
+                                    echo("<td>$individual[7]</td>");
                                 }
                                 echo("</tr>");
                             }

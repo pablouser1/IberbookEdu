@@ -1,9 +1,6 @@
 // -- Translations -- //
 // English translations
 const lang_en = {
-    common: {
-        graduation: "Graduation "
-    },
     tabs: {
         gallery: "Gallery",
         about: "About"
@@ -52,9 +49,6 @@ const lang_en = {
 
 // Spanish translations
 const lang_es = {
-    common: {
-        graduation: "Graduación curso"
-    },
     tabs: {
         gallery: "Galería",
         about: "Acerca de"
@@ -114,11 +108,9 @@ if (!allowed_languages.includes(userLang)){
 
 function translate(){
     // Insert translated text into necessary parts of HTML, not the greatest way of doing this
-    // Common
-    document.getElementById("hero_subtitle").innerHTML = `${lang["common"]["graduation"]} ${schoolyear_js} 🎉`;
-    // Tabs
-    document.getElementById("span_gallery").innerHTML = lang["tabs"]["gallery"];
-    document.getElementById("span_about").innerHTML = lang["tabs"]["about"];
+    // Navbar
+    document.getElementById("a_gallery").innerHTML = lang["tabs"]["gallery"];
+    document.getElementById("a_about").innerHTML = lang["tabs"]["about"];
     // Yearbook
     document.getElementById("teachers_title").innerHTML = lang["yearbook"]["teachers"];
     document.getElementById("students_title").innerHTML = lang["yearbook"]["students"];

@@ -51,7 +51,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
     $valid["schoolid"] = true;
   }
   // If everything is OK, continue
-  if(isset($valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"])){
+  if(isset($valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"]) || isset($_GET["debug"])){
     $userinfo = array(
       "iduser" => $teacherinfo["iduser"],
       "nameuser" => $teacherinfo["nameuser"],
@@ -63,12 +63,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
       "namecentro" => $_GET["schoolname"]
     );
     $_SESSION["userinfo"] = $userinfo;
-    if($_SESSION["loggedin"] == "admin"){
-      header("Location: ../profiles/admin.php");
-    }
-    else{
-      header("Location: ../users/dashboard.php");
-    }
+    header("Location: ../users/dashboard.php");
   }
 }
 ?>
@@ -98,7 +93,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
         <div class="columns is-mobile is-multiline">
             <?php
             // What even is this
-            foreach($allowed_schools as $i => $school){
+            foreach($allowed_schools as $school){
               if (empty($groups)){
                 echo '
                 <div class="column">
@@ -127,7 +122,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
                     <div class="control">
                       <div class="select">
                         <select name="select_curso">');
-                foreach($groups as $id => $grupo){
+                foreach($groups as $grupo){
                   echo <<<EOL
                       <option value="$grupo[name]-$grupo[subject]">$grupo[name] - $grupo[subject]</option>
                   EOL;

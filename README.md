@@ -26,11 +26,8 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 
 # TODO
 
-Error handling
-
-Terminar cuenta de dueño
-
-setup.php - Usando placeholder para el id del centro
+* Agregar soporte para Formación Profesional
+* Agregar curso académico (2019/2020 por ejemplo)
 
 # Credits
 
@@ -43,4 +40,5 @@ Este proyecto no sería posible sin la ayuda de los siguientes proyectos:
 
 Assets:
 
-‘Portrait Placeholder’ by Greasemann, https://commons.wikimedia.org/wiki/File:Portrait_Placeholder.png | [LICENSE](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
+Portrait Placeholder : Greasemann / CC BY-SA (https://creativecommons.org/licenses/by-sa/4.0)
+Favicon: Fabián Alexis / CC BY-SA (https://creativecommons.org/licenses/by-sa/3.0)

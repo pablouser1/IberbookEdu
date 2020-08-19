@@ -8,6 +8,19 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("location: ../login.php");
     exit;
 }
+function delete_files($target) {
+    if(is_dir($target)){
+        $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
+
+        foreach($files as $file){
+            delete_files($file);
+        }
+
+        rmdir($target);
+    } elseif(is_file($target)) {
+        unlink($target);  
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userinfo = $_SESSION["userinfo"];
@@ -15,6 +28,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $gallery_dir = '/gallery/';
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
     if(count($_FILES['gallery']['name']) > 0){
+        // The user wants to overwrite data
+        if(isset($_POST["overwrite"])){
+            $stmt = $conn->prepare("DELETE FROM gallery WHERE schoolid=? AND schoolyear=?");
+            $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+            if ($stmt->execute() !== TRUE) {
+                die("Error deleting gallery data: " . $conn->error);
+            }
+            delete_files($ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/gallery/");
+        }
+        
         if (!is_dir($baseurl.$gallery_dir)){
             mkdir($baseurl.$gallery_dir, 0700, true);
         }

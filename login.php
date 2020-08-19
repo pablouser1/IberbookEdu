@@ -2,12 +2,7 @@
 session_start();
 if (isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
     $userinfo = $_SESSION["userinfo"];
-    if($_SESSION["loggedin"] == "user"){
-        header("Location: users/dashboard.php");
-    }
-    elseif($_SESSION["loggedin"] == "admin"){
-        header("Location: profiles/admin.php");
-    }
+    header("Location: users/dashboard.php");
 }
 $login_error = $password_err = $username_err = "";
 require_once("helpers/db.php");
@@ -45,45 +40,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($result !== false && $result->num_rows == 0) {
                     $login_error = "Su centro no está permitido";
                 }
+                //Check if user is from 6º Primaria, 4º ESO or 2ºBCT    
+                if(strpos($userinfo["yearuser"], "4º ESO") === false || strpos($userinfo["yearuser"], "2º BCT") === false || strpos($userinfo["yearuser"], "6EP") === false){
+                    $login_error = "Sólo se admiten usuarios de 6º de Primaria, 4º ESO o de 2º BACH";
+                }
             }
-            // Check if user is admin
-            $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
-            $result = $conn->query($sql);
-            if ($result->num_rows == 1) {
-                // User is admin
-                $_SESSION["loggedin"] = "admin";
+            if(empty($login_error)){
+                // Check if user is admin
+                $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
+                $result = $conn->query($sql);
+                if ($result->num_rows == 1) {
+                    // User is admin
+                    $_SESSION["loggedin"] = "admin";
+                }
+                else{
+                    // User is not admin
+                    $_SESSION["loggedin"] = "user";
+                }
+
                 switch ($userinfo["typeuser"]){
                     case "ALU":
                         $_SESSION["userinfo"] = $userinfo;
-                        header("Location: profiles/admin.php");
+                        header("Location: users/dashboard.php");
                     break;
                     case "TUT_LEGAL":
                         $_SESSION["tutorinfo"] = $userinfo;
+                        header("Location: profiles/tutorlegal.php");
                     break;
                     case "P":
                         $_SESSION["teacherinfo"] = $userinfo;
+                        header("Location: profiles/teachers.php");
                     break;
                 }
-            }
-            else{
-                // User is not admin
-                $_SESSION["loggedin"] = "user";
-            }
-
-            switch ($userinfo["typeuser"]){
-                case "ALU":
-                    // Only if user is student and regular user.
-                    $_SESSION["userinfo"] = $userinfo;
-                    header("Location: users/dashboard.php");
-                break;
-                case "TUT_LEGAL":
-                    $_SESSION["tutorinfo"] = $userinfo;
-                    header("Location: profiles/tutorlegal.php");
-                break;
-                case "P":
-                    $_SESSION["teacherinfo"] = $userinfo;
-                    header("Location: profiles/teachers.php");
-                break;
             }
         }
         else{

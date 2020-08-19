@@ -12,7 +12,7 @@ if($_SESSION["loggedin"] !== "admin"){
 $userinfo = $_SESSION["userinfo"];
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject FROM teachers where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -28,7 +28,7 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -117,7 +117,7 @@ if ($stmt->num_rows == 1) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard admins</title>
+    <title>Dashboard admins - IberbookEdu</title>
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
 </head>
@@ -139,6 +139,7 @@ if ($stmt->num_rows == 1) {
             <i class="fas fa-chalkboard-teacher"></i>
             <span>Profesores</span>
         </p>
+        <p class="subtitle">Total: <?php echo(count($teachers_values));?></p>
         <div class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
@@ -148,6 +149,7 @@ if ($stmt->num_rows == 1) {
                         <th>Foto</th>
                         <th>Vídeo</th>
                         <th>Enlace</th>
+                        <th>Cita</th>
                         <th>Fecha de subida</th>
                         <th>Asignatura</th>
                     </tr>
@@ -155,7 +157,7 @@ if ($stmt->num_rows == 1) {
                 <tbody>
                     <?php
                     // Get all values from teachers' table
-                    foreach($teachers_values as $value => $individual){
+                    foreach($teachers_values as $individual){
                         echo <<<EOL
                         <tr>
                             <td>$individual[0]</td>
@@ -163,8 +165,18 @@ if ($stmt->num_rows == 1) {
                             <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=P' target='_blank'>$individual[2]</a></td>
                             <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=P' target='_blank'>$individual[3]</a></td>
                             <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
+                        EOL;
+                        if(empty($individual[5])) {
+                            echo("<td class='has-text-centered'>-</td>");
+                        }
+                        else {
+                            echo <<<EOL
                             <td>$individual[5]</td>
-                            <td>$individual[6]</td>
+                            EOL;
+                        }
+                        echo <<<EOL
+                        <td>$individual[6]</td>
+                        <td>$individual[7]</td>
                         </tr>
                         EOL;
                     }
@@ -176,6 +188,7 @@ if ($stmt->num_rows == 1) {
             <i class="fas fa-user-graduate"></i>
             <span>Alumnos</span>
         </p>
+        <p class="subtitle">Total: <?php echo(count($students_values));?></p>
         <div class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
@@ -185,6 +198,7 @@ if ($stmt->num_rows == 1) {
                         <th>Foto</th>
                         <th>Vídeo</th>
                         <th>Enlace</th>
+                        <th>Cita</th>
                         <th>Fecha de subida</th>
                     </tr>
                 </thead>
@@ -199,9 +213,17 @@ if ($stmt->num_rows == 1) {
                             <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=ALU' target='_blank'>$individual[2]</a></td>
                             <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=ALU' target='_blank'>$individual[3]</a></td>
                             <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
-                            <td>$individual[5]</td>
-                        </tr>
                         EOL;
+                        if(empty($individual[5])) {
+                            echo("<td>-</td>");
+                        }
+                        else {
+                            echo <<<EOL
+                            <td>$individual[5]</td>
+                            <td>$individual[6]</td>
+                            </tr>
+                            EOL;
+                        }
                     }
                     ?>
                 </tbody>
@@ -211,6 +233,7 @@ if ($stmt->num_rows == 1) {
             <i class="far fa-images"></i>
             <span>Galería</span>
         </p>
+        <p class="subtitle">Total: <?php echo(count($gallery_values));?></p>
         <div class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
@@ -256,12 +279,6 @@ if ($stmt->num_rows == 1) {
                     </span>
                     <span>Descargar yearbook</span>
                 </a>
-                <a href="dashboard.php?makeavailable=true" class="button is-link">
-                    <span class="icon">
-                        <i class="fas fa-user"></i>
-                    </span>
-                    <span>Alternar permisos de visionado a usuarios</span>
-                </a>
                 <a href="dashboard.php?deleteyearbook=true" class="button is-danger">
                     <span class="icon">
                         <i class="fas fa-trash"></i>
@@ -270,14 +287,25 @@ if ($stmt->num_rows == 1) {
                 </a>
             </div>
             ';
+            // Show if admin didn't make the yearbook available for regular users
+            if($yearbook["available"] == 0){
+                echo '
+                <a href="dashboard.php?makeavailable=true" class="button is-link">
+                    <span class="icon">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <span>Alternar permisos de visionado a usuarios</span>
+                </a>
+                ';
+            }
         }
         ?>
     </section>
+    <div id="progress" class="is-hidden container">
+        <p class="subtitle">Generando yearbook, este proceso puede tardar varios minutos</p>
+        <progress class="progress is-primary" max="100"></progress>
+    </div>
     <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
-        <div id="progress" class="is-hidden container">
-            <p class="subtitle">Generando yearbook, este proceso puede tardar varios minutos</p>
-            <progress class="progress is-primary" max="100"></progress>
-        </div>
         <div class="buttons">
             <a id="genyearbook" class="button is-success" href="send.php">
                 <span class="icon">
