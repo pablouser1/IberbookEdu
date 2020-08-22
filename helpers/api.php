@@ -1,40 +1,6 @@
 <?php
 require_once("config.php");
-
-// Get requests
-function get($url, $cookies){
-    $options = array(
-        'http' => array(
-            'method'  => 'GET',
-            'header'  => array(
-                "Content-type: application/json",
-                "Cookie: ".array_keys($cookies)[0]."=".$cookies[array_keys($cookies)[0]],
-                "Cookie: ".array_keys($cookies)[1]."=".$cookies[array_keys($cookies)[1]]
-            )
-        ),
-        "ssl"=>$GLOBALS["ssloptions"],
-    );
-    $context = stream_context_create($options);
-    return(json_decode(utf8_encode(file_get_contents($url, false, $context)), true));
-}
-
-// Post requests
-function post($url, $data, $cookies){
-    $options = array(
-        'http' => array(
-            'method'  => 'POST',
-            'content' => http_build_query($data),
-            'header'  => array(
-                "Content-Type: application/x-www-form-urlencoded",
-                "Cookie: ".array_keys($cookies)[0]."=".$cookies[array_keys($cookies)[0]],
-                "Cookie: ".array_keys($cookies)[1]."=".$cookies[array_keys($cookies)[1]]
-            )
-        ),
-        "ssl"=>$GLOBALS["ssloptions"],
-    );
-    $context = stream_context_create($options);
-    return(file_get_contents($url, false, $context));
-}
+require_once("requests.php");
 
 // Login user
 function login($username, $password, $type){
@@ -61,7 +27,7 @@ function login($username, $password, $type){
     if ($result["ESTADO"]["CODIGO"] != "C"){
         return array(
             "cookies" => null,
-            "error" => "Hubo un error al iniciar sesión:<br>".$result["ESTADO"]["DESCRIPCION"]
+            "error" => $result["ESTADO"]["DESCRIPCION"]
         );
     }
     // Get cookies
@@ -73,10 +39,10 @@ function login($username, $password, $type){
         }
     }
     $cookies["SenecaP"] = str_replace(' ', '+', $cookies["SenecaP"]); // PHP converts "+" to spaces, undo that
-    return array(
+    return [
         "cookies" => $cookies,
         "error" => null
-    );
+    ];
 
 }
 
@@ -126,15 +92,31 @@ function getinfo($cookies, $type){
                 "nameuser" => $info["RESULTADO"][0]["USUARIO"],
                 "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
             );
-            foreach ($info["RESULTADO"][0]["CENTROS"] as $id => $centro){
-                $userinfo["centros"][$id]["id"] = $centro["C_CODIGO"];
-                $userinfo["centros"][$id]["name"] = $centro["CENTRO"];
+            // TODO, check if needed
+            if(!isset($info["RESULTADO"][0]["CENTROS"]) || empty($info["RESULTADO"][0]["CENTROS"])) {
+                $id = $info["RESULTADO"][0]["C_CODIGO"];
+                $userinfo["centros"][$id] = [
+                    "id" => $info["RESULTADO"][0]["C_CODIGO"],
+                    "name" => $info["RESULTADO"][0]["CENTRO"],
+                    "X_CENTRO" => null
+                ];
+            }
+            else {
+                foreach ($info["RESULTADO"][0]["CENTROS"] as $centro){
+                    $id = $centro["C_CODIGO"];
+                    $userinfo["centros"][$id] = [
+                        "id" => $id,
+                        "name" => $centro["CENTRO"],
+                        "X_CENTRO" => $centro["X_CENTRO"]
+                    ];
+                }
             }
             break;
     }
     return $userinfo;
 }
 
+// Get school id
 function getcentrostudent($cookies, $data){
     $url = $GLOBALS["base_url"].'pasendroid/datosCentro';
     $response = json_decode(utf8_encode(post($url, $data, $cookies)), true);
@@ -152,40 +134,51 @@ function getpicstudent($cookies, $data){
 
 // Get id of teacher
 function getidteacher($cookies){
-    $url = "https://seneca.juntadeandalucia.es/seneca/jsp/senecadroid/getDatosUsuario";
-    $cafile = "helpers/cert/juntadeandalucia-es-chain.pem";
+    $url = $GLOBALS["base_url"]."senecadroid/getDatosUsuario";
     $response = json_decode(utf8_encode(post($url, [], $cookies)), true);
     return $response["RESULTADO"][0]["DATOS"][0]["C_NUMIDE"]; // Teacher's id
 }
 
+// Change between schools (if needed)
+function changeschoolteachers($cookies, $data){
+    $url = $GLOBALS["base_url"]."senecadroid/setCentro";
+    $response = json_decode(utf8_encode(post($url, $data, $cookies)), true);
+    if ($response["ESTADO"]["CODIGO"] == "C") return true;
+    else return false;
+}
+// https://stackoverflow.com/a/10514539, eliminates duplicates in array
+function super_unique($array,$key)
+{
+    $temp_array = [];
+    foreach ($array as &$v) {
+        if (!isset($temp_array[$v[$key]]))
+        $temp_array[$v[$key]] =& $v;
+    }
+    $array = array_values($temp_array);
+    return $array;
+}
+
 function getgroupsteachers($cookies){
-    $url = "https://seneca.juntadeandalucia.es/seneca/jsp/senecadroid/getGrupos";
+    $url = $GLOBALS["base_url"]."senecadroid/getGrupos";
     $response = json_decode(utf8_encode(post($url, [], $cookies)), true);
-    // Get each course, split all groups and if there are any 4º ESO or 2º BCT, add it to array
+    // TODO, subjects probably don't get stored properly
+
+    // Get each course, split all groups and if there are any 4º ESO, 2º BCT add it to array
     foreach($response["RESULTADO"] as $id => $grupo){
         $grupos_split[] = str_split($grupo["UNIDADES"], 10);
         foreach($grupos_split[$id] as $nameid => $name){
-            if(strpos($name, "4º ESO") !== false || strpos($name, "2º BCT") !== false || strpos($name, "6EP")){
+            if(strpos($name, "4º ESO") !== false || strpos($name, "2º BCT") !== false){
                 $grupos[$id]["name"] = trim($name);
                 $grupos[$id]["subject"] = $grupo["MATERIAS"];
             }
         }
     }
-
-    // https://stackoverflow.com/a/10514539, eliminates duplicates in array
-    function super_unique($array,$key)
-    {
-       $temp_array = [];
-       foreach ($array as &$v) {
-           if (!isset($temp_array[$v[$key]]))
-           $temp_array[$v[$key]] =& $v;
-       }
-       $array = array_values($temp_array);
-       return $array;
-
+    if(isset($grupos)) {
+        $grupos = super_unique($grupos, "name");
+        return array_values($grupos);
     }
-
-    $grupos = super_unique($grupos, "name");
-    return array_values($grupos);
+    else {
+        return [];
+    }
 }
 ?>

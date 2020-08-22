@@ -138,7 +138,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <p class="modal-card-title">Agregar/eliminar staff</p>
                 <button onclick="closeschool()" class="delete" aria-label="close"></button>
             </header>
-            <form action="managestaff.php" method="POST">
+            <form action="manageschool.php" method="POST">
                 <section class="modal-card-body">
                     <div class="field">
                         <label class="label">Código del centro</label>

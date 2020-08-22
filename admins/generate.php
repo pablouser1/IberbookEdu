@@ -1,9 +1,13 @@
 <?php
 // Generate HTML final document and generate ZIP file //
 session_start();
+
+if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
+    header("Location: ../login.php");
+}
+
 require_once("../helpers/db.php");
 ob_start();
-
 // Get vars from before and set a new one
 $students = $_SESSION["students"];
 $teachers = $_SESSION["teachers"];
@@ -24,15 +28,13 @@ function recursivecopy($source, $dest){
          }
        }
 }
-$source = "../assets/styles/yearbook/";
-$dest = $baseurl.'styles/';
-recursivecopy($source, $dest);
-$source = "../assets/scripts/yearbook/";
-$dest = $baseurl.'scripts/';
-recursivecopy($source, $dest);
-copy("externalprojects_licenses.txt", $baseurl.'externalprojects_licenses.txt');
+$source = "../assets/yearbook";
+recursivecopy($source, $baseurl);
 copy("../LICENSE",  $baseurl.'LICENSE.txt');
 copy("../favicon.ico",  $baseurl.'favicon.ico');
+
+// Get date (used later)
+$dt = new DateTime("now");
 ?>
 
 <!DOCTYPE html>
@@ -55,9 +57,10 @@ copy("../favicon.ico",  $baseurl.'favicon.ico');
     <link rel="stylesheet" href="styles/yearbook.css">
     <!-- User data in JSON, output of PHP -->
     <script type="text/javascript">
-        const students_js = <?php echo json_encode($students);?>;
         const teachers_js = <?php echo json_encode($teachers);?>;
+        const students_js = <?php echo json_encode($students);?>;
         const gallery_js = <?php echo json_encode($gallery);?>;
+        const ybdate_js = <?php echo($dt->getTimestamp());?>;
     </script>
 </head>
 
@@ -83,6 +86,7 @@ copy("../favicon.ico",  $baseurl.'favicon.ico');
             <div class="container">
                 <h1 class="title has-text-centered"><?php echo($userinfo["yearuser"]);?></h1>
                 <h2 class="subtitle has-text-centered"></h2>
+                <h2 id="recap" class="subtitle has-text-centered"></h2>
             </div>
         </div>
     </section>
@@ -291,7 +295,7 @@ copy("../favicon.ico",  $baseurl.'favicon.ico');
     <!-- Footer, currently only used for changing languages -->
     <footer id="footer" class="footer">
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
-            <ul>
+            <ul id="languages">
                 <li><a onclick="changelanguage('en')">English</a></li>
                 <li><a onclick="changelanguage('es')">Español</a></li>
             </ul>
@@ -303,6 +307,8 @@ copy("../favicon.ico",  $baseurl.'favicon.ico');
     <script src="scripts/lang.js"></script>
     <!-- Yearbook manager -->
     <script src="scripts/yearbook.js"></script>
+    <!-- Misc -->
+    <script src="scripts/misc.js"></script>
     <!-- Splashscreen handler -->
     <script src="scripts/splashscreen.js"></script>
 </body>
@@ -359,7 +365,6 @@ class HZip
 }
 
 // Makes zip from folder
-$dt = new DateTime("now", new DateTimeZone('Europe/Madrid'));
 $date_file = $dt->format('d-m-Y_his');
 $zip_name = "yearbook_".$date_file.'.zip';
 $zip_path = $baseurl.$zip_name;

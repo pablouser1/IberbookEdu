@@ -27,7 +27,9 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 # TODO
 
 * Agregar soporte para Formación Profesional
+* Agregar soporte para 6º Primaria (No sigue la misma mecánica que 4º ESO y 2º BCT)
 * Agregar curso académico (2019/2020 por ejemplo)
+* Arreglar profesores, (asignaturas no salen todas las veces)
 
 # Credits
 

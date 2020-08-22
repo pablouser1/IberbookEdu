@@ -4,7 +4,7 @@ if (isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
     $userinfo = $_SESSION["userinfo"];
     header("Location: users/dashboard.php");
 }
-$login_error = $password_err = $username_err = "";
+$login_error = array();
 require_once("helpers/db.php");
 require_once("helpers/api.php");
 
@@ -12,19 +12,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Reset SESSION
     $_SESSION = array();
     if(empty(trim($_POST["username"]))){
-        $username_err = "No has escrito ningún nombre de usuario.";
+        $login_error = "No has escrito ningún nombre de usuario.";
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
     if(empty(trim($_POST["password"]))){
-        $password_err = "No has escrito ninguna contraseña.";
+        $login_error = "No has escrito ninguna contraseña.";
     } 
     else{
         $password = trim($_POST["password"]);
     }
-    if(empty($username_err) && empty($password_err)){
+    if(empty($login_error)){
         // Get type
         $type = $_POST["type"];
         // Login user to pasen and check if there are any errors
@@ -38,11 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
                 $result = $conn->query($sql);
                 if ($result !== false && $result->num_rows == 0) {
-                    $login_error = "Su centro no está permitido";
+                    $login_error[] = "Su centro no está permitido";
                 }
-                //Check if user is from 6º Primaria, 4º ESO or 2ºBCT    
-                if(strpos($userinfo["yearuser"], "4º ESO") === false || strpos($userinfo["yearuser"], "2º BCT") === false || strpos($userinfo["yearuser"], "6EP") === false){
-                    $login_error = "Sólo se admiten usuarios de 6º de Primaria, 4º ESO o de 2º BACH";
+
+                //Check if user is from 4º ESO or 2ºBCT    
+                if((strpos($userinfo["yearuser"], "4º ESO") || strpos($userinfo["yearuser"], "2º BCT") === false)) {
+                    $login_error[] = "Sólo se admiten usuarios de 4º ESO o de 2º BACH";
                 }
             }
             if(empty($login_error)){
@@ -75,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         else{
-            $login_error = $loginres["error"];
+            $login_error[] = $loginres["error"];
         }
     }
 }
@@ -89,7 +90,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Iberbook Login</title>
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
 </head>
 
 <body>
@@ -134,18 +134,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <a href="about.html">Acerca de</a>
                         </form>
-                        <?php
-                        if($login_error || $username_err || $password_err !== ""){
-                            echo <<<EOL
-                            <div class="notification is-danger">
-                                <span>
-                                    <p>$login_error</p>
-                                    <p>$username_err $password_err</p>
-                                </span>
-                            </div>
-                            EOL;
-                        }
-                        ?>
+                        <div class="notification is-danger <?php if(empty($login_error)) echo('is-hidden');?>">
+                            <span>
+                                <?php
+                                if(!empty($login_error)){
+                                    foreach($login_error as $error){
+                                        echo <<<EOL
+                                        <p>Hubo un error al iniciar sesión:<br>$error</p>
+                                        EOL;
+                                    }
+                                }
+                                ?>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

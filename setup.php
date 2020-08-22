@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
         $ssloptions = 'array(
             // The cafile is necessary only in Andalucia
-            "cafile" => $base_path."/helpers/cert/juntadeandalucia-es-chain.pem",
+            "cafile" => $base_path."helpers/cert/juntadeandalucia-es-chain.pem",
             "verify_peer"=> true,
             "verify_peer_name"=> true,
         );';

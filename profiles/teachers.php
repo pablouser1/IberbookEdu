@@ -3,27 +3,45 @@ session_start();
 if (!isset($_SESSION["loggedin"]) && !isset($_SESSION["teacherinfo"])){
     header("Location: ../login.php");
 }
+$finalschools = array();
 require_once("../helpers/api.php");
 require_once("../helpers/db.php");
 $teacherinfo = $_SESSION["teacherinfo"];
-// Get only allowed schools
+// Get groups
+$cookies = $_SESSION["cookies"];
+// Set array with only allowed schools
 $stmt = $conn->prepare("SELECT name, id FROM schools WHERE id=?");
+// Check each school available
 foreach($teacherinfo["centros"] as $id => $centro){
   $stmt->bind_param("i", $centro["id"]);
   $stmt->execute();
-  $stmt->store_result();    
+  $stmt->store_result();
   $stmt->bind_result($allowed_name, $allowed_id);
   if($stmt->num_rows == 1) {
-      while ($stmt->fetch()) {
-          $allowed_schools[$id]["name"] = $allowed_name;
-          $allowed_schools[$id]["id"] = $allowed_id;
+    if(!empty($centro["X_CENTRO"])){
+      $data = ["X_CENTRO" => $centro["X_CENTRO"], "C_PERFIL" => "P"];
+      changeschoolteachers($cookies, $data);
+    }
+    $groups = getgroupsteachers($cookies);
+    while ($stmt->fetch()) {
+      // Set basic school info
+      $finalschools[$id] = [
+        "name" => $allowed_name,
+        "id" => $allowed_id,
+      ];
+    }
+    // Set groups info
+    if(empty($groups)){
+      $finalschools[$id]["groups"][] = [];
+    }
+    else {
+      foreach ($groups as $group) {
+        $finalschools[$id]["groups"][] = $group;
       }
+    }
   }
 }
 $stmt->close();
-$cookies = $_SESSION["cookies"];
-$groups = getgroupsteachers($cookies);
-
 // User submitted info
 if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
   // https://stackoverflow.com/a/4128377
@@ -36,34 +54,44 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
   
     return false;
   }
-  $groupform = explode("-", $_GET["select_curso"]);
-  // Check if user didn't manipulate input
-  if(in_array_r($groupform[0], $groups)){
-    $valid["groupname"] = true;
+  if($_GET["select_curso"] !== "notavailable") {
+    $valid["select_ok"] = true;
+    $groupform = explode("-", $_GET["select_curso"]);
+    $id = $_GET["schoolid"];
+    // Check if user didn't manipulate input
+    if(in_array_r($groupform[0], $finalschools[$id])){
+      $valid["groupname"] = true;
+    }
+    if(in_array_r($groupform[1], $finalschools[$id])){
+      $valid["subjectname"] = true;
+    }
+    if($_GET["schoolname"] == $finalschools[$id]["name"]){
+      $valid["schoolname"] = true;
+    }
+    if($_GET["schoolid"] == $finalschools[$id]["id"]){
+      $valid["schoolid"] = true;
+    }
+    // If everything is OK, continue
+    if(isset($valid["select_ok"], $valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"])){
+      $userinfo = array(
+        "iduser" => $teacherinfo["iduser"],
+        "nameuser" => $teacherinfo["nameuser"],
+        "typeuser" => $teacherinfo["typeuser"],
+        "subject" => $groupform[1],
+        "yearuser" => $groupform[0],
+        "photouser" => base64_encode(file_get_contents("../assets/img/PortraitPlaceholder.png")), // SENECA doesn't have photos
+        "idcentro" => $_GET["schoolid"],
+        "namecentro" => $_GET["schoolname"]
+      );
+      $_SESSION["userinfo"] = $userinfo;
+      header("Location: ../users/dashboard.php");
+    }
+    else {
+      $error[] = "Ha habido un error al procesar tu solicitud, ¿has modificado los valores?";
+    }
   }
-  if(in_array_r($groupform[1], $groups)){
-    $valid["subjectname"] = true;
-  }
-  if(in_array_r($_GET["schoolname"], $allowed_schools)){
-    $valid["schoolname"] = true;
-  }
-  if(in_array_r($_GET["schoolid"], $allowed_schools)){
-    $valid["schoolid"] = true;
-  }
-  // If everything is OK, continue
-  if(isset($valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"]) || isset($_GET["debug"])){
-    $userinfo = array(
-      "iduser" => $teacherinfo["iduser"],
-      "nameuser" => $teacherinfo["nameuser"],
-      "typeuser" => $teacherinfo["typeuser"],
-      "subject" => $groupform[1],
-      "yearuser" => $groupform[0],
-      "photouser" => base64_encode(file_get_contents("../assets/img/PortraitPlaceholder.png")), // SENECA doesn't have photos
-      "idcentro" => $_GET["schoolid"],
-      "namecentro" => $_GET["schoolname"]
-    );
-    $_SESSION["userinfo"] = $userinfo;
-    header("Location: ../users/dashboard.php");
+  else {
+    $error[] = "Ese centro no tiene cursos disponibles";
   }
 }
 ?>
@@ -92,65 +120,72 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
     <section class="section">
         <div class="columns is-mobile is-multiline">
             <?php
-            // What even is this
-            foreach($allowed_schools as $school){
-              if (empty($groups)){
+            if (empty($finalschools)){
+              echo '
+              <div class="column">
+                <p class="title">No tienes centros aceptados</p>
+              </div>
+              ';
+            }
+            else {
+              foreach($finalschools as $id => $school){
                 echo '
                 <div class="column">
-                  <p class="title">'.$school.' no tiene cursos disponibles</p>
-                </div>
-                ';
-              }
-              else{
-                echo '
-                <div class="column">
-                    <div class="card">
-                        <header class="card-header">
-                            <p class="card-header-title">
-                            '.$school["name"].'
-                            </p>
-                        </header>
-                        <div class="card-content">
-                          <p class="subtitle">Seleciona un curso</p>
-                ';
-                // Cursos de profesores
-                echo('
-                <form method="get" action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'">
-                  <input name="schoolid" type="hidden" value="'.$school["id"].'"></input>
-                  <input name="schoolname" type="hidden" value="'.$school["name"].'"></input>
-                  <div class="field">
-                    <div class="control">
-                      <div class="select">
-                        <select name="select_curso">');
-                foreach($groups as $grupo){
-                  echo <<<EOL
-                      <option value="$grupo[name]-$grupo[subject]">$grupo[name] - $grupo[subject]</option>
-                  EOL;
-                }
-                echo '
-                </select></div></div></div>
-                <div class="field">
-                  <div class="control">
-                    <button id="login_teacher" class="button is-primary">Continuar</button>
+                  <div class="card">
+                    <header class="card-header">
+                      <p class="card-header-title">
+                        '.$school["name"].'
+                      </p>
+                    </header>
+                    <div class="card-content">
+                      <p class="subtitle">Selecciona un curso</p>
+                      <form method="get" action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'">
+                        <input name="schoolid" type="hidden" value="'.$school["id"].'"></input>
+                        <input name="schoolname" type="hidden" value="'.$school["name"].'"></input>
+                        <div class="field">
+                          <div class="control">
+                            <div class="select">
+                              <select name="select_curso">
+                              ';
+                              foreach($school["groups"] as $group){
+                                if(!empty($group)){
+                                  echo '
+                                  <option value="'.$group["name"].'-'.$group["subject"].'">'.$group["name"].' - '.$group["subject"].'</option>
+                                  ';
+                                }
+                                else echo '<option value="notavailable">No hay grupos disponibles</option>';
+                              }
+                              echo '
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="field">
+                          <div class="control">
+                            <button id="login_teacher" class="button is-primary">Continuar</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
-                </form></div></div></div></div>';
+                ';
               }
             }
             ?>
         </div>
         <progress id="progress" class="progress is-primary is-hidden" max="100"></progress>
-        <?php
-        if(isset($error)){
-          echo <<<EOL
-          <div class="container">
-            <div class="notification is-danger">
-              $error
-            </div>
+        <div class="container <?php if(!isset($error)) echo("is-hidden");?>">
+          <div class="notification is-danger">
+            <?php
+            if(isset($error)){
+              foreach ($error as $error_i) {
+                echo($error_i);
+              }
+            }
+            ?>
           </div>
-          EOL;
-        }
-        ?>
+        </div>
     </section>
     <footer class="footer">
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">

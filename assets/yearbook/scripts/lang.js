@@ -44,6 +44,9 @@ const lang_en = {
         distributed under the <a href="LICENSE.txt" target="_blank">GPLv3 license</a>`,
         contributors_button: "See contributors",
         madewith: "Made with <span style='color: #e25555;'> &#9829; </span> in Github"
+    },
+    misc: {
+        longtime: "Hi!👋 Long time no see, how is everything going?"
     }
 }
 
@@ -92,6 +95,9 @@ const lang_es = {
         distribuido bajo la <a href="LICENSE.txt" target="_blank">licencia GPLv3</a>`,
         contributors_button: "Ver contribuidores",
         madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> en Github"
+    },
+    misc: {
+        longtime: "¡Hola!👋 Hace más de cinco años de esta graduación, ¿qué tal va todo?"
     }
 }
 

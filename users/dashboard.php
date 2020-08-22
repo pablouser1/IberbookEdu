@@ -1,7 +1,9 @@
 <?php
 session_start();
+if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
+    header("Location: ../login.php");
+}
 require_once("../helpers/db.php");
-
 function delete_files($target) {
     if(is_dir($target)){
         $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
@@ -16,59 +18,66 @@ function delete_files($target) {
     }
 }
 
-if(isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
-    // User data
-    $userinfo = $_SESSION["userinfo"];
-    if ($userinfo["typeuser"] == "P"){
-        $table_name = "teachers";
-    }
-    else{
-        $table_name = "students";
-    }
-    $_SESSION["table_name"] = $table_name;
-    // Elimina datos del usuario
-    if(isset($_POST['reset'])) {
-        // Base de datos
-        $stmt = $conn->prepare("DELETE FROM $table_name WHERE id=?");
-        $stmt->bind_param("s", $userinfo["iduser"]);
-        if ($stmt->execute() !== true) {
-            die("Error deleting data: " . $conn->error);
-        }
-        $stmt->close();
-        // Ficheros
-        delete_files('../yearbooks/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/".$userinfo["iduser"]);
-        header("Location: dashboard.php");
-    }
-    // Check if yearbook is available
-    $stmt = $conn->prepare("SELECT generated, available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
-    $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($generated, $available);
-    if ($stmt->num_rows == 1) {
-        if(($result = $stmt->fetch()) == true && $available == 1){
-            $yearbook = array(
-                "date" => $generated,
-                "available" => $available,
-            );
-        }
-    }
-    $stmt->close();
-    // Check if user uploaded pic and vid before
-    if (isset($userinfo["subject"])){
-        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
-        FROM $table_name where schoolid=? and schoolyear=?");
-    }
-    else{
-        $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
-        FROM $table_name where schoolid=? and schoolyear=?");
-    }
-    $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-    $stmt->execute();
-    $result = $stmt->get_result();
+// User data
+$userinfo = $_SESSION["userinfo"];
+if ($userinfo["typeuser"] == "P"){
+    $table_name = "teachers";
 }
 else{
-    header("Location: ../login.php");
+    $table_name = "students";
+}
+$_SESSION["table_name"] = $table_name;
+
+// Elimina datos del usuario
+if(isset($_POST['reset'])) {
+    // Base de datos
+    $stmt = $conn->prepare("DELETE FROM $table_name WHERE id=?");
+    $stmt->bind_param("s", $userinfo["iduser"]);
+    if ($stmt->execute() !== true) {
+        die("Error deleting data: " . $conn->error);
+    }
+    $stmt->close();
+    // Ficheros
+    delete_files('../yearbooks/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/".$userinfo["iduser"]);
+    header("Location: dashboard.php");
+}
+// Check if yearbook is available
+$stmt = $conn->prepare("SELECT generated, available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
+$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($generated, $available);
+if ($stmt->num_rows == 1) {
+    if(($result = $stmt->fetch()) == true && $available == 1){
+        $yearbook = array(
+            "date" => $generated,
+            "available" => $available,
+        );
+    }
+}
+$stmt->close();
+// Check if user uploaded pic and vid before
+if (isset($userinfo["subject"])){
+    $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
+    FROM $table_name where schoolid=? and schoolyear=?");
+}
+else{
+    $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
+    FROM $table_name where schoolid=? and schoolyear=?");
+}
+$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+$stmt->execute();
+$result = $stmt->get_result();
+// Set array with values
+$user_values = [];
+if ($result->num_rows > 0){
+    while ($row = mysqli_fetch_assoc($result)) {
+        $id = $row["id"];
+        $user_values[$id] = array();
+        foreach ($row as $field => $value) {
+            $user_values[$id][] = $value;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -116,7 +125,7 @@ else{
                 <hr>
                 END;
             }
-            if ($result->num_rows == 0){
+            if (empty($user_values)){
                 echo <<<END
                 <div class="content has-text-centered">
                     <h1 class="title">¡Hola! Bienvenido</h1>
@@ -130,15 +139,7 @@ else{
                 </div>
             END;
             }
-            elseif ($result->num_rows == 1) {
-                $user_values = array();
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $id = $row["id"];
-                    $user_values[$id] = array();
-                    foreach ($row as $field => $value) {
-                        $user_values[$id][] = $value;
-                    }
-                }
+            else {
                 echo("<h1 class='title'>Tus datos</h1>");
             }
             ?>
@@ -173,10 +174,14 @@ else{
                                     <td>$individual[1]</td>
                                     <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=$userinfo[typeuser]' target='_blank'>$individual[2]</a></td>
                                     <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
-                                    <td><a href="$individual[4]" target="_blank">Abrir enlace</a></td>
-                                    <td>$individual[5]</td>
-                                    <td>$individual[6]</td>
                                 END;
+                                if (empty($individual[4])) echo '<td class="has-text-centered">-</td>';
+                                else echo '<td><a href="'.$individual[4].'" target="_blank">Abrir enlace</a></td>';
+
+                                if (empty($individual[5])) echo '<td class="has-text-centered">-</td>';
+                                else echo '<td>'.$individual[5].'</td>';
+
+                                echo '<td>'.$individual[6].'</td>';
                                 if($userinfo["typeuser"] == "P"){
                                     echo("<td>$individual[7]</td>");
                                 }
@@ -189,7 +194,7 @@ else{
             </div>
             <?php
             // Comprobar si ya hay información subida
-            if ($result->num_rows == 1 && !isset($yearbook)){
+            if (!empty($user_values) && !isset($yearbook)){
                 echo '
                 <hr>
                 <form method="post">

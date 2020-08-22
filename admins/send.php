@@ -3,9 +3,8 @@
 
 session_start();
 // Check if the user is logged in, if not then redirect him to login page
-if($_SESSION["loggedin"] !== "admin"){
-    header("location: login.php");
-    exit;
+if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
+    header("Location: ../login.php");
 }
 function getname($type, $string){
     if($type == "abbr"){
