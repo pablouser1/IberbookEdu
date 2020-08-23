@@ -9,13 +9,11 @@ $ownerinfo = $_SESSION["ownerinfo"];
 $stmt = $conn->prepare("SELECT id, username, permissions FROM staff");
 $stmt->execute();
 $result = $stmt->get_result();
-$staff_values = array();
-$staff_fields = mysqli_fetch_fields($result);
 while ($row = mysqli_fetch_assoc($result)) {
     $id = $row["id"];
-    $staff_values[$id] = array();
-    foreach ($row as $field => $value) {
-        $staff_values[$id][] = $value;
+    $staff[$id] = array();
+    foreach ($row as $value) {
+        $staff[$id][] = $value;
     }
 }
 ?>
@@ -29,6 +27,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   </head>
+
   <body>
     <section class="hero is-primary">
         <div class="hero-body">
@@ -45,26 +44,26 @@ while ($row = mysqli_fetch_assoc($result)) {
     <section class="section">
         <div class="columns">
             <div class="column">
-                <h1 class="title">Staff</h1>
+                <p class="title">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Staff</span>
+                </p>
                 <table class="table is-bordered is-striped is-hoverable">
                 <thead>
                     <tr>
-                        <?php
-                        // Get all fields from teachers' table
-                        foreach($staff_fields as $val){
-                            echo ("<th>$val->name</th>");
-                        }
-                        ?>
+                        <th>ID</th>
+                        <th>Nombre de usuario</th>
+                        <th>Permisos</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    foreach($staff_values as $individual){
+                    foreach($staff as $user){
                         echo <<<EOL
                         <tr>
-                        <td>$individual[0]</td>
-                        <td>$individual[1]</td>
-                        <td>$individual[2]</td>
+                        <td>$user[0]</td>
+                        <td>$user[1]</td>
+                        <td>$user[2]</td>
                         </tr>
                         EOL;
                     }
@@ -74,13 +73,33 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
         </div>
         <div class="buttons">
-            <button id="managestaff" type="button" class="button is-info">Agregar/eliminar staff</button>
+            <button id="managestaff" type="button" class="button is-info">
+                <span class="icon">
+                    <i class="fas fa-user-friends"></i>
+                </span>
+                <span>Agregar/eliminar staff</span>
+            </button>
         </div>
         <hr>
-        <h1 class="title">Administración general</h1>
+        <p class="title">
+            <span class="icon">
+                <i class="fas fa-tasks"></i>
+            </span>
+            <span>Administración general</span>
+        </p>
         <div class="buttons">
-            <button id="manageschool" type="button" class="button is-info">Agregar/eliminar centro</button>  
-            <button id="cleardb" type="button" class="button is-danger">Limpiar bases de datos</button>  
+            <button id="manageschool" type="button" class="button is-info">
+                <span class="icon">
+                    <i class="fas fa-school"></i>
+                </span>
+                <span>Agregar/eliminar centro</span>
+            </button>  
+            <button id="cleardb" type="button" class="button is-danger">
+                <span class="icon">
+                    <i class="fas fa-database"></i>
+                </span>
+                <span>Limpiar bases de datos</span>
+            </button>  
         </div>
     </section>
     <!-- Modal for adding/removing staff members -->
@@ -124,8 +143,18 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button id="addstaff" name="addstaff" value="admin" class="button is-success" type="submit">Agregar</button>
-                    <button id="removestaff" name="removestaff" value="admin" class="button is-danger" type="submit">Eliminar</button>
+                    <button id="addstaff" name="addstaff" value="admin" class="button is-success" type="submit">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span>Agregar</span>
+                    </button>
+                    <button id="removestaff" name="removestaff" value="admin" class="button is-danger" type="submit">
+                        <span class="icon">
+                            <i class="fas fa-minus"></i>
+                        </span>
+                        <span>Eliminar</span>
+                    </button>
                 </footer>
             </form>
         </div>
@@ -160,8 +189,18 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button name="addschool" class="button is-success" type="submit">Agregar</button>
-                    <button name="removeschool" class="button is-danger" type="submit">Eliminar</button>
+                    <button name="addschool" class="button is-success" type="submit">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span>Agregar</span>
+                    </button>
+                    <button name="removeschool" class="button is-danger" type="submit">
+                        <span class="icon">
+                            <i class="fas fa-minus"></i>
+                        </span>
+                        <span>Eliminar</span>
+                    </button>
                 </footer>
             </form>
         </div>
@@ -177,7 +216,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             <form action="cleardb.php" method="POST">
                 <section class="modal-card-body">
                     <p><span class="has-background-danger"><b>ADVERTENCIA</b></span>, esta función elimina todos los datos
-                    subidos por los usuarios de un centro, <span class="has-background-danger">ESTA ACCIÓN ES IRREVERSIBLE</span></p>
+                    subidos por los usuarios de un centro, <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span></p>
                     <div class="field">
                         <label class="label">Código del centro</label>
                         <div class="control has-icons-left">
@@ -189,7 +228,12 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button name="cleardb" class="button is-danger" type="submit">Limpiar</button>
+                    <button name="cleardb" class="button is-danger" type="submit">
+                        <span class="icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </span>
+                        <span>Limpiar</span>
+                    </button>
                 </footer>
             </form>
         </div>
@@ -210,4 +254,5 @@ while ($row = mysqli_fetch_assoc($result)) {
     </footer>
     <script src="scripts/dashboard.js"></script>
   </body>
+
 </html>

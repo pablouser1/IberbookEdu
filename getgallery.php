@@ -33,6 +33,6 @@ if ($stmt->num_rows == 1) {
     }
 }
 else{
-    echo("No se ha podido encontrar los datos que solicitaste");
+    echo("No se ha podido encontrar la foto que solicitaste");
 }
 ?>

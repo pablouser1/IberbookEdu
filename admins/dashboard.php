@@ -5,7 +5,7 @@ require_once("../helpers/db.php");
 require_once("../helpers/config.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
-    header("location: ../login.php");
+    header("Location: ../login.php");
 }
 
 $userinfo = $_SESSION["userinfo"];
@@ -198,24 +198,26 @@ if ($stmt->num_rows == 1) {
                 <div class="select">
                     <select id="select_user">
                     <?php
+                    echo("<option disabled>Profesores</option>");
                     if (isset($teachers)){
-                        echo("<option disabled>Profesores</option>");
                         foreach ($teachers as $teacher){
                             echo ('<option value="'.$teacher[0].'">'.$teacher[1].'</option>');
                         }
                     }
+                    else echo("<option>No hay profesores disponibles");
+                    echo("<option disabled>Alumnos</option>");
                     if (isset($students)){
-                        echo("<option disabled>Alumnos</option>");
                         foreach ($students as $student){
                             echo ('<option value="'.$student[0].'">'.$student[1].'</option>');
                         }
                     }
+                    else echo("<option>No hay alumnos disponibles</option>");
                     ?>
                     </select>
                 </div>
             </div>
             <div class="control">
-                <button id="delete_user" class="button is-danger <?php if(!isset($teachers, $students)) echo('is-disabled');?>">
+                <button id="delete_user" class="button is-danger" <?php if(!isset($teachers) && !isset($students)) echo('disabled');?>>
                     <span class="icon">
                         <i class="fas fa-trash"></i>
                     </span>
@@ -291,7 +293,7 @@ if ($stmt->num_rows == 1) {
                     <span class="icon">
                         <i class="fas fa-user"></i>
                     </span>
-                    <span>Alternar permisos de visionado a usuarios</span>
+                    <span>Hacer visible a los usuarios</span>
                 </a>
                 ';
             }
@@ -299,12 +301,13 @@ if ($stmt->num_rows == 1) {
         ?>
     </section>
     <div id="progress" class="is-hidden container">
-        <p class="subtitle">Generando yearbook, este proceso puede tardar varios minutos</p>
+        <p class="subtitle">Generando yearbook, este proceso puede tardar varios minutos, por favor <strong>NO</strong> cierre su navegador</p>
         <progress class="progress is-primary" max="100"></progress>
     </div>
     <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
         <div class="buttons">
-            <a id="genyearbook" class="button is-success" href="send.php">
+            <!-- TODO, make button not start progress bar -->
+            <a id="genyearbook" class="button is-success" <?php if(!isset($students, $teachers)) echo("disabled"); else echo('href="send.php"');?>>
                 <span class="icon">
                     <i class="fas fa-check"></i>
                 </span>
@@ -321,6 +324,20 @@ if ($stmt->num_rows == 1) {
     <footer class="footer">
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
             <ul>
+                <?php
+                if(isset($_SESSION["teacherinfo"])) {
+                    echo '
+                    <li>
+                        <a href="../profiles/teachers.php">
+                            <span class="icon is-small">
+                                <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
+                            </span>
+                            <span>Cambiar de curso/centro escolar</span>
+                        </a>
+                    </li>
+                    ';
+                }
+                ?>
                 <li>
                     <a href="../users/dashboard.php">
                         <span class="icon is-small">

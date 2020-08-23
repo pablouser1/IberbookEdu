@@ -231,20 +231,8 @@ if ($result->num_rows > 0){
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
             <ul>
             <?php
-            if(isset($_SESSION["tutorinfo"])){
-                echo <<<EOL
-                <li>
-                    <a href="../profiles/tutorlegal.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                        </span>
-                        <span>Cambiar hijo</span>
-                    </a>
-                </li>
-                EOL;
-            }
-            if($_SESSION["loggedin"] == "admin"){
-                echo <<<EOL
+            if($_SESSION["loggedin"] == "admin") {
+                echo '
                 <li>
                     <a href="../admins/dashboard.php">
                         <span class="icon is-small">
@@ -253,7 +241,31 @@ if ($result->num_rows > 0){
                         <span>Cambiar a administrador</span>
                     </a>
                 </li>
-                EOL;
+                ';
+            }
+            if(isset($_SESSION["tutorinfo"])) {
+                echo '
+                <li>
+                    <a href="../profiles/tutorlegal.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cambiar hijo</span>
+                    </a>
+                </li>
+                ';
+            }
+            if(isset($_SESSION["teacherinfo"])) {
+                echo '
+                <li>
+                    <a href="../profiles/teachers.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
+                        </span>
+                        <span>Cambiar de curso/centro escolar</span>
+                    </a>
+                </li>
+                ';
             }
             ?>
                 <li>

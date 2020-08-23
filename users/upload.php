@@ -1,102 +1,102 @@
 <?php
 session_start();
+if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
+    header("Location: ../login.php");
+}
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
+
+$userinfo = $_SESSION["userinfo"];
+$table_name = $_SESSION["table_name"];
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
-$max_characters = 280;
-if(isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
-    $userinfo = $_SESSION["userinfo"];
-    $table_name = $_SESSION["table_name"];
-    $pic_error = $vid_error = $general_error = "";
-    // Check if user uploaded pic and vid before
-    $stmt = $conn->prepare("SELECT id FROM $table_name where schoolid=? and schoolyear=?");
-    $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows == 1){
-        die("No tienes permisos para acceder a esta página ya que ya has subido tu foto y tu vídeo.");
-    }
-    $stmt->close();
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Prepare
-        // Allowed formats
-        $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
-        $allowed_vid = array('mp4', 'webm');
-        // Upload directory
-        $baseurl = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/";
-        if(strlen($_POST["quote"]) > $max_characters){
-            $general_error = "Has excedido la máxima cantidad de caracteres";   
-        }
-        // Continue with the files upload if the quote didn't excede the max amount
-        else{
-            // Pic upload
-            if(isset($_FILES['pic'])){
-                $tmpFilePath = $_FILES['pic']['tmp_name'];
-                if($tmpFilePath != ""){
-                    $picPath = $baseurl.$userinfo["iduser"]."/".$_FILES['pic']['name'];
-                    $ext = pathinfo($picPath, PATHINFO_EXTENSION);
-                    // If the extension is not in the array create error message
-                    if (!in_array($ext, $allowed_pic)) {
-                        $pic_error = "$ext no es un formato admitido.<br>";
-                    }
-                    else{
-                        if (!is_dir($baseurl.$userinfo["iduser"])){
-                            mkdir($baseurl.$userinfo["iduser"], 0700, true);
-                        }
-                        $picname = basename($picPath);
-                        move_uploaded_file($tmpFilePath, $picPath);
-                    }
-                }
-            }
-            else{
-                $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
-            }
-            // Vid upload
-            if(isset($_FILES['vid'])){
-                $tmpFilePath = $_FILES['vid']['tmp_name'];
-                if($tmpFilePath != ""){
-                    $vidPath = $baseurl.$userinfo["iduser"]."/".$_FILES['vid']['name'];
-                    $ext = pathinfo($vidPath, PATHINFO_EXTENSION);
-                    // If the extension is not in the array create error message
-                    if (!in_array($ext, $allowed_vid)) {
-                        $vid_error = "$ext no es un formato admitido.<br>";
-                    }
-                    else{
-                        if (!is_dir($baseurl.$userinfo["iduser"])){
-                            mkdir($baseurl.$userinfo["iduser"], 0700, true);
-                        }
-                        $vidname = basename($vidPath);
-                        move_uploaded_file($tmpFilePath, $vidPath);
-                    }
-                }
-            }
-            else{
-                $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
-            }
-        }
-        // Inject to DB
-        if (empty($vid_error) && empty($pic_error) && empty($general_error)){
-            // Create row with user data, nl2br is used to follow line breaks.
-            if (isset($userinfo["subject"])){
-                $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssissssss",
-                $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], nl2br(htmlspecialchars($_POST["quote"])), $userinfo["subject"]);
-            }
-            else{
-                $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssisssss",
-                $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], nl2br(htmlspecialchars($_POST["quote"])));
-            }
-            if ($stmt->execute() !== true) {
-                die("Error inserting user data: " . $conn->error);
-            }
-            $stmt->close();
-            header("Location: finish.php");
-        }
-    }
+$max_characters = 280; // "Quote" max characters
+$pic_error = $vid_error = $general_error = "";
+
+// Check if user uploaded pic and vid before
+$stmt = $conn->prepare("SELECT id FROM $table_name where schoolid=? and schoolyear=?");
+$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result->num_rows == 1){
+    die("No tienes permisos para acceder a esta página ya que ya has subido tu foto y tu vídeo.");
 }
-else{
-    header("Location: ../login.php");
+$stmt->close();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Prepare
+    // Allowed formats
+    $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
+    $allowed_vid = array('mp4', 'webm');
+    // Upload directory
+    $baseurl = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/";
+    if(strlen($_POST["quote"]) > $max_characters){
+        $general_error = "Has excedido la máxima cantidad de caracteres";   
+    }
+    // Continue with the files upload if the quote didn't excede the max amount
+    else{
+        // Pic upload
+        if(isset($_FILES['pic'])){
+            $tmpFilePath = $_FILES['pic']['tmp_name'];
+            if($tmpFilePath != ""){
+                $picPath = $baseurl.$userinfo["iduser"]."/".$_FILES['pic']['name'];
+                $ext = pathinfo($picPath, PATHINFO_EXTENSION);
+                // If the extension is not in the array create error message
+                if (!in_array($ext, $allowed_pic)) {
+                    $pic_error = "$ext no es un formato admitido.<br>";
+                }
+                else{
+                    if (!is_dir($baseurl.$userinfo["iduser"])){
+                        mkdir($baseurl.$userinfo["iduser"], 0700, true);
+                    }
+                    $picname = basename($picPath);
+                    move_uploaded_file($tmpFilePath, $picPath);
+                }
+            }
+        }
+        else{
+            $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
+        }
+        // Vid upload
+        if(isset($_FILES['vid'])){
+            $tmpFilePath = $_FILES['vid']['tmp_name'];
+            if($tmpFilePath != ""){
+                $vidPath = $baseurl.$userinfo["iduser"]."/".$_FILES['vid']['name'];
+                $ext = pathinfo($vidPath, PATHINFO_EXTENSION);
+                // If the extension is not in the array create error message
+                if (!in_array($ext, $allowed_vid)) {
+                    $vid_error = "$ext no es un formato admitido.<br>";
+                }
+                else{
+                    if (!is_dir($baseurl.$userinfo["iduser"])){
+                        mkdir($baseurl.$userinfo["iduser"], 0700, true);
+                    }
+                    $vidname = basename($vidPath);
+                    move_uploaded_file($tmpFilePath, $vidPath);
+                }
+            }
+        }
+        else{
+            $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
+        }
+    }
+    // Inject to DB
+    if (empty($vid_error) && empty($pic_error) && empty($general_error)){
+        // Create row with user data, nl2br is used to follow line breaks.
+        if (isset($userinfo["subject"])){
+            $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssissssss",
+            $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], nl2br(htmlspecialchars($_POST["quote"])), $userinfo["subject"]);
+        }
+        else{
+            $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssisssss",
+            $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], nl2br(htmlspecialchars($_POST["quote"])));
+        }
+        if ($stmt->execute() !== true) {
+            die("Error inserting user data: " . $conn->error);
+        }
+        $stmt->close();
+        header("Location: finish.php");
+    }
 }
 ?>
 <!DOCTYPE html>

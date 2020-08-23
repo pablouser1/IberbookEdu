@@ -7,7 +7,6 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
 }
 
 require_once("../helpers/db.php");
-ob_start();
 // Get vars from before and set a new one
 $students = $_SESSION["students"];
 $teachers = $_SESSION["teachers"];
@@ -35,8 +34,8 @@ copy("../favicon.ico",  $baseurl.'favicon.ico');
 
 // Get date (used later)
 $dt = new DateTime("now");
+ob_start();
 ?>
-
 <!DOCTYPE html>
 <html>
 
@@ -288,7 +287,6 @@ $dt = new DateTime("now");
                 <section class="modal-card-body">
                     <span>Project Leader: Pablo Ferreiro Romero <a href="https://twitter.com/pablouser1" target="_blank">@pablouser1</a></span>
                 </section>
-                <footer id="contributors_footer" class="modal-card-foot"></footer>
             </div>
         </div>
     </section>
@@ -331,7 +329,7 @@ class HZip
       if ($f != '.' && $f != '..') {
         $filePath = "$folder/$f";
         // Remove prefix from file path before add to zip.
-        $localPath = substr($filePath, $exclusiveLength);
+        $localPath = "yearbook".substr($filePath, $exclusiveLength);
         if (is_file($filePath)) {
           $zipFile->addFile($filePath, $localPath);
         } elseif (is_dir($filePath)) {
@@ -354,7 +352,6 @@ class HZip
   public static function zipDir($sourcePath, $outZipPath)
   {
     $pathInfo = pathInfo($sourcePath);
-    $parentPath = $pathInfo['dirname'];
     $dirName = $pathInfo['basename'];
 
     $z = new ZipArchive();

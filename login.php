@@ -9,17 +9,15 @@ require_once("helpers/db.php");
 require_once("helpers/api.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Reset SESSION
-    $_SESSION = array();
     if(empty(trim($_POST["username"]))){
-        $login_error = "No has escrito ningún nombre de usuario.";
+        $login_error[] = "No has escrito ningún nombre de usuario.";
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
     if(empty(trim($_POST["password"]))){
-        $login_error = "No has escrito ninguna contraseña.";
+        $login_error[] = "No has escrito ninguna contraseña.";
     } 
     else{
         $password = trim($_POST["password"]);
@@ -40,10 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($result !== false && $result->num_rows == 0) {
                     $login_error[] = "Su centro no está permitido";
                 }
-
-                //Check if user is from 4º ESO or 2ºBCT    
-                if((strpos($userinfo["yearuser"], "4º ESO") || strpos($userinfo["yearuser"], "2º BCT") === false)) {
-                    $login_error[] = "Sólo se admiten usuarios de 4º ESO o de 2º BACH";
+                // Check if user is from 4º ESO, 2º BCT or 6º Primaria
+                if(!preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $userinfo["yearuser"])) {
+                    $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
                 }
             }
             if(empty($login_error)){
@@ -140,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 if(!empty($login_error)){
                                     foreach($login_error as $error){
                                         echo <<<EOL
-                                        <p>Hubo un error al iniciar sesión:<br>$error</p>
+                                        <p>Hubo un error al procesar tu solicitud:<br>$error</p>
                                         EOL;
                                     }
                                 }
@@ -152,7 +149,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </section>
-    <script src="scripts/login.js"></script>
 </body>
 
 </html>

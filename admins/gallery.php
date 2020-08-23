@@ -5,7 +5,7 @@ require_once("../helpers/db.php");
 require_once("../helpers/config.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
-    header("location: ../login.php");
+    header("Location: ../login.php");
     exit;
 }
 function delete_files($target) {

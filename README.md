@@ -17,17 +17,24 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 * Genera un ZIP preparado para extraer y colocar en cualquier parte.
 * Acepta agregar tanto profesores como alumnos.
   * Pueden añadir una foto y un vídeo
+  * Además pueden agregar opcionalmente un enlace y un texto de 280 caracteres máximo.
   * También los tutores legales pueden subir la foto y el vídeo de sus hijos
 * Galería general, puedes subir fotos del grupo aquí.
 * Gestión de cuentas:
   * Usuario: Puede subir y administrar sus datos
   * Administrador: Puede administrar los datos de su curso
-  * Dueño: Puede agregar administradores y dueños
+  * Dueño: Puede agregar administradores y dueños, además de cambiar los centros admitidos
+
+# Instalation
+
+Necesitas los siguientes programas para poder hacer funcionar IberBookEdu:
+* PHP5 (PHP7 recomendado)
+* Extensiones php-mysqli, php-zip
+* Servidor de bases de datos MySQL / MariaDB
 
 # TODO
 
 * Agregar soporte para Formación Profesional
-* Agregar soporte para 6º Primaria (No sigue la misma mecánica que 4º ESO y 2º BCT)
 * Agregar curso académico (2019/2020 por ejemplo)
 * Arreglar profesores, (asignaturas no salen todas las veces)
 

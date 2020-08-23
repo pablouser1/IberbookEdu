@@ -1,5 +1,4 @@
 <?php
-require("helpers/common.php");
 if (!extension_loaded('mysqli') || !extension_loaded('zip')) {
     die("Este programa necesita los siguientes plugins para funcionar: php-mysqli, php-zip");
 }

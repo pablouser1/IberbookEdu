@@ -147,6 +147,7 @@ function changeschoolteachers($cookies, $data){
     else return false;
 }
 // https://stackoverflow.com/a/10514539, eliminates duplicates in array
+// TODO, make array with 1 or more subjects
 function super_unique($array,$key)
 {
     $temp_array = [];
@@ -161,16 +162,14 @@ function super_unique($array,$key)
 function getgroupsteachers($cookies){
     $url = $GLOBALS["base_url"]."senecadroid/getGrupos";
     $response = json_decode(utf8_encode(post($url, [], $cookies)), true);
-    // TODO, subjects probably don't get stored properly
-
-    // Get each course, split all groups and if there are any 4º ESO, 2º BCT add it to array
+    // Get each course, split all groups and if there are any 4º ESO, 2º BCT, 6 Primaria add it to array
     foreach($response["RESULTADO"] as $id => $grupo){
-        $grupos_split[] = str_split($grupo["UNIDADES"], 10);
-        foreach($grupos_split[$id] as $nameid => $name){
-            if(strpos($name, "4º ESO") !== false || strpos($name, "2º BCT") !== false){
-                $grupos[$id]["name"] = trim($name);
-                $grupos[$id]["subject"] = $grupo["MATERIAS"];
-            }
+        preg_match_all("/(4º\sESO)\s.|(2º\sBCT)\s.|(6.)P/", $grupo["UNIDADES"], $tempgrupo);
+        foreach ($tempgrupo[0] as $temp) {
+            $grupos[] = [
+                "name" => $temp,
+                "subject" => $grupo["MATERIAS"]
+            ];
         }
     }
     if(isset($grupos)) {
