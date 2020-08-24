@@ -6,7 +6,7 @@ PASEN/SÉNECA (Andalucía)
 
 ROBLE (Madrid) (Sin verificar su funcionamiento)
 
-Este programa solo funciona para 2º de Bachillerato y 4º ESO por el momento.
+Este programa solo funciona para 2º de Bachillerato, 4º ESO y 6º Primaria
 
 Todos los datos del usuario se extraen a partir de la información de los servidores de PASEN/SENECA o ROBLE.
 

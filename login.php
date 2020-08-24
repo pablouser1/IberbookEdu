@@ -133,11 +133,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </form>
                         <div class="notification is-danger <?php if(empty($login_error)) echo('is-hidden');?>">
                             <span>
+                                <p>Hubo un error al procesar tu solicitud:</p>
                                 <?php
                                 if(!empty($login_error)){
                                     foreach($login_error as $error){
                                         echo <<<EOL
-                                        <p>Hubo un error al procesar tu solicitud:<br>$error</p>
+                                        <p>$error</p>
                                         EOL;
                                     }
                                 }
