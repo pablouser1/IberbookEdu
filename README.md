@@ -32,6 +32,8 @@ Necesitas los siguientes programas para poder hacer funcionar IberBookEdu:
 * Extensiones php-mysqli, php-zip
 * Servidor de bases de datos MySQL / MariaDB
 
+Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes comenzar con la instalación inicial encontrada en el archivo setup.php
+
 # TODO
 
 * Agregar soporte para Formación Profesional
