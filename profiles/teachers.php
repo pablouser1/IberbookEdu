@@ -44,54 +44,41 @@ foreach($teacherinfo["centros"] as $id => $centro){
 $stmt->close();
 // User submitted info
 if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
-  // https://stackoverflow.com/a/4128377
-  function in_array_r($needle, $haystack, $strict = false) {
-    foreach ($haystack as $item) {
-        if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
-            return true;
-        }
-    }
-  
-    return false;
+  $valid = array();
+  // School id and group id
+  $schoolid = $_GET["schoolid"];
+  $groupid = $_GET["select_curso"];
+
+  // Check if user didn't manipulate input
+  if(isset($finalschools[$schoolid]["groups"][$groupid])) {
+    $group = $finalschools[$schoolid]["groups"][$groupid]["name"];
+    $subject = $finalschools[$schoolid]["groups"][$groupid]["subject"];
+    $valid["groupinfo"] = true;
   }
-  if($_GET["select_curso"] !== "notavailable") {
-    $valid["select_ok"] = true;
-    $groupform = explode("-", $_GET["select_curso"]);
-    $id = $_GET["schoolid"];
-    // Check if user didn't manipulate input
-    if(in_array_r($groupform[0], $finalschools[$id])){
-      $valid["groupname"] = true;
-    }
-    if(in_array_r($groupform[1], $finalschools[$id])){
-      $valid["subjectname"] = true;
-    }
-    if($_GET["schoolname"] == $finalschools[$id]["name"]){
-      $valid["schoolname"] = true;
-    }
-    if($_GET["schoolid"] == $finalschools[$id]["id"]){
-      $valid["schoolid"] = true;
-    }
-    // If everything is OK, continue
-    if(isset($valid["select_ok"], $valid["groupname"], $valid["subjectname"], $valid["schoolname"], $valid["schoolid"])){
-      $userinfo = array(
-        "iduser" => $teacherinfo["iduser"],
-        "nameuser" => $teacherinfo["nameuser"],
-        "typeuser" => $teacherinfo["typeuser"],
-        "subject" => $groupform[1],
-        "yearuser" => $groupform[0],
-        "photouser" => base64_encode(file_get_contents("../assets/img/PortraitPlaceholder.png")), // SENECA doesn't have photos
-        "idcentro" => $_GET["schoolid"],
-        "namecentro" => $_GET["schoolname"]
-      );
-      $_SESSION["userinfo"] = $userinfo;
-      header("Location: ../users/dashboard.php");
-    }
-    else {
-      $error[] = "Ha habido un error al procesar tu solicitud, ¿has modificado los valores?";
-    }
+  if($_GET["schoolname"] == $finalschools[$schoolid]["name"]){
+    $valid["schoolname"] = true;
+  }
+  if($_GET["schoolid"] == $finalschools[$schoolid]["id"]){
+    $valid["schoolid"] = true;
+  }
+
+  // If everything is OK, continue
+  if(count($valid) == 3){
+    $userinfo = array(
+      "iduser" => $teacherinfo["iduser"],
+      "nameuser" => $teacherinfo["nameuser"],
+      "typeuser" => $teacherinfo["typeuser"],
+      "subject" => $subject,
+      "yearuser" => $group,
+      "photouser" => base64_encode(file_get_contents("../assets/img/PortraitPlaceholder.png")), // SENECA doesn't have photos
+      "idcentro" => $_GET["schoolid"],
+      "namecentro" => $_GET["schoolname"]
+    );
+    $_SESSION["userinfo"] = $userinfo;
+    header("Location: ../users/dashboard.php");
   }
   else {
-    $error[] = "Ese centro no tiene cursos disponibles";
+    $error[] = "Ha habido un error al procesar tu solicitud";
   }
 }
 ?>
@@ -147,10 +134,10 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
                             <div class="select">
                               <select name="select_curso">
                               ';
-                              foreach($school["groups"] as $group){
+                              foreach($school["groups"] as $id => $group){
                                 if(!empty($group)){
                                   echo '
-                                  <option value="'.$group["name"].'-'.$group["subject"].'">'.$group["name"].' - '.$group["subject"].'</option>
+                                  <option value='.$id.'>'.$group["name"].' - '.$group["subject"].'</option>
                                   ';
                                 }
                                 else echo '<option value="notavailable">No hay grupos disponibles</option>';

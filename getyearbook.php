@@ -16,9 +16,8 @@ $stmt->store_result();
 $stmt->bind_result($filename, $available);
 $stmt->fetch();
 if ($stmt->num_rows == 1) {
-    if($_SESSION["loggedin"] == "admin" || $available == "1"){
-        $filepath = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/generated/";
-        $fullname = $filepath.$filename;
+    if($_SESSION["loggedin"] == "admin" || $available == 1){
+        $fullname = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/".$filename;
         // https://stackoverflow.com/a/27805443 and https://stackoverflow.com/a/23447332
         if(file_exists($fullname)){
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -34,7 +33,7 @@ if ($stmt->num_rows == 1) {
             readfile($fullname);
         }
         else{
-            $yearbook_error = "Ha habido un error al descargar el yearbook";
+            $yearbook_error = "Este archivo no existe";
         }
     }
     else{

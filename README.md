@@ -38,7 +38,7 @@ Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes com
 
 * Agregar soporte para Formación Profesional
 * Agregar curso académico (2019/2020 por ejemplo)
-* Arreglar profesores, (asignaturas no salen todas las veces)
+* Rework profesores
 
 # Credits
 

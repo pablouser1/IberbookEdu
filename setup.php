@@ -151,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute() !== true) {
         die("Error writing owners' info: " . $conn->error);
     }
-
+    mkdir($global_config[1], 0755);
     // Elimina setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");

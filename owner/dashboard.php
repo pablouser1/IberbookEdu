@@ -94,11 +94,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </span>
                 <span>Agregar/eliminar centro</span>
             </button>  
-            <button id="cleardb" type="button" class="button is-danger">
+            <button id="archive" type="button" class="button is-danger">
                 <span class="icon">
-                    <i class="fas fa-database"></i>
+                    <i class="fas fa-archive"></i>
                 </span>
-                <span>Limpiar bases de datos</span>
+                <span>Archivar</span>
             </button>  
         </div>
     </section>
@@ -206,17 +206,22 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
     <!-- Modal for deleting rows of specific school -->
-    <div id="modaldb" class="modal">
-        <div onclick="closedb()" class="modal-background"></div>
+    <div id="modalarchive" class="modal">
+        <div onclick="closearchive()" class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">Limpiar base de datos</p>
-                <button onclick="closedb()" class="delete" aria-label="close"></button>
+                <p class="modal-card-title">Archivar datos</p>
+                <button onclick="closearchive()" class="delete" aria-label="close"></button>
             </header>
-            <form action="cleardb.php" method="POST">
+            <form action="archive.php" method="POST">
                 <section class="modal-card-body">
-                    <p><span class="has-background-danger"><b>ADVERTENCIA</b></span>, esta función elimina todos los datos
-                    subidos por los usuarios de un centro, <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span></p>
+                    <p>Archiva los yearbooks de un centro</p>
+                    <p>
+                        <span class="has-background-danger"><strong>ADVERTENCIA</strong></span>,
+                        esta función sólo conserva los .zip de los yearbooks, tanto los datos de la base de datos como los archivos
+                        subidos por los usuarios serán <strong>borrados.</strong><br>
+                        <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span>
+                    </p>
                     <div class="field">
                         <label class="label">Código del centro</label>
                         <div class="control has-icons-left">
@@ -228,7 +233,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button name="cleardb" class="button is-danger" type="submit">
+                    <button name="archive" class="button is-danger" type="submit">
                         <span class="icon">
                             <i class="fas fa-exclamation-triangle"></i>
                         </span>

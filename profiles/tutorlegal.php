@@ -55,11 +55,11 @@ if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
         </div>
       </section>
     <section class="section">
-        <div class="columns is-multiline">
+        <div class="columns is-multiline is-centered is-mobile">
             <?php
             foreach($tutorinfo["children"] as $id => $child){
                 echo '
-                <div class="column is-narrow">
+                <div class="column is-narrow is-full-mobile">
                     <div class="card">
                         <div class="card-content">
                             <div class="media">

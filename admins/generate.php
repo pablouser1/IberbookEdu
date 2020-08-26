@@ -1,5 +1,5 @@
 <?php
-// Generate HTML final document and generate ZIP file //
+// -- Generate HTML final document and generate ZIP file -- //
 session_start();
 
 if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
@@ -7,33 +7,28 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
 }
 
 require_once("../helpers/db.php");
+
+// Deleting files
+function recursivedelete($dir) {
+    $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+    $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
+    foreach($files as $file) {
+        if ($file->isDir()) rmdir($file->getRealPath());
+        else unlink($file->getRealPath());
+    }
+    rmdir($dir);
+}
+
 // Get vars from before and set a new one
 $students = $_SESSION["students"];
 $teachers = $_SESSION["teachers"];
 $gallery = $_SESSION["gallery"];
 $userinfo = $_SESSION["userinfo"];
-$baseurl = $_SESSION["baseurl"];
-// Copying files
-function recursivecopy($source, $dest){
-    foreach (
-        $iterator = new \RecursiveIteratorIterator(
-         new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
-         \RecursiveIteratorIterator::SELF_FIRST) as $item
-       ) {
-         if ($item->isDir()) {
-             mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-         } else {
-           copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-         }
-       }
-}
-$source = "../assets/yearbook";
-recursivecopy($source, $baseurl);
-copy("../LICENSE",  $baseurl.'LICENSE.txt');
-copy("../favicon.ico",  $baseurl.'favicon.ico');
+$zipdir = $_SESSION["zipdir"];
+$tempdir = $_SESSION["tempdir"];
 
 // Get date (used later)
-$dt = new DateTime("now");
+$dt = new DateTime("now", new DateTimeZone('Europe/Madrid'));
 ob_start();
 ?>
 <!DOCTYPE html>
@@ -313,7 +308,7 @@ ob_start();
 </html>
 <?php
 // Generate HTML file
-file_put_contents($baseurl.'index.html', ob_get_contents());
+file_put_contents($tempdir.'/index.html', ob_get_contents());
 // https://stackoverflow.com/a/19730838 Literally have no clue how this works, but it just works. Generate ZIP
 class HZip 
 { 
@@ -362,10 +357,9 @@ class HZip
 }
 
 // Makes zip from folder
-$date_file = $dt->format('d-m-Y_his');
+$date_file = $dt->format('d-m-Y');
 $zip_name = "yearbook_".$date_file.'.zip';
-$zip_path = $baseurl.$zip_name;
-HZip::zipDir($baseurl, $zip_path);
+HZip::zipDir($tempdir, $zipdir."/".$zip_name);
 
 // Writes data to DB
 $stmt = $conn->prepare("INSERT IGNORE INTO yearbooks(schoolid, schoolyear, zipname, available) VALUES(?, ?, ?, 0)");
@@ -373,5 +367,9 @@ $stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $zip_name
 if ($stmt->execute() !== true) {
     die("Error writing data: " . $conn->error);
 }
+
+// Delete temp dir
+recursivedelete($tempdir);
+
 header("Location: dashboard.php");
 ?>

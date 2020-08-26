@@ -1,6 +1,6 @@
 var modalstaff = document.getElementById("modalstaff")
 var modalschool = document.getElementById("modalschool")
-var modaldb = document.getElementById("modaldb")
+var modaldb = document.getElementById("modalarchive")
 document.getElementById("managestaff").addEventListener("click", function (){
     modalstaff.classList.add("is-active")
 })
@@ -9,7 +9,7 @@ document.getElementById("manageschool").addEventListener("click", function (){
     modalschool.classList.add("is-active")
 })
 
-document.getElementById("cleardb").addEventListener("click", function (){
+document.getElementById("archive").addEventListener("click", function (){
     modaldb.classList.add("is-active")
 })
 
@@ -46,6 +46,6 @@ function closeschool(){
     modalschool.classList.remove("is-active")
 }
 
-function closedb(){
+function closearchive(){
     modaldb.classList.remove("is-active")
 }

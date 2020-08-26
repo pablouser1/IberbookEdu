@@ -1,7 +1,6 @@
 <?php
 require_once("config.php");
 require_once("requests.php");
-
 // Login user
 function login($username, $password, $type){
     if ($type === "alumno" || $type === "tutorlegal"){
@@ -58,6 +57,7 @@ function getinfo($cookies, $type){
     $info = get($url, $cookies);
     // Save common user info to array
     switch($type){
+        // -- Alumno -- //
         case 'alumno':
             // Get Pic
             $datapic = array('X_MATRICULA' => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"], 'ANCHO' => 64, 'ALTO' => 64);
@@ -76,6 +76,7 @@ function getinfo($cookies, $type){
                 "namecentro" => $infocentro["namecentro"]
             );
             break;
+        // -- Tutor legal -- //
         case 'tutorlegal':
             // Set user info
             $userinfo = array(
@@ -84,6 +85,7 @@ function getinfo($cookies, $type){
                 "children" => $info["RESULTADO"][0]["HIJOS"],
             );
             break;
+        // -- Profesor -- //
         case 'profesor':
             // Set user info
             $idteacher = getidteacher($cookies);
@@ -146,8 +148,8 @@ function changeschoolteachers($cookies, $data){
     if ($response["ESTADO"]["CODIGO"] == "C") return true;
     else return false;
 }
+
 // https://stackoverflow.com/a/10514539, eliminates duplicates in array
-// TODO, make array with 1 or more subjects
 function super_unique($array,$key)
 {
     $temp_array = [];
@@ -166,14 +168,16 @@ function getgroupsteachers($cookies){
     foreach($response["RESULTADO"] as $id => $grupo){
         preg_match_all("/(4º\sESO)\s.|(2º\sBCT)\s.|(6.)P/", $grupo["UNIDADES"], $tempgrupo);
         foreach ($tempgrupo[0] as $temp) {
-            $grupos[] = [
+            $grupos_repeated[] = [
                 "name" => $temp,
                 "subject" => $grupo["MATERIAS"]
             ];
         }
     }
-    if(isset($grupos)) {
-        $grupos = super_unique($grupos, "name");
+
+    if(isset($grupos_repeated)) {
+        // Sort
+        $grupos = super_unique($grupos_repeated, "name");
         return array_values($grupos);
     }
     else {
