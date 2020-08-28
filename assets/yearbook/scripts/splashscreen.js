@@ -5,6 +5,7 @@ window.addEventListener("load", function(){
         document.getElementById("banner").classList.remove("is-hidden")
         document.getElementById("navbar").classList.remove("is-hidden")
         document.getElementById("yearbook").classList.remove("is-hidden")
+        document.getElementById("footer").classList.remove("is-hidden")
         confetti.start(1000)
     });
 })

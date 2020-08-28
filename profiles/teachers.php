@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION["loggedin"]) && !isset($_SESSION["teacherinfo"])){
     header("Location: ../login.php");
+    exit;
 }
 $finalschools = array();
 require_once("../helpers/api.php");
@@ -76,6 +77,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
     );
     $_SESSION["userinfo"] = $userinfo;
     header("Location: ../users/dashboard.php");
+    exit;
   }
   else {
     $error[] = "Ha habido un error al procesar tu solicitud";

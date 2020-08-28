@@ -3,32 +3,32 @@ session_start();
 if (isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
     $userinfo = $_SESSION["userinfo"];
     header("Location: users/dashboard.php");
+    exit;
 }
 $login_error = array();
 require_once("helpers/db.php");
 require_once("helpers/api.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(empty(trim($_POST["username"]))){
+    if(!$_POST["username"]){
         $login_error[] = "No has escrito ningún nombre de usuario.";
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
-    if(empty(trim($_POST["password"]))){
+    if(!$_POST["password"]){
         $login_error[] = "No has escrito ninguna contraseña.";
     } 
     else{
         $password = trim($_POST["password"]);
     }
-    if(empty($login_error)){
+    if(!$login_error){
         // Get type
         $type = $_POST["type"];
         // Login user to pasen and check if there are any errors
         $loginres = login($username, $password, $type);
-        $pos = strpos($loginres["error"], "error");
-        if ($pos === false){
+        if (!$loginres["error"]){
             // Get user info
             $userinfo = getinfo($loginres["cookies"], $type);
             // Check if school is allowed, only for students. Teachers' schools are checked in users/teachers.php
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
                 }
             }
-            if(empty($login_error)){
+            if(!$login_error){
                 // Check if user is admin
                 $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
                 $result = $conn->query($sql);
@@ -70,6 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("Location: profiles/teachers.php");
                     break;
                 }
+                exit;
             }
         }
         else{
@@ -78,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 
@@ -95,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="container">
                 <div class="columns is-centered">
                     <div class="column is-5-tablet is-4-desktop is-3-widescreen">
-                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" class="box">
+                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="box">
                             <div class="field">
                                 <label for="" class="label">Usuario</label>
                                 <div class="control has-icons-left">
@@ -131,17 +133,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <a href="about.html">Acerca de</a>
                         </form>
-                        <div class="notification is-danger <?php if(empty($login_error)) echo('is-hidden');?>">
+                        <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
                             <span>
                                 <p>Hubo un error al procesar tu solicitud:</p>
                                 <?php
-                                if(!empty($login_error)){
-                                    foreach($login_error as $error){
-                                        echo <<<EOL
-                                        <p>$error</p>
-                                        EOL;
+                                    if($login_error) {
+                                        foreach($login_error as $error) {
+                                            echo "<p>$error</p>";
+                                        }
                                     }
-                                }
                                 ?>
                             </span>
                         </div>

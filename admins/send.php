@@ -196,8 +196,9 @@ $dest = $tempdir;
 recursivecopy($source, $dest);
 
 $source = "../assets/yearbook";
+// Copy all assets/yearbook dir
 recursivecopy($source, $tempdir);
-copy("../LICENSE",  $tempdir.'/LICENSE.txt');
+
 copy("../favicon.ico",  $tempdir.'/favicon.ico');
 
 header("Location: generate.php");

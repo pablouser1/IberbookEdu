@@ -28,8 +28,8 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 # Instalation
 
 Necesitas los siguientes programas para poder hacer funcionar IberBookEdu:
-* PHP5 (PHP7 recomendado)
-* Extensiones php-mysqli, php-zip
+* PHP5.5 (PHP7 recomendado)
+* Extensiones php-mysqli, php-zip, php-curl
 * Servidor de bases de datos MySQL / MariaDB
 
 Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes comenzar con la instalación inicial encontrada en el archivo setup.php
@@ -37,8 +37,6 @@ Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes com
 # TODO
 
 * Agregar soporte para Formación Profesional
-* Agregar curso académico (2019/2020 por ejemplo)
-* Rework profesores
 
 # Credits
 

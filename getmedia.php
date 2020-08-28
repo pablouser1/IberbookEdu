@@ -5,6 +5,7 @@ require_once ("helpers/db.php");
 require_once ("helpers/config.php");
 if (!isset($_SESSION["loggedin"])){
     header("Location: login.php");
+    exit;
 }
 
 $userinfo = $_SESSION["userinfo"];
@@ -36,18 +37,17 @@ if ($stmt->num_rows == 1) {
         $downloadable = 1;
     }
     else{
-        echo("No tienes permisos para descargar eso");
+        die("No tienes permisos para descargar eso");
     }
 }
 else{
-    echo("No se ha podido encontrar los datos que solicitaste");
+    die("No se ha podido encontrar los datos que solicitaste");
 }
 
 if ($downloadable == 1){
     $filepath = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$type."/".$mediaid."/".$medianame;
     if(file_exists($filepath)){
         // https://www.sitepoint.com/community/t/loading-html5-video-with-php-chunks-or-not/350957
-        ob_end_clean();
         $fp = @fopen($filepath, 'rb');
         $size = filesize($filepath); // File size
         $length = $size; // Content length

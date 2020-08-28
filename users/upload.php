@@ -2,6 +2,7 @@
 session_start();
 if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     header("Location: ../login.php");
+    exit;
 }
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
@@ -18,7 +19,7 @@ $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
 if ($result->num_rows == 1){
-    die("No tienes permisos para acceder a esta página ya que ya has subido tu foto y tu vídeo.");
+    die("No tienes permisos para acceder a esta página ya que ya has subido tus datos.");
 }
 $stmt->close();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -80,22 +81,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     // Inject to DB
     if (empty($vid_error) && empty($pic_error) && empty($general_error)){
+        $qoute = ($_POST["quote"]) ? nl2br(htmlspecialchars($_POST["quote"])) : null;
         // Create row with user data, nl2br is used to follow line breaks.
-        if (isset($userinfo["subject"])){
-            $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($userinfo["typeuser"] == "P"){
+            $stmt = $conn->prepare("INSERT INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssissssss",
-            $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], nl2br(htmlspecialchars($_POST["quote"])), $userinfo["subject"]);
+            $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute, $userinfo["subject"]);
         }
         else{
-            $stmt = $conn->prepare("INSERT IGNORE INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssisssss",
-            $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], nl2br(htmlspecialchars($_POST["quote"])));
+            $stmt = $conn->prepare("INSERT INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssisssss", $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute);
         }
         if ($stmt->execute() !== true) {
             die("Error inserting user data: " . $conn->error);
         }
         $stmt->close();
-        header("Location: finish.php");
+        header("Location: finish.html");
+        exit;
     }
 }
 ?>
@@ -198,7 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <i class="fas fa-paper-plane"></i>
                                     </span>
                                     <span>Enviar</span>
-                                  </button>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -206,13 +208,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <hr>
                     <?php
                     if ($pic_error || $vid_error || $general_error !== ""){
-                        echo <<<EOL
-                        <div class="notification is-danger">
+                        echo "
+                        <div class='notification is-danger'>
                             $general_error
                             $pic_error
                             $vid_error
                         </div>
-                        EOL;
+                        ";
                     }
                     ?>
                     <div class="notification is-info">

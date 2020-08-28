@@ -2,35 +2,47 @@
 session_start();
 if (!isset($_SESSION["owner"])){
     header("Location: login.php");
+    exit;
 }
 require_once("../helpers/db.php");
-if (isset($_POST["username"])){
-    if (isset($_POST["addstaff"])){
-        $stmt = $conn->prepare("INSERT INTO `staff` (`username`, `password`, `permissions`) VALUES (?, ?, ?)");
-        if ($_POST["addstaff"] == "admin"){
-            $staff_password = null;
-        }
-        elseif($_POST["addstaff"] == "owner"){
-            $staff_password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        }
-        $stmt->bind_param("sss", $_POST["username"], $staff_password, $_POST["addstaff"]);
-        if ($stmt->execute() !== true) {
-            die("Error writing staff info: " . $conn->error);
-        }
-    }
-    elseif(isset($_POST["removestaff"])){
-        if ($_POST["removestaff"] == "admin"){
-            $staff_password = null;
-        }
-        elseif($_POST["removestaff"] == "owner"){
-            $staff_password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        }
-        $stmt = $conn->prepare("DELETE FROM `staff` WHERE username=?");
-        $stmt->bind_param("s", $_POST["username"]);
-        if ($stmt->execute() !== true) {
-            die("Error deleting staff info: " . $conn->error);
-        }
+if (isset($_POST["sendstaff"], $_POST["action"])) {
+    switch ($_POST["sendstaff"]) {
+        case "owner":
+            if ($_POST["action"] == "add") {
+                $stmt = $conn->prepare("INSERT INTO `staff` (`username`, `password`, `permissions`) VALUES (?, ?, 'owner')");
+            }
+            elseif ($_POST["action"] == "remove") {
+                $stmt = $conn->prepare("DELETE FROM `staff` WHERE username=? AND password=?");
+            }
+            foreach ($_POST["username"] as $id => $usernname) {
+                $owner_password = password_hash($_POST["password"][$id], PASSWORD_DEFAULT);
+                $stmt->bind_param("ss", $usernname, $owner_password);
+                if ($stmt->execute() !== true) {
+                    die("Error executing command: " . $conn->error);
+                }
+            }
+            $stmt->close();
+        break;
+        case "admin":
+            if ($_POST["action"] == "add") {
+                $stmt = $conn->prepare("INSERT INTO `staff` (`username`, `permissions`) VALUES (?, 'admin')");
+            }
+            elseif ($_POST["action"] == "remove") {
+                $stmt = $conn->prepare("DELETE FROM `staff` WHERE username=?");
+            }
+
+            foreach ($_POST["username"] as $usernname) {
+                $stmt->bind_param("s", $usernname);
+                if ($stmt->execute() !== true) {
+                    die("Error executing command: " . $conn->error);
+                }
+            }
+            $stmt->close();
+        break;
+        default:
+        die("Sólo puedes agregar o eliminar admins o dueños");
     }
     header('Location: dashboard.php');
+    exit;
 }
 ?>

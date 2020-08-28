@@ -1,6 +1,6 @@
 <?php
-if (!extension_loaded('mysqli') || !extension_loaded('zip')) {
-    die("Este programa necesita los siguientes plugins para funcionar: php-mysqli, php-zip");
+if (!extension_loaded('mysqli') || !extension_loaded('zip') || !extension_loaded('curl')) {
+    die("Este programa necesita los siguientes plugins para funcionar: php-mysqli, php-zip y php-curl");
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db_config = $_POST["db"]; // DB data
@@ -24,17 +24,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
         $ssloptions = 'array(
             // The cafile is necessary only in Andalucia
-            "cafile" => $base_path."helpers/cert/juntadeandalucia-es-chain.pem",
-            "verify_peer"=> true,
-            "verify_peer_name"=> true,
+            CURLOPT_CAINFO => $base_path."helpers/cert/juntadeandalucia-es-chain.pem",
+            CURLOPT_SSL_VERIFYPEER => true
         );';
     }
     elseif($global_config[0] == "madrid"){
         $base_url = "https://raices.madrid.org/raiz_app/jsp/";
         $ssloptions = '
         array(
-            "verify_peer"=> true,
-            "verify_peer_name"=> true,
+            CURLOPT_SSL_VERIFYPEER => true
         );';
     }
     $global_config_file =
@@ -156,6 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
     header("Location: index.html");
+    exit;
 }
 ?>
 <!DOCTYPE html>

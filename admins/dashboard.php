@@ -6,6 +6,7 @@ require_once("../helpers/config.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("Location: ../login.php");
+    exit;
 }
 
 $userinfo = $_SESSION["userinfo"];
@@ -24,6 +25,8 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 $stmt->close();
+// Get amount teachers
+$teachers_amount = (!isset($teachers)) ? 0 : count($teachers);
 
 // Students
 $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
@@ -39,6 +42,8 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 $stmt->close();
+// Get amount students
+$students_amount = (!isset($students)) ? 0 : count($students);
 
 // Gallery
 
@@ -56,6 +61,8 @@ while ($row = $result->fetch_assoc()) {
     $gallery_i++;
 }
 $stmt->close();
+// Get amount pics
+$gallery_amount = (!isset($gallery)) ? 0 : count($gallery);
 
 // Check if admin generated yearbook before
 $stmt = $conn->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i'), available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
@@ -102,7 +109,7 @@ if ($stmt->num_rows == 1) {
             <i class="fas fa-chalkboard-teacher"></i>
             <span>Profesores</span>
         </p>
-        <p class="subtitle">Total: <?php echo(count($teachers));?></p>
+        <p class="subtitle">Total: <?php echo($teachers_amount); ?></p>
         <div class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
@@ -124,22 +131,22 @@ if ($stmt->num_rows == 1) {
                     if (!isset($teachers)) echo '<td>No hay profesores disponibles</td>';
                     else {
                         foreach($teachers as $teacher){
-                            echo <<<EOL
+                            echo "
                                 <td>$teacher[0]</td>
                                 <td>$teacher[1]</td>
                                 <td><a href='../getmedia.php?id=$teacher[0]&media=picname&type=P' target='_blank'>$teacher[2]</a></td>
                                 <td><a href='../getmedia.php?id=$teacher[0]&media=vidname&type=P' target='_blank'>$teacher[3]</a></td>
-                            EOL;
+                            ";
                             if (empty($teacher[4])) echo '<td class="has-text-centered">-</td>';
                             else echo '<td><a href="'.$teacher[4].'" target="_blank">Abrir enlace</a></td>';
     
                             if (empty($teacher[5])) echo("<td class='has-text-centered'>-</td>");
                             else echo '<td>'.$teacher[5].'</td>';
     
-                            echo <<<EOL
+                            echo "
                             <td>$teacher[6]</td>
                             <td>$teacher[7]</td>
-                            EOL;
+                            ";
                         }
                     }
                     ?>
@@ -152,7 +159,7 @@ if ($stmt->num_rows == 1) {
             <i class="fas fa-user-graduate"></i>
             <span>Alumnos</span>
         </p>
-        <p class="subtitle">Total: <?php echo(count($students));?></p>
+        <p class="subtitle">Total: <?php echo($students_amount);?></p>
         <div class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
@@ -172,13 +179,13 @@ if ($stmt->num_rows == 1) {
                     if (!isset($students)) echo '<td>No hay alumnos disponibles</td>';
                     else {
                         foreach($students as $student){
-                            echo <<<EOL
+                            echo "
                             <tr>
                                 <td>$student[0]</td>
                                 <td>$student[1]</td>
                                 <td><a href='../getmedia.php?id=$student[0]&media=picname&type=ALU' target='_blank'>$student[2]</a></td>
                                 <td><a href='../getmedia.php?id=$student[0]&media=vidname&type=ALU' target='_blank'>$student[3]</a></td>
-                            EOL;
+                            ";
                             if (empty($student[4])) echo '<td class="has-text-centered">-</td>';
                             else echo '<td><a href="'.$student[4].'" target="_blank">Abrir enlace</a></td>';
     
@@ -231,7 +238,7 @@ if ($stmt->num_rows == 1) {
             <i class="far fa-images"></i>
             <span>Galería</span>
         </p>
-        <p class="subtitle">Total: <?php echo(count($gallery));?></p>
+        <p class="subtitle">Total: <?php echo($gallery_amount); ?></p>
         <div class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
@@ -244,14 +251,16 @@ if ($stmt->num_rows == 1) {
                 <tbody>
                     <?php
                     // Get all values from gallery's table
-                    foreach($gallery as $picture){
-                        echo <<<EOL
-                        <tr>
-                            <td>$picture[0]</td>
-                            <td><a href='../getgallery.php?id=$picture[0]' target='_blank'>$picture[1]</a></td>
-                            <td>$picture[2]</td>
-                        </tr>
-                        EOL;
+                    if (!isset($gallery)) echo '<td>No hay fotos disponibles</td>';
+                    else {
+                        foreach($gallery as $picture){
+                            echo "
+                            <tr>
+                                <td>$picture[0]</td>
+                                <td><a href='../getgallery.php?id=$picture[0]' target='_blank'>$picture[1]</a></td>
+                                <td>$picture[2]</td>
+                            ";
+                        }
                     }
                     ?>
                 </tbody>

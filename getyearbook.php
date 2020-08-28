@@ -5,6 +5,7 @@ require_once("helpers/db.php");
 require_once("helpers/config.php");
 if (!isset($_SESSION["loggedin"])){
     header("Location: login.php");
+    exit;
 }
 
 $userinfo = $_SESSION["userinfo"];
@@ -28,20 +29,17 @@ if ($stmt->num_rows == 1) {
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
             header('Content-Length: ' . filesize($fullname));
-            ob_clean();
-            ob_end_flush();
             readfile($fullname);
         }
         else{
-            $yearbook_error = "Este archivo no existe";
+            die("Este archivo no existe");
         }
     }
     else{
-        $yearbook_error = "No tienes permisos para descargar el yearbook";
+        die("No tienes permisos para descargar el yearbook");
     }
 }
 else{
-    $yearbook_error = "No hay ningún yearbook disponible";
+    die("No hay ningún yearbook disponible");
 }
-if(isset($yearbook_error)) echo($yearbook_error);
 ?>

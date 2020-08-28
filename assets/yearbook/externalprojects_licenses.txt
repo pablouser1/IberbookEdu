@@ -101,4 +101,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
+Portrait Placeholder : Greasemann / CC BY-SA (https://creativecommons.org/licenses/by-sa/4.0)
 Favicon: Fabián Alexis / CC BY-SA (https://creativecommons.org/licenses/by-sa/3.0)

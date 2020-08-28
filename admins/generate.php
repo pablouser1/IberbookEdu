@@ -9,14 +9,17 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
 require_once("../helpers/db.php");
 
 // Deleting files
-function recursivedelete($dir) {
-    $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
-    $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
-    foreach($files as $file) {
-        if ($file->isDir()) rmdir($file->getRealPath());
-        else unlink($file->getRealPath());
+function recursiveRemoveDirectory($directory)
+{
+    foreach(glob("{$directory}/*") as $file)
+    {
+        if(is_dir($file)) { 
+            recursiveRemoveDirectory($file);
+        } else {
+            unlink($file);
+        }
     }
-    rmdir($dir);
+    rmdir($directory);
 }
 
 // Get vars from before and set a new one
@@ -122,6 +125,7 @@ ob_start();
     </nav>
     <!-- Yearbook, includes stories and pics -->
     <section id="yearbook" class="section is-hidden tab">
+        <!-- Teachers -->
         <h1 class="title has-text-centered">
             <i class="fas fa-chalkboard-teacher"></i>
             <span id="teachers_title"></span>
@@ -134,12 +138,13 @@ ob_start();
         <div class="columns is-mobile is-centered is-multiline is-vcentered">
         <?php
         foreach($teachers as $teacher){
+            $usersmall = str_replace(" ", "", $teacher["name"]);
             echo '
             <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
                 <article class="media">
                     <div class="media-content">
                         <p>
-                            <strong>'.$teacher["fullname"]["name"]." ".$teacher["fullname"]["surname"].'</strong> <small>@'.str_replace(" ", "", $teacher["name"]).'</small>
+                            <strong>'.$teacher["fullname"]["name"]." ".$teacher["fullname"]["surname"].'</strong> <small>@'.$usersmall.'</small>
                             <a href="'.$teacher["photo"].'" target="_blank">
                                 <figure class="image figure_yearbook">
                                     <img src="'.$teacher["photo"].'">
@@ -173,6 +178,7 @@ ob_start();
         ?>
         </div>
         <hr>
+        <!-- Students -->
         <h1 class="title has-text-centered">
             <i class="fas fa-user-graduate"></i>
             <span id="students_title"></span>
@@ -185,12 +191,13 @@ ob_start();
         <div class="columns is-mobile is-centered is-multiline is-vcentered">
         <?php
         foreach($students as $student){
+            $usersmall = str_replace(" ", "", $student["name"]);
             echo '
             <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
                 <article class="media">
                     <div class="media-content">
                         <p>
-                            <strong>'.$student["fullname"]["name"]." ".$student["fullname"]["surname"].'</strong> <small>@'.str_replace(" ", "", $student["name"]).'</small>
+                            <strong>'.$student["fullname"]["name"]." ".$student["fullname"]["surname"].'</strong> <small>@'.$usersmall.'</small>
                             <a href="'.$student["photo"].'" target="_blank">
                                 <figure class="image figure_yearbook">
                                     <img src="'.$student["photo"].'">
@@ -226,19 +233,19 @@ ob_start();
         <div class="columns is-centered is-multiline">
             <?php
             foreach ($gallery as $id => $pic) {
-                echo <<<EOL
-                <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
-                    <div class="container">
-                        <div class="card">
-                            <div class="card-content">
-                                <figure class="image figure_gallery">
-                                    <img onclick="viewphoto('$id')" src="$pic[path]">
+                echo "
+                <div class='column is-full-mobile is-one-third-tablet is-one-fifth-desktop'>
+                    <div class='container'>
+                        <div class='card'>
+                            <div class='card-content'>
+                                <figure class='image figure_gallery'>
+                                    <img onclick='viewphoto($id)' src='$pic[path]'>
                                 </figure>
                             </div>
                         </div>
                     </div>
                 </div>
-                EOL;
+                ";
             }
             ?>
         </div>
@@ -285,14 +292,15 @@ ob_start();
             </div>
         </div>
     </section>
-    <!-- Footer, currently only used for changing languages -->
-    <footer id="footer" class="footer">
+    <!-- Document footer -->
+    <footer id="footer" class="footer is-hidden">
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
             <ul id="languages">
                 <li><a onclick="changelanguage('en')">English</a></li>
                 <li><a onclick="changelanguage('es')">Español</a></li>
             </ul>
         </nav>
+        <p class="has-text-centered" id="madewith_footer"></p>
     </footer>
     <!-- Stories library -->
     <script src="scripts/vendor/zuck.min.js"></script>
@@ -369,7 +377,7 @@ if ($stmt->execute() !== true) {
 }
 
 // Delete temp dir
-recursivedelete($tempdir);
+recursiveRemoveDirectory($tempdir);
 
 header("Location: dashboard.php");
 ?>

@@ -4,14 +4,14 @@ $login_error = $password_err = $username_err = "";
 require_once("../helpers/db.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(empty(trim($_POST["username"]))){
+    if(!$_POST["username"]){
         $username_err = "No has escrito ningún nombre de usuario.";
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
-    if(empty(trim($_POST["password"]))){
+    if(!$_POST["password"]){
         $password_err = "No has escrito ninguna contraseña.";
     } 
     else{
@@ -48,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["ownerinfo"] = $ownerinfo;
                             // Redirect user to welcome page
                             header("location: dashboard.php");
+                            exit;
                         } else{
                             // Display an error message if password is not valid
                             $password_err = "Esta contraseña no es válida.";
@@ -116,14 +117,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </form>
                         <?php
                         if($login_error || $username_err || $password_err !== ""){
-                            echo <<<EOL
-                            <div class="notification is-danger">
+                            echo "
+                            <div class='notification is-danger'>
                                 <span>
                                     <p>$login_error</p>
                                     <p>$username_err $password_err</p>
                                 </span>
                             </div>
-                            EOL;
+                            ";
                         }
                         ?>
                     </div>

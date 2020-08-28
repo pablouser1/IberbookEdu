@@ -1,21 +1,14 @@
 <?php
 session_start();
-require_once("../helpers/db.php");
 if (!isset($_SESSION["owner"])){
     header("Location: login.php");
+    exit;
 }
 
 $ownerinfo = $_SESSION["ownerinfo"];
-$stmt = $conn->prepare("SELECT id, username, permissions FROM staff");
-$stmt->execute();
-$result = $stmt->get_result();
-while ($row = mysqli_fetch_assoc($result)) {
-    $id = $row["id"];
-    $staff[$id] = array();
-    foreach ($row as $value) {
-        $staff[$id][] = $value;
-    }
-}
+
+// Get staff
+require_once("getstaff.php");
 ?>
 
 <!DOCTYPE html>
@@ -59,27 +52,25 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <tbody>
                     <?php
                     foreach($staff as $user){
-                        echo <<<EOL
+                        echo "
                         <tr>
                         <td>$user[0]</td>
                         <td>$user[1]</td>
                         <td>$user[2]</td>
                         </tr>
-                        EOL;
+                        ";
                     }
                     ?>
                 </tbody>
                 </table>
             </div>
         </div>
-        <div class="buttons">
-            <button id="managestaff" type="button" class="button is-info">
-                <span class="icon">
-                    <i class="fas fa-user-friends"></i>
-                </span>
-                <span>Agregar/eliminar staff</span>
-            </button>
-        </div>
+        <a href="staff.php" class="button is-info">
+            <span class="icon">
+                <i class="fas fa-user-friends"></i>
+            </span>
+            <span>Agregar/eliminar staff</span>
+        </a>
         <hr>
         <p class="title">
             <span class="icon">
@@ -102,63 +93,6 @@ while ($row = mysqli_fetch_assoc($result)) {
             </button>  
         </div>
     </section>
-    <!-- Modal for adding/removing staff members -->
-    <div id="modalstaff" class="modal">
-        <div onclick="closestaff()" class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">Agregar/eliminar staff</p>
-                <button onclick="closestaff()" class="delete" aria-label="close"></button>
-            </header>
-            <form action="managestaff.php" method="POST">
-                <section class="modal-card-body">
-                    <div class="field">
-                        <label class="label">Nombre de usuario</label>
-                        <div class="control has-icons-left">
-                            <input class="input" type="text" name="username" placeholder="usuario" required>
-                            <span class="icon is-left">
-                                <i class="fas fa-user"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div id="password" class="field is-hidden">
-                        <label class="label">Contraseña</label>
-                        <div class="control has-icons-left">
-                            <input class="input" type="password" name="password" placeholder="***********">
-                            <span class="icon is-left">
-                                <i class="fas fa-key"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Tipo de usuario</label>
-                        <div class="control">
-                            <div class="select">
-                                <select id="typestaff">
-                                    <option value="admin">Administrador</option>
-                                    <option value="owner">Dueño</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <footer class="modal-card-foot">
-                    <button id="addstaff" name="addstaff" value="admin" class="button is-success" type="submit">
-                        <span class="icon">
-                            <i class="fas fa-plus"></i>
-                        </span>
-                        <span>Agregar</span>
-                    </button>
-                    <button id="removestaff" name="removestaff" value="admin" class="button is-danger" type="submit">
-                        <span class="icon">
-                            <i class="fas fa-minus"></i>
-                        </span>
-                        <span>Eliminar</span>
-                    </button>
-                </footer>
-            </form>
-        </div>
-    </div>
     <!-- Modal for adding/removing schools -->
     <div id="modalschool" class="modal">
         <div onclick="closeschool()" class="modal-background"></div>
@@ -215,12 +149,13 @@ while ($row = mysqli_fetch_assoc($result)) {
             </header>
             <form action="archive.php" method="POST">
                 <section class="modal-card-body">
-                    <p>Archiva los yearbooks de un centro</p>
+                    <p>Archiva los yearbooks</p>
                     <p>
                         <span class="has-background-danger"><strong>ADVERTENCIA</strong></span>,
                         esta función sólo conserva los .zip de los yearbooks, tanto los datos de la base de datos como los archivos
                         subidos por los usuarios serán <strong>borrados.</strong><br>
-                        <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span>
+                        <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span><br>
+                        Esta opción es útil para empezar un año nuevo.
                     </p>
                     <div class="field">
                         <label class="label">Código del centro</label>
@@ -257,7 +192,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             </ul>
         </nav>
     </footer>
-    <script src="scripts/dashboard.js"></script>
+    <script src="../assets/scripts/owner/dashboard.js"></script>
   </body>
 
 </html>

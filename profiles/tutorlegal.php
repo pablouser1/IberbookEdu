@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "user" && !isset($_SESSION["tutorinfo"])){
     header("Location: login.php");
+    exit;
 }
 require_once("../helpers/api.php");
 $cookies = $_SESSION["cookies"];
@@ -29,6 +30,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
     );
     $_SESSION["userinfo"] = $userinfo;
     header("Location: ../users/dashboard.php");
+    exit;
 }
 ?>
 

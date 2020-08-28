@@ -5,8 +5,10 @@ require_once("helpers/db.php");
 require_once("helpers/config.php");
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("Location: login.php");
+    exit;
 }
 $userinfo = $_SESSION["userinfo"];
+
 $stmt = $conn->prepare("SELECT picname, id FROM gallery where id=? and schoolid=? and schoolyear=?");
 $stmt->bind_param("sis", $_GET["id"], $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
@@ -26,10 +28,8 @@ if ($stmt->num_rows == 1) {
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header('Content-Length: ' . filesize($filepath));
-        ob_clean();
-        ob_end_flush();
         readfile($filepath);
-        exit();
+        exit;
     }
 }
 else{

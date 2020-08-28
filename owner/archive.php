@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION["owner"])){
     header("Location: login.php");
+    exit;
 }
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
@@ -64,5 +65,6 @@ if (isset($_POST["id"])){
         
     }
     header('Location: dashboard.php');
+    exit;
 }
 ?>

@@ -3,36 +3,50 @@
 
 // Get requests
 function get($url, $cookies){
-    $options = array(
-        'http' => array(
-            'method'  => 'GET',
-            'header'  => array(
-                "Content-type: application/json",
-                "Cookie: ".array_keys($cookies)[0]."=".$cookies[array_keys($cookies)[0]],
-                "Cookie: ".array_keys($cookies)[1]."=".$cookies[array_keys($cookies)[1]]
-            )
-        ),
-        "ssl"=>$GLOBALS["ssloptions"],
+    // Options
+    $initial_options = array(
+        CURLOPT_URL => $url,
+        CURLOPT_HEADER => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_COOKIE => $cookies,
+        CURLOPT_CONNECTTIMEOUT => 5
     );
-    $context = stream_context_create($options);
-    return(json_decode(utf8_encode(file_get_contents($url, false, $context)), true));
+    // Add SSL options
+    $options = $initial_options + $GLOBALS["ssloptions"];
+
+    $ch = curl_init();
+    curl_setopt_array($ch, $options);
+    $response = curl_exec($ch);
+    
+    $json_data = mb_substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));  
+    $result = json_decode(utf8_encode($json_data), true);
+
+    curl_close($ch);
+    return $result;
 }
 
 // Post requests
 function post($url, $data, $cookies){
-    $options = array(
-        'http' => array(
-            'method'  => 'POST',
-            'content' => http_build_query($data),
-            'header'  => array(
-                "Content-Type: application/x-www-form-urlencoded",
-                "Cookie: ".array_keys($cookies)[0]."=".$cookies[array_keys($cookies)[0]],
-                "Cookie: ".array_keys($cookies)[1]."=".$cookies[array_keys($cookies)[1]]
-            )
-        ),
-        "ssl"=>$GLOBALS["ssloptions"],
+    // Options
+    $initial_options = array(
+        CURLOPT_URL => $url,
+        CURLOPT_HEADER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => http_build_query($data),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_COOKIE => $cookies,
+        CURLOPT_CONNECTTIMEOUT => 5
     );
-    $context = stream_context_create($options);
-    return(file_get_contents($url, false, $context));
+    // Add SSL options
+    $options = $initial_options + $GLOBALS["ssloptions"];
+
+    $ch = curl_init();
+    curl_setopt_array($ch, $options);
+    $response = curl_exec($ch);
+    
+    $data = mb_substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));  
+
+    curl_close ($ch);
+    return $data;
 }
 ?>

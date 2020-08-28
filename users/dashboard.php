@@ -2,20 +2,17 @@
 session_start();
 if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     header("Location: ../login.php");
+    exit;
 }
 require_once("../helpers/db.php");
-function delete_files($target) {
-    if(is_dir($target)){
-        $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
-
-        foreach($files as $file){
-            delete_files($file);
-        }
-
-        rmdir($target);
-    } elseif(is_file($target)) {
-        unlink($target);  
+function delete_files($dir) {
+    $it = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
+    $it = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
+    foreach($it as $file) {
+        if ($file->isDir()) rmdir($file->getPathname());
+        else unlink($file->getPathname());
     }
+    rmdir($dir);
 }
 
 // User data
@@ -40,6 +37,7 @@ if(isset($_POST['reset'])) {
     // Ficheros
     delete_files('../yearbooks/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/".$userinfo["iduser"]);
     header("Location: dashboard.php");
+    exit;
 }
 // Check if yearbook is available
 $stmt = $conn->prepare("SELECT generated, available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
@@ -106,7 +104,7 @@ if ($result->num_rows > 0){
         <section id="dashboard" class="section">
             <?php
             if(isset($yearbook)){
-                echo <<<END
+                echo '
                 <section class="hero is-medium is-success is-bold">
                     <div class="hero-body">
                         <div class="container">
@@ -123,10 +121,10 @@ if ($result->num_rows > 0){
                     </div>
                 </section>
                 <hr>
-                END;
+                ';
             }
             if (empty($user_values)){
-                echo <<<END
+                echo '
                 <div class="content has-text-centered">
                     <h1 class="title">¡Hola! Bienvenido</h1>
                     <p>Parece ser que no tienes ninguna foto o vídeo subido, puedes comenzar pulsando el botón:</p>
@@ -137,7 +135,7 @@ if ($result->num_rows > 0){
                         <span>Agregar foto y vídeo</span>
                     </a>
                 </div>
-            END;
+                ';
             }
             else {
                 echo("<h1 class='title'>Tus datos</h1>");
@@ -149,7 +147,7 @@ if ($result->num_rows > 0){
                         <tr>
                             <?php
                             if(!empty($user_values)){
-                                echo <<<EOL
+                                echo "
                                 <th>ID</th>
                                 <th>Nombre y apellidos</th>
                                 <th>Foto</th>
@@ -157,7 +155,7 @@ if ($result->num_rows > 0){
                                 <th>Enlace</th>
                                 <th>Cita</th>
                                 <th>Fecha de subida</th>
-                                EOL;
+                                ";
                                 if($userinfo["typeuser"] == "P") echo("<th>Asignatura</th>");
                             }
                             ?>
@@ -168,13 +166,13 @@ if ($result->num_rows > 0){
                         // Get all values from user' table
                         if (!empty($user_values)) {
                             foreach($user_values as $value => $individual){
-                                echo <<<END
+                                echo "
                                 <tr>
                                     <td>$individual[0]</td>
                                     <td>$individual[1]</td>
                                     <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=$userinfo[typeuser]' target='_blank'>$individual[2]</a></td>
                                     <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
-                                END;
+                                ";
                                 if (empty($individual[4])) echo '<td class="has-text-centered">-</td>';
                                 else echo '<td><a href="'.$individual[4].'" target="_blank">Abrir enlace</a></td>';
 

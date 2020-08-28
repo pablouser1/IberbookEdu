@@ -11,18 +11,32 @@ function login($username, $password, $type){
         $url = $GLOBALS["base_url"]."senecadroid/login";
         $data = array('p' => '{"version":"11.2.9"}', 'USUARIO' => $username, 'CLAVE' => $password);
     }
-    $options = array(
-        'http' => array(
-            'method'  => 'POST',
-            'content' => http_build_query($data),
-            'header'  => array(
-                "Content-Type: application/x-www-form-urlencoded",
-            )
-        ),
-        "ssl"=>$GLOBALS["ssloptions"],
+    // Options
+    $initial_options = array(
+        CURLOPT_URL => $url,
+        CURLOPT_HEADER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => http_build_query($data),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => 5
     );
-    $context = stream_context_create($options);
-    $result = json_decode(file_get_contents($url, false, $context), true);
+    $options = $initial_options + $GLOBALS["ssloptions"];
+
+    $ch = curl_init();
+    curl_setopt_array($ch, $options);
+    // Get headers and JSON data
+    $response = curl_exec($ch);
+    // Check if any errors (timeouts...)
+    if(curl_error($ch))
+    {
+        return array(
+            "cookies" => null,
+            "error" => curl_error($ch)
+        );
+    }
+    $json_data = mb_substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));  
+    $result = json_decode($json_data, true);
+    curl_close($ch);
     if ($result["ESTADO"]["CODIGO"] != "C"){
         return array(
             "cookies" => null,
@@ -30,14 +44,12 @@ function login($username, $password, $type){
         );
     }
     // Get cookies
-    $cookies = array();
-    foreach ($http_response_header as $hdr) {
-        if (preg_match('/^Set-Cookie:\s*([^;]+)/', $hdr, $matches)) {
-            urldecode(parse_str($matches[1], $tmp));
-            $cookies += $tmp;
-        }
+    $cookies = "";
+    preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $response, $matches);
+    foreach($matches[1] as $item) {
+        $cookies .= $item.";";
     }
-    $cookies["SenecaP"] = str_replace(' ', '+', $cookies["SenecaP"]); // PHP converts "+" to spaces, undo that
+
     return [
         "cookies" => $cookies,
         "error" => null
