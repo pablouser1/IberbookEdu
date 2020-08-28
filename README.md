@@ -23,9 +23,9 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 * Gestión de cuentas:
   * Usuario: Puede subir y administrar sus datos
   * Administrador: Puede administrar los datos de su curso
-  * Dueño: Puede agregar administradores y dueños, además de cambiar los centros admitidos
+  * Dueño: Puede agregar/eliminar administradores y dueños, además de cambiar los centros admitidos
 
-# Instalation
+# Installation
 
 Necesitas los siguientes programas para poder hacer funcionar IberBookEdu:
 * PHP5.5 (PHP7 recomendado)
@@ -49,5 +49,5 @@ Este proyecto no sería posible sin la ayuda de los siguientes proyectos:
 
 Assets:
 
-Portrait Placeholder : Greasemann / CC BY-SA (https://creativecommons.org/licenses/by-sa/4.0)
-Favicon: Fabián Alexis / CC BY-SA (https://creativecommons.org/licenses/by-sa/3.0)
+* Portrait Placeholder : Greasemann / CC BY-SA (https://creativecommons.org/licenses/by-sa/4.0)
+* Favicon: Fabián Alexis / CC BY-SA (https://creativecommons.org/licenses/by-sa/3.0)

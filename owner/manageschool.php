@@ -7,11 +7,8 @@ if (!isset($_SESSION["owner"])){
 require_once("../helpers/db.php");
 if (isset($_POST["id"])){
     if (isset($_POST["addschool"])){
-        if(!isset($_POST["schoolname"])){
-            die("No has escrito ningún nombre");
-        }
-        $stmt = $conn->prepare("INSERT INTO `schools` (`id`, `name`) VALUES (?, ?)");
-        $stmt->bind_param("is", trim($_POST["id"]), trim($_POST["schoolname"]));
+        $stmt = $conn->prepare("INSERT INTO `schools` (`id`, `url`) VALUES (?, ?)");
+        $stmt->bind_param("is", trim($_POST["id"]), trim($_POST["schoolurl"]));
         if ($stmt->execute() !== true) {
             die("Error writing school info: " . $conn->error);
         }

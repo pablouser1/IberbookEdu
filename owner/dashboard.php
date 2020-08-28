@@ -113,11 +113,11 @@ require_once("getstaff.php");
                         </div>
                     </div>
                     <div class="field">
-                        <label class="label">Nombre del centro (Sólo necesario si estás <b>agregando</b> un centro)</label>
+                        <label class="label">URL del centro (Opcional y Sólo necesario si estás <b>agregando</b> un centro)</label>
                         <div class="control has-icons-left">
-                            <input class="input" type="text" name="schoolname" placeholder="I.E.S Pepito de los Palotes">
+                            <input class="input" type="text" name="schoolurl" placeholder="http://example.com">
                             <span class="icon is-left">
-                                <i class="fas fa-school"></i>
+                                <i class="fas fa-link"></i>
                             </span>
                         </div>
                     </div>

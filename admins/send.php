@@ -184,10 +184,20 @@ $stmt->close();
 
 $tempdir = tempdir();
 
+// Get school info
+$schoolurl = null;
+$stmt = $conn->prepare("SELECT url FROM schools where id=?");
+$stmt->bind_param("i", $userinfo["idcentro"]);
+$stmt->execute();
+$result = $stmt->get_result();
+if($result->num_rows === 1) {
+    $schoolurl = $result->fetch_row()[0];
+}
 // Set vars to session
 $_SESSION["students"] = $students;
 $_SESSION["teachers"] = $teachers;
 $_SESSION["gallery"] = $gallery;
+$_SESSION["schoolurl"] = $schoolurl;
 $_SESSION["tempdir"] = $tempdir;
 
 // Copying all files to final folder

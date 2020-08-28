@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "user" && !isset($_SESSION["tutorinfo"])){
+if (!isset($_SESSION["loggedin"], $_SESSION["tutorinfo"])){
     header("Location: login.php");
     exit;
 }

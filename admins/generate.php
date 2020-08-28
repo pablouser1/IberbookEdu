@@ -26,6 +26,7 @@ function recursiveRemoveDirectory($directory)
 $students = $_SESSION["students"];
 $teachers = $_SESSION["teachers"];
 $gallery = $_SESSION["gallery"];
+$schoolurl = (!empty($_SESSION["schoolurl"])) ? $_SESSION["schoolurl"] : "#";
 $userinfo = $_SESSION["userinfo"];
 $zipdir = $_SESSION["zipdir"];
 $tempdir = $_SESSION["tempdir"];
@@ -44,7 +45,8 @@ ob_start();
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico">
     <!-- Scripts -->
-    <script defer src="scripts/vendor/fontawesome.js"></script>
+    <script defer src="scripts/vendor/solid.min.js"></script>
+    <script defer src="scripts/vendor/fontawesome.min.js"></script>
     <script src="scripts/vendor/confetti.min.js"></script>
     <!-- Styles -->
     <link rel="stylesheet" href="styles/vendor/bulma.min.css">
@@ -81,8 +83,13 @@ ob_start();
     <section id="banner" class="hero is-primary is-hidden">
         <div class="hero-body">
             <div class="container">
-                <h1 class="title has-text-centered"><?php echo($userinfo["yearuser"]);?></h1>
-                <h2 class="subtitle has-text-centered"></h2>
+                <p class="title has-text-centered">
+                    <span class="icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </span>
+                    <span id="banner_title"></span>
+                </p>
+                <h2 class="subtitle has-text-centered"><?php echo($userinfo["yearuser"]);?></h2>
                 <h2 id="recap" class="subtitle has-text-centered"></h2>
             </div>
         </div>
@@ -90,7 +97,7 @@ ob_start();
     <!-- Navigation tabs -->
     <nav id="navbar" class="navbar is-hidden is-primary is-bold is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item">
+            <a href="<?php echo($schoolurl); ?>" target="_blank" class="navbar-item">
                 <i class="fas fa-graduation-cap"></i>
                 <span><?php echo($userinfo["namecentro"]);?></span>
             </a>
@@ -140,17 +147,15 @@ ob_start();
         foreach($teachers as $teacher){
             $usersmall = str_replace(" ", "", $teacher["name"]);
             echo '
-            <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
+            <div class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
                 <article class="media">
                     <div class="media-content">
                         <p>
                             <strong>'.$teacher["fullname"]["name"]." ".$teacher["fullname"]["surname"].'</strong> <small>@'.$usersmall.'</small>
+                            <span class="tag">'.$teacher["subject"].'</span>
                             <a href="'.$teacher["photo"].'" target="_blank">
                                 <figure class="image figure_yearbook">
                                     <img src="'.$teacher["photo"].'">
-                                    <figcaption style="top:auto;" class="has-text-centered is-overlay">
-                                        <span class="tag">'.$teacher["subject"].'</span>
-                                    </figcaption>
                                 </figure>
                             </a>
                             <span>'.$teacher["quote"].'</span>
@@ -193,7 +198,7 @@ ob_start();
         foreach($students as $student){
             $usersmall = str_replace(" ", "", $student["name"]);
             echo '
-            <div class="column is-full-mobile is-one-third-tablet is-one-fifth-desktop">
+            <div class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
                 <article class="media">
                     <div class="media-content">
                         <p>
@@ -234,7 +239,7 @@ ob_start();
             <?php
             foreach ($gallery as $id => $pic) {
                 echo "
-                <div class='column is-full-mobile is-one-third-tablet is-one-fifth-desktop'>
+                <div class='column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
                     <div class='container'>
                         <div class='card'>
                             <div class='card-content'>

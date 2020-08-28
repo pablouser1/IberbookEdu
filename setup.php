@@ -127,6 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "CREATE TABLE `schools` (
         `id` int NOT NULL UNIQUE,
         `name` varchar(128) NOT NULL,
+        `url` varchar(255),
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -137,13 +138,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // School info
     // First we need to get the school's name
-    $stmt = $conn->prepare("INSERT INTO schools (id, name) VALUES (?, ?);");
+    $stmt = $conn->prepare("INSERT INTO schools (id, url) VALUES (?, ?);");
     $stmt->bind_param("is", $schoolinfo[0], $schoolinfo[1]);
     if ($stmt->execute() !== true) {
         die("Error writing school: " . $conn->error);
     }
-    $owner_password = password_hash($owner[1], PASSWORD_DEFAULT);
+    
     // Staff info
+    $owner_password = password_hash($owner[1], PASSWORD_DEFAULT);
     $stmt = $conn->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
     $stmt->bind_param("ss", $owner[0], $owner_password);
     if ($stmt->execute() !== true) {
@@ -278,11 +280,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="control">
                         <input name="schoolinfo[]" class="input" type="number" placeholder="Ej: 181206713" required>
                     </div>
-                    <label class="label">Nombre del centro</label>
+                    <label class="label">URL (opcional)<i class="fas fa-link"></i></label>
                     <div class="control">
-                        <input name="schoolinfo[]" class="input" type="text" required>
+                        <input name="schoolinfo[]" class="input" type="text">
+                        <p class="help">Esta URL saldrá en cada orla generada</p>
                     </div>
-                    <p class="help">Puedes conseguir la información en <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
+                    <p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">

@@ -1,6 +1,9 @@
 // -- Translations -- //
 // English translations
 const lang_en = {
+    banner: {
+        title: "Graduation"
+    },
     tabs: {
         gallery: "Gallery",
         about: "About"
@@ -52,6 +55,9 @@ const lang_en = {
 
 // Spanish translations
 const lang_es = {
+    banner: {
+        title: "Graduación"
+    },
     tabs: {
         gallery: "Galería",
         about: "Acerca de"
@@ -114,6 +120,8 @@ if (!allowed_languages.includes(userLang)){
 
 function translate(){
     // Insert translated text into necessary parts of HTML, not the greatest way of doing this
+    // Banner
+    document.getElementById("banner_title").innerHTML = lang["banner"]["title"];
     // Navbar
     document.getElementById("a_gallery").innerHTML = lang["tabs"]["gallery"];
     document.getElementById("a_about").innerHTML = lang["tabs"]["about"];
