@@ -65,16 +65,15 @@ $stmt->close();
 $gallery_amount = (!isset($gallery)) ? 0 : count($gallery);
 
 // Check if admin generated yearbook before
-$stmt = $conn->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i'), available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
+$stmt = $conn->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i') FROM yearbooks WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($generated, $available);
+$stmt->bind_result($generated);
 if ($stmt->num_rows == 1) {
     if(($result = $stmt->fetch()) == true){
         $yearbook = array(
-            "date" => $generated,
-            "available" => $available,
+            "date" => $generated
         );
     }
 }
@@ -199,7 +198,7 @@ if ($stmt->num_rows == 1) {
             </table>
         </div>
         <hr>
-        <p class="title">Administrar datos</p>
+        <p class="title">Administrar usuarios</p>
         <div class="field is-grouped">
             <div class="control">
                 <div class="select">
@@ -269,43 +268,27 @@ if ($stmt->num_rows == 1) {
         <?php
         // -- Yearbook options when generated -- //
         if (isset($yearbook)){
-            echo '
+            $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+            $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&year=$userinfo[yearuser]";
+            echo "
             <hr>
-            <h1 class="title">Yearbook</h1>
-            <p class="subtitle">Generado el '.$yearbook["date"].'';
-            if($yearbook["available"] == 0){
-                echo('<p class="subtitle">Sólo los <strong>administradores</strong> pueden ver el yearbook');
-            }
-            else{
-                echo('<p class="subtitle"><strong>Los usuarios y administradores</strong> pueden ver el yearbook');
-            }
-            echo '
-            <div class="buttons">
-                <a href="../getyearbook.php" class="button is-primary">
-                    <span class="icon">
-                        <i class="fas fa-download"></i>
+            <h1 class='title'>Yearbook</h1>
+            <p class='subtitle'>Generado el $yearbook[date]
+            <div class='buttons'>
+                <a href='../yearbooks.php{$params}' target='_blank' class='button is-primary'>
+                    <span class='icon'>
+                        <i class='fas fa-eye'></i>
                     </span>
-                    <span>Descargar yearbook</span>
+                    <span>Ver yearbook</span>
                 </a>
-                <a href="manageyb.php?deleteyearbook=true" class="button is-danger">
-                    <span class="icon">
-                        <i class="fas fa-trash"></i>
+                <a href='manageyb.php?action=delete' class='button is-danger'>
+                    <span class='icon'>
+                        <i class='fas fa-trash'></i>
                     </span>
                     <span>Eliminar yearbook</span>
                 </a>
             </div>
-            ';
-            // Show if admin didn't make the yearbook available for regular users
-            if($yearbook["available"] == 0){
-                echo '
-                <a href="manageyb.php?makeavailable=true" class="button is-link">
-                    <span class="icon">
-                        <i class="fas fa-user"></i>
-                    </span>
-                    <span>Hacer visible a los usuarios</span>
-                </a>
-                ';
-            }
+            ";
         }
         ?>
     </section>
@@ -315,13 +298,12 @@ if ($stmt->num_rows == 1) {
     </div>
     <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
         <div class="buttons">
-            <!-- TODO, make button not start progress bar -->
-            <a id="genyearbook" class="button is-success" <?php if(!isset($students, $teachers)) echo("disabled"); else echo('href="send.php"');?>>
+            <button id="genyearbook" class="button is-success" <?php if(!isset($students, $teachers)) echo("disabled"); ?>>
                 <span class="icon">
                     <i class="fas fa-check"></i>
                 </span>
                 <span>Generar Yearbook</span>
-            </a>
+            </button>
             <a class="button is-info" href="gallery.php">
                 <span class="icon">
                     <i class="far fa-images"></i>

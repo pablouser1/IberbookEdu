@@ -45,7 +45,7 @@ else{
 }
 
 if ($downloadable == 1){
-    $filepath = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$type."/".$mediaid."/".$medianame;
+    $filepath = $uploadpath.$userinfo["idcentro"]."/$userinfo[yearuser]"."/$type/$mediaid/$medianame";
     if(file_exists($filepath)){
         // https://www.sitepoint.com/community/t/loading-html5-video-with-php-chunks-or-not/350957
         $fp = @fopen($filepath, 'rb');

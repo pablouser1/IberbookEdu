@@ -100,12 +100,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Yearbook
     $sql = "CREATE TABLE `yearbooks` (
-        `id` int NOT NULL,
+        `id` int NOT NULL AUTO_INCREMENT,
         `schoolid` varchar(32) NOT NULL,
         `schoolyear` varchar(32) NOT NULL,
         `zipname` varchar(32) NOT NULL,
         `generated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        `available` varchar(5) NOT NULL
+        `acyear` varchar(16) NOT NULL,
+        primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
         die("Error creating yearbooks' table: " . $conn->error);
@@ -270,9 +271,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="field">
                     <label class="label">Ubicación de los yearbooks</label>
                     <div class="control">
-                        <input name="global[]" id="yearbook" class="input" type="text" value="<?php echo(dirname(__FILE__)."/yearbooks/");?>" required>
+                        <input name="global[]" id="yearbook" class="input" type="text" value="<?php echo(dirname($_SERVER['PHP_SELF'])."/yearbooks/");?>" required>
                     </div>
-                    <p class="help">Recomedable que <b>no</b> sea un directorio público</p>
+                    <p class="help">Aquí se guardan los yearbooks ya generados, MUY recomendable que sea un directorio público</p>
                 </div>
                 <div class="field">
                     <h2 class="title">Centro admitido</h2>
@@ -280,12 +281,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="control">
                         <input name="schoolinfo[]" class="input" type="number" placeholder="Ej: 181206713" required>
                     </div>
+                    <p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
                     <label class="label">URL (opcional)<i class="fas fa-link"></i></label>
                     <div class="control">
                         <input name="schoolinfo[]" class="input" type="text">
                         <p class="help">Esta URL saldrá en cada orla generada</p>
                     </div>
-                    <p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">

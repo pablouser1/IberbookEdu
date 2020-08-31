@@ -24,7 +24,7 @@ function delete_files($target) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userinfo = $_SESSION["userinfo"];
-    $baseurl = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads";
+    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/";
     $gallery_dir = '/gallery/';
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
     if(count($_FILES['gallery']['name']) > 0){
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->execute() !== TRUE) {
                 die("Error deleting gallery data: " . $conn->error);
             }
-            delete_files($ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/gallery/");
+            delete_files($uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/gallery/");
         }
         
         if (!is_dir($baseurl.$gallery_dir)){

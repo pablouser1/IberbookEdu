@@ -85,11 +85,11 @@ require_once("getstaff.php");
                 </span>
                 <span>Agregar/eliminar centro</span>
             </button>  
-            <button id="archive" type="button" class="button is-danger">
+            <button id="clear" type="button" class="button is-danger">
                 <span class="icon">
                     <i class="fas fa-archive"></i>
                 </span>
-                <span>Archivar</span>
+                <span>Limpiar carpeta de subidas</span>
             </button>  
         </div>
     </section>
@@ -140,22 +140,20 @@ require_once("getstaff.php");
         </div>
     </div>
     <!-- Modal for deleting rows of specific school -->
-    <div id="modalarchive" class="modal">
-        <div onclick="closearchive()" class="modal-background"></div>
+    <div id="modalclear" class="modal">
+        <div onclick="closeclear()" class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title">Archivar datos</p>
-                <button onclick="closearchive()" class="delete" aria-label="close"></button>
+                <button onclick="closeclear()" class="delete" aria-label="close"></button>
             </header>
-            <form action="archive.php" method="POST">
+            <form action="clear.php" method="POST">
                 <section class="modal-card-body">
                     <p>Archiva los yearbooks</p>
                     <p>
                         <span class="has-background-danger"><strong>ADVERTENCIA</strong></span>,
-                        esta función sólo conserva los .zip de los yearbooks, tanto los datos de la base de datos como los archivos
-                        subidos por los usuarios serán <strong>borrados.</strong><br>
+                        esta función elimina todos los datos subidos por el usuario en la carpeta de subidas.
                         <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span><br>
-                        Esta opción es útil para empezar un año nuevo.
                     </p>
                     <div class="field">
                         <label class="label">Código del centro</label>
@@ -168,7 +166,7 @@ require_once("getstaff.php");
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button name="archive" class="button is-danger" type="submit">
+                    <button name="clear" class="button is-danger" type="submit">
                         <span class="icon">
                             <i class="fas fa-exclamation-triangle"></i>
                         </span>

@@ -1,4 +1,5 @@
 .vscode
 yearbooks/
+uploads/
 helpers/db_config.php
 helpers/config.php

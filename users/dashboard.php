@@ -5,51 +5,27 @@ if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     exit;
 }
 require_once("../helpers/db.php");
-function delete_files($dir) {
-    $it = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
-    $it = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
-    foreach($it as $file) {
-        if ($file->isDir()) rmdir($file->getPathname());
-        else unlink($file->getPathname());
-    }
-    rmdir($dir);
-}
 
 // User data
 $userinfo = $_SESSION["userinfo"];
 if ($userinfo["typeuser"] == "P"){
-    $table_name = "teachers";
+    $typeuser = "teachers";
 }
 else{
-    $table_name = "students";
+    $typeuser = "students";
 }
-$_SESSION["table_name"] = $table_name;
+$_SESSION["table_name"] = $typeuser;
 
-// Elimina datos del usuario
-if(isset($_POST['reset'])) {
-    // Base de datos
-    $stmt = $conn->prepare("DELETE FROM $table_name WHERE id=?");
-    $stmt->bind_param("s", $userinfo["iduser"]);
-    if ($stmt->execute() !== true) {
-        die("Error deleting data: " . $conn->error);
-    }
-    $stmt->close();
-    // Ficheros
-    delete_files('../yearbooks/'.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/".$userinfo["iduser"]);
-    header("Location: dashboard.php");
-    exit;
-}
 // Check if yearbook is available
-$stmt = $conn->prepare("SELECT generated, available FROM yearbooks WHERE schoolid=? AND schoolyear=?");
+$stmt = $conn->prepare("SELECT generated FROM yearbooks WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($generated, $available);
 if ($stmt->num_rows == 1) {
-    if(($result = $stmt->fetch()) == true && $available == 1){
+    if(($result = $stmt->fetch()) == true){
         $yearbook = array(
-            "date" => $generated,
-            "available" => $available,
+            "date" => $generated
         );
     }
 }
@@ -57,11 +33,11 @@ $stmt->close();
 // Check if user uploaded pic and vid before
 if (isset($userinfo["subject"])){
     $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
-    FROM $table_name where schoolid=? and schoolyear=?");
+    FROM $typeuser where schoolid=? and schoolyear=?");
 }
 else{
     $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
-    FROM $table_name where schoolid=? and schoolyear=?");
+    FROM $typeuser where schoolid=? and schoolyear=?");
 }
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
@@ -104,24 +80,26 @@ if ($result->num_rows > 0){
         <section id="dashboard" class="section">
             <?php
             if(isset($yearbook)){
-                echo '
-                <section class="hero is-medium is-success is-bold">
-                    <div class="hero-body">
-                        <div class="container">
-                            <h1 class="title">Tu yearbook está listo</h1>
-                            <p class="subtitle">
-                                <a href="../getyearbook.php" class="button is-success">
-                                    <span class="icon">
-                                        <i class="fas fa-download"></i>
+                $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+                $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&year=$userinfo[yearuser]";
+                echo "
+                <section class='hero is-medium is-success is-bold'>
+                    <div class='hero-body'>
+                        <div class='container'>
+                            <h1 class='title'>Tu yearbook está listo</h1>
+                            <p class='subtitle'>
+                                <a href='../yearbooks.php{$params}' target='_blank' class='button is-success'>
+                                    <span class='icon'>
+                                        <i class='fas fa-eye'></i>
                                     </span>
-                                    <span>Descargar</span>
+                                    <span>Ver</span>
                                 </a>
                             </p>
                         </div>
                     </div>
                 </section>
                 <hr>
-                ';
+                ";
             }
             if (empty($user_values)){
                 echo '
@@ -195,20 +173,18 @@ if ($result->num_rows > 0){
             if (!empty($user_values) && !isset($yearbook)){
                 echo '
                 <hr>
-                <form method="post">
-                    <button id="delete_button" class="button is-danger" type="button">
-                        <span class="icon">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                        <span>Eliminar datos</span>
-                    </button>
-                </form>
+                <button id="delete_button" class="button is-danger" type="button">
+                    <span class="icon">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                    <span>Eliminar datos</span>
+                </button>
                 ';
             }
             ?>
         </section>
         <div id="delete_modal" class="modal">
-            <div class="modal-background"></div>
+            <div onclick="closedelete()" class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">¿Seguro?</p>
@@ -216,12 +192,10 @@ if ($result->num_rows > 0){
                 <section class="modal-card-body">
                     <p>Al eliminar los datos tendrás que <b>volver a subir tus datos otra vez</b></p>
                 </section>
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                    <footer class="modal-card-foot">
-                        <button name="reset" type="submit" class="button">Continuar</button>
-                        <button id="delete_cancel" type="button" class="button">Cancelar</button>
-                    </footer>
-                </form>
+                <footer class="modal-card-foot">
+                    <a href="managedata.php?action=delete" class="button">Continuar</a>
+                    <button id="delete_cancel" type="button" class="button">Cancelar</button>
+                </footer>
             </div>
         </div>
         <script src="../assets/scripts/users/dashboard.js"></script>

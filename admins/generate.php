@@ -8,28 +8,14 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
 
 require_once("../helpers/db.php");
 
-// Deleting files
-function recursiveRemoveDirectory($directory)
-{
-    foreach(glob("{$directory}/*") as $file)
-    {
-        if(is_dir($file)) { 
-            recursiveRemoveDirectory($file);
-        } else {
-            unlink($file);
-        }
-    }
-    rmdir($directory);
-}
-
 // Get vars from before and set a new one
 $students = $_SESSION["students"];
 $teachers = $_SESSION["teachers"];
 $gallery = $_SESSION["gallery"];
 $schoolurl = (!empty($_SESSION["schoolurl"])) ? $_SESSION["schoolurl"] : "#";
 $userinfo = $_SESSION["userinfo"];
-$zipdir = $_SESSION["zipdir"];
-$tempdir = $_SESSION["tempdir"];
+$baseurl = $_SESSION["baseurl"];
+$acyear = $_SESSION["acyear"];
 
 // Get date (used later)
 $dt = new DateTime("now", new DateTimeZone('Europe/Madrid'));
@@ -45,15 +31,17 @@ ob_start();
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico">
     <!-- Scripts -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script src="scripts/vendor/vue.js"></script>
     <script defer src="scripts/vendor/solid.min.js"></script>
     <script defer src="scripts/vendor/fontawesome.min.js"></script>
     <script src="scripts/vendor/confetti.min.js"></script>
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/vendor/bulma.min.css">
+    <link rel="stylesheet" href="styles/vendor/bulma.min.css"/>
+    <link id="dark-theme" rel="stylesheet" type="text/css" href="styles/vendor/bulma-prefers-dark.min.css"/>
     <link rel="stylesheet" href="styles/vendor/animate.min.css"/>
-    <link rel="stylesheet" href="styles/vendor/zuck.min.css">
-    <link rel="stylesheet" href="styles/vendor/snapgram.min.css">
-    <link rel="stylesheet" href="styles/yearbook.css">
+    <link rel="stylesheet" href="styles/vendor/zuck.min.css"/>
+    <link rel="stylesheet" href="styles/vendor/snapgram.min.css"/>
     <!-- User data in JSON, output of PHP -->
     <script type="text/javascript">
         const teachers_js = <?php echo json_encode($teachers);?>;
@@ -63,265 +51,148 @@ ob_start();
     </script>
 </head>
 
-<body class="has-navbar-fixed-top">
+<body>
     <!-- NoScript Warning -->
     <noscript>This program needs Javascript</noscript>
-    <!-- Splashscreen -->
-    <section id="loading" class="hero is-fullheight">
-        <div id="loading_body" class="hero-body">
-            <div class="container">
-                <p class="title">
-                    Loading...
-                </p>
-                <p class="subtitle">
-                    <progress class="progress is-large is-primary" max="100"></progress>
-                </p>
-            </div>
-        </div>
-    </section>
-    <!-- Banner -->
-    <section id="banner" class="hero is-primary is-hidden">
-        <div class="hero-body">
-            <div class="container">
-                <p class="title has-text-centered">
-                    <span class="icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </span>
-                    <span id="banner_title"></span>
-                </p>
-                <h2 class="subtitle has-text-centered"><?php echo($userinfo["yearuser"]);?></h2>
-                <h2 id="recap" class="subtitle has-text-centered"></h2>
-            </div>
-        </div>
-    </section>
-    <!-- Navigation tabs -->
-    <nav id="navbar" class="navbar is-hidden is-primary is-bold is-fixed-top" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a href="<?php echo($schoolurl); ?>" target="_blank" class="navbar-item">
-                <i class="fas fa-graduation-cap"></i>
-                <span><?php echo($userinfo["namecentro"]);?></span>
-            </a>
-            <a id="navbar-burger" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-            </a>
-        </div>
-        <div id="navbarMenu" class="navbar-menu">
-            <div class="navbar-start">
-                <a href="#yearbook" class="navbar-item">
-                    <span class="icon">
-                        <i class="fas fa-book-open"></i>
-                    </span>
-                    <span>Yearbook</span>
-                </a>
-                <a href="#gallery" class="navbar-item">
-                    <span class="icon">
-                        <i class="fas fa-images"></i>
-                    </span>
-                    <span id="a_gallery"></span>
-                </a>
-                <a href="#about" class="navbar-item">
-                    <span class="icon">
-                        <i class="fas fa-info-circle"></i>
-                    </span>
-                    <span id="a_about"></span>
-                </a>
-            </div>
-        </div>
-    </nav>
-    <!-- Yearbook, includes stories and pics -->
-    <section id="yearbook" class="section is-hidden tab">
-        <!-- Teachers -->
-        <h1 class="title has-text-centered">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <span id="teachers_title"></span>
-        </h1>
-        <p class="subtitle has-text-centered">Total: <?php echo(count($teachers));?></p>
-        <div class="container">
-            <div id="stories_teachers"></div>
-        </div>
-        <br>
-        <div class="columns is-mobile is-centered is-multiline is-vcentered">
-        <?php
-        foreach($teachers as $teacher){
-            $usersmall = str_replace(" ", "", $teacher["name"]);
-            echo '
-            <div class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
-                <article class="media">
-                    <div class="media-content">
-                        <p>
-                            <strong>'.$teacher["fullname"]["name"]." ".$teacher["fullname"]["surname"].'</strong> <small>@'.$usersmall.'</small>
-                            <span class="tag">'.$teacher["subject"].'</span>
-                            <a href="'.$teacher["photo"].'" target="_blank">
-                                <figure class="image figure_yearbook">
-                                    <img src="'.$teacher["photo"].'">
-                                </figure>
-                            </a>
-                            <span>'.$teacher["quote"].'</span>
-                            <br>
-                            <i><small>'.$teacher["date"].'</small></i>
-                        </p>
-                        <nav class="level is-mobile">
-                            <div class="level-left">
-                                <a class="level-item">
-                                    <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                                </a>
-                                <a class="level-item">
-                                    <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                                </a>
-                                <a class="level-item">
-                                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                                </a>
-                            </div>
-                        </nav>
-                    </div>
-                </article>
-            </div>
-            ';
-        }
-        ?>
-        </div>
-        <hr>
-        <!-- Students -->
-        <h1 class="title has-text-centered">
-            <i class="fas fa-user-graduate"></i>
-            <span id="students_title"></span>
-        </h1>
-        <p class="subtitle has-text-centered">Total: <?php echo(count($students));?></p>
-        <div class="container">
-            <div id="stories_students"></div>
-        </div>
-        <br>
-        <div class="columns is-mobile is-centered is-multiline is-vcentered">
-        <?php
-        foreach($students as $student){
-            $usersmall = str_replace(" ", "", $student["name"]);
-            echo '
-            <div class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
-                <article class="media">
-                    <div class="media-content">
-                        <p>
-                            <strong>'.$student["fullname"]["name"]." ".$student["fullname"]["surname"].'</strong> <small>@'.$usersmall.'</small>
-                            <a href="'.$student["photo"].'" target="_blank">
-                                <figure class="image figure_yearbook">
-                                    <img src="'.$student["photo"].'">
-                                </figure>
-                            </a>
-                            <span>'.$student["quote"].'</span>
-                            <br>
-                            <i><small>'.$student["date"].'</small></i>
-                        </p>
-                        <nav class="level is-mobile">
-                            <div class="level-left">
-                                <a class="level-item">
-                                    <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                                </a>
-                                <a class="level-item">
-                                    <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                                </a>
-                                <a class="level-item">
-                                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                                </a>
-                            </div>
-                        </nav>
-                    </div>
-                </article>
-            </div>
-            ';
-        }
-        ?>
-        </div>
-    </section>
-    <!-- Gallery -->
-    <section id="gallery" class="section is-hidden tab">
-        <div class="columns is-centered is-multiline">
-            <?php
-            foreach ($gallery as $id => $pic) {
-                echo "
-                <div class='column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
-                    <div class='container'>
-                        <div class='card'>
-                            <div class='card-content'>
-                                <figure class='image figure_gallery'>
-                                    <img onclick='viewphoto($id)' src='$pic[path]'>
-                                </figure>
-                            </div>
-                        </div>
-                    </div>
+    <div id="main" class="has-navbar-fixed-top">
+        <!-- Splashscreen -->
+        <section v-if="!ready" class="hero is-fullheight">
+            <div id="loading_body" class="hero-body">
+                <div class="container">
+                    <p class="title">
+                        Loading...
+                    </p>
+                    <p class="subtitle">
+                        <progress class="progress is-large is-primary" max="100"></progress>
+                    </p>
                 </div>
-                ";
-            }
-            ?>
-        </div>
-        <!-- Modal used for zooming gallery photos -->
-        <div id="gallery_modal" class="modal">
-            <div onclick="exitphoto()" class="modal-background"></div>
-            <div class="modal-card animate__animated animate__fadeIn">
-                <header class="modal-card-head">
-                    <i class="fas fa-image"></i><p id="gallery_modal_title" class="modal-card-title"></p>
-                    <button onclick="exitphoto()" class="modal-close is-large" aria-label="close"></button>
-                </header>
-                <section class="modal-card-body">
-                    <div class="container has-text-centered">
-                        <img id="imagen_modal" src="">
-                    </div>
-                    <br>
-                    <div class="container">
-                        <p id="gallery_description" class="modal-card-title"></p>
-                    </div>
-                </section>
-                <footer class="modal-card-foot"></footer>
             </div>
-        </div>
-    </section>
-    <!-- About section -->
-    <section id="about" class="section is-hidden tab">
-        <div class="container">
-            <p id="about_attribution">
-            </p>
-            <hr>
-            <p id="credits"></p>
-            <br>
-            <button id="contributors_button" onclick="contributors_open()" class="button is-info" type="button"></button>
-            <div id="contributors_modal" class="modal animate__animated animate__fadeIn">
-                <div onclick="contributors_close()" class="modal-background"></div>
-                <div class="modal-card">
-                    <header class="modal-card-head">
-                        <p id="contributors_title" class="modal-card-title"></p>
-                        <button onclick="contributors_close()" class="delete" aria-label="close"></button>
-                    </header>
-                <section class="modal-card-body">
-                    <span>Project Leader: Pablo Ferreiro Romero <a href="https://twitter.com/pablouser1" target="_blank">@pablouser1</a></span>
-                </section>
+        </section>
+        <!-- Banner -->
+        <section v-if="ready" class="hero is-primary">
+            <div class="hero-body">
+                <div class="container">
+                    <p class="title has-text-centered">
+                        <span class="icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </span>
+                        <span>{{ lang.banner.title }} <?php echo($acyear);?></span>
+                    </p>
+                    <h2 class="subtitle has-text-centered"><?php echo($userinfo["yearuser"]);?></h2>
+                    <h2 v-if="longtimeago" class="subtitle has-text-centered">{{ lang.misc.longtime }}</h2>
+                </div>
             </div>
-        </div>
-    </section>
-    <!-- Document footer -->
-    <footer id="footer" class="footer is-hidden">
-        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
-            <ul id="languages">
-                <li><a onclick="changelanguage('en')">English</a></li>
-                <li><a onclick="changelanguage('es')">Español</a></li>
-            </ul>
+        </section>
+        <!-- Navigation tabs -->
+        <nav id="navbar" v-if="ready" class="navbar is-primary is-bold is-fixed-top" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a href="<?php echo($schoolurl); ?>" target="_blank" class="navbar-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span><?php echo($userinfo["namecentro"]);?></span>
+                </a>
+                <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button" aria-label="menu" aria-expanded="false">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu" :class="{ 'is-active': showNav }">
+                <div class="navbar-start">
+                    <a href="#yearbook" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-book-open"></i>
+                        </span>
+                        <span>Yearbook</span>
+                    </a>
+                    <a href="#gallery" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-images"></i>
+                        </span>
+                        <span>{{ lang.tabs.gallery }}</span>
+                    </a>
+                    <a href="#about" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                        <span>{{ lang.tabs.about }}</span>
+                    </a>
+                </div>
+                <div class="navbar-end">
+                    <a v-if="theme" v-on:click="toggletheme" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-adjust"></i>
+                        </span>
+                        <span>{{ lang.tabs.theme }}</span>
+                    </a>
+                </div>
+            </div>
         </nav>
-        <p class="has-text-centered" id="madewith_footer"></p>
-    </footer>
+        <!-- Yearbook and Gallery (used by Vue.js) includes stories -->
+        <section id="yearbook" v-show="ready" class="section tab">
+            <!-- Teachers -->
+            <h1 class="title has-text-centered">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>{{ lang.yearbook.teachers }}</span>
+            </h1>
+            <p class="subtitle has-text-centered">Total: <?php echo(count($teachers));?></p>
+            <div class="container box">
+                <div id="stories_teachers"></div>
+            </div>
+            <br>
+            <teachers v-bind:teachers="teachers"></teachers>
+            <hr>
+            <!-- Students -->
+            <h1 class="title has-text-centered">
+                <i class="fas fa-user-graduate"></i>
+                <span>{{ lang.yearbook.students }}</span>
+            </h1>
+            <p class="subtitle has-text-centered">Total: <?php echo(count($students));?></p>
+            <div class="container box">
+                <div id="stories_students"></div>
+            </div>
+            <br>
+            <students v-bind:students="students"></students>
+        </section>
+        <!-- Gallery -->
+        <section id="gallery" class="section is-hidden tab">
+            <gallery v-bind:gallery="gallery"></gallery>
+        </section>
+        <!-- About section -->
+        <section id="about" class="section is-hidden tab">
+            <div class="container">
+                <p v-html="lang.about.attribution"></p>
+                <hr>
+                <p v-html="lang.about.credits"></p>
+                <br>
+                <span>Project Leader: Pablo Ferreiro Romero <a href="https://twitter.com/pablouser1" target="_blank">@pablouser1</a></span>
+            </div>
+        </section>
+        <!-- Document footer -->
+        <footer v-if="ready" id="footer" class="footer">
+            <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+                <ul id="languages">
+                    <li><a v-on:click="changelang('en')">English</a></li>
+                    <li><a v-on:click="changelang('es')">Español</a></li>
+                </ul>
+            </nav>
+            <p v-html="lang.footer.madewith" class="has-text-centered"></p>
+        </footer>
+    </div>
     <!-- Stories library -->
     <script src="scripts/vendor/zuck.min.js"></script>
     <!-- Multilang manager -->
     <script src="scripts/lang.js"></script>
     <!-- Yearbook manager -->
     <script src="scripts/yearbook.js"></script>
+    <!-- Stories manager -->
+    <script src="scripts/stories.js"></script>
     <!-- Misc -->
     <script src="scripts/misc.js"></script>
-    <!-- Splashscreen handler -->
-    <script src="scripts/splashscreen.js"></script>
 </body>
 </html>
 <?php
 // Generate HTML file
-file_put_contents($tempdir.'/index.html', ob_get_contents());
+file_put_contents($baseurl.'/index.html', ob_get_contents());
 // https://stackoverflow.com/a/19730838 Literally have no clue how this works, but it just works. Generate ZIP
 class HZip 
 { 
@@ -372,17 +243,14 @@ class HZip
 // Makes zip from folder
 $date_file = $dt->format('d-m-Y');
 $zip_name = "yearbook_".$date_file.'.zip';
-HZip::zipDir($tempdir, $zipdir."/".$zip_name);
+HZip::zipDir($baseurl, $baseurl."/".$zip_name);
 
 // Writes data to DB
-$stmt = $conn->prepare("INSERT IGNORE INTO yearbooks(schoolid, schoolyear, zipname, available) VALUES(?, ?, ?, 0)");
-$stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $zip_name);
+$stmt = $conn->prepare("INSERT INTO yearbooks(schoolid, schoolname, schoolyear, zipname, acyear) VALUES(?, ?, ?, ?, ?)");
+$stmt->bind_param("issss", $userinfo["idcentro"], $userinfo["namecentro"], $userinfo["yearuser"], $zip_name, $acyear);
 if ($stmt->execute() !== true) {
     die("Error writing data: " . $conn->error);
 }
-
-// Delete temp dir
-recursiveRemoveDirectory($tempdir);
 
 header("Location: dashboard.php");
 ?>

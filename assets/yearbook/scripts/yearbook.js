@@ -1,14 +1,3 @@
-// -- Navbar -- //
-
-// Burger (mobile)
-var burger = document.getElementById("navbar-burger")
-burger.addEventListener("click", () => {
-    const target = burger.dataset.target;
-    const $target = document.getElementById(target);
-    burger.classList.toggle('is-active');
-    $target.classList.toggle('is-active');
-})
-
 // Changes active tab
 window.addEventListener("hashchange", () => {
     var hash = window.location.hash.substring(1);
@@ -23,57 +12,176 @@ window.addEventListener("hashchange", () => {
 })
 
 // -- Yearbook -- //
-let teachers_stories = new Zuck('stories_teachers', {
-    skin: 'snapgram', // Skin used
-    avatars: true, // shows user photo instead of last story item preview
-    list: false, // displays a timeline instead of carousel
-    openEffect: true, // enables effect when opening story
-    cubeEffect: true, // enables the 3d cube effect when sliding story
-    autoFullScreen: true, // enables fullscreen on mobile browsers
-    backButton: true, // adds a back button to close the story viewer
-    backNative: false, // uses window history to enable back button on browsers/android
-    previousTap: true, // use 1/3 of the screen to navigate to previous item when tap the story
-    localStorage: true, // set true to save "seen" position. Element must have a id to save properly.
-    reactive: false, // set true if you use frameworks like React to control the timeline (see react.sample.html)
 
-    stories: teachers_js,
-    language: lang["stories"]
-});
+// Teachers
+Vue.component('teachers', {
+    props: {
+        "teachers": {
+            type: Array,
+            required: true
+        }
+    },
+    template: 
+    `
+    <div class="columns is-centered is-multiline is-vcentered is-mobile">
+        <div v-for="(teacher) in teachers" class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+            <article class="media">
+                <div class="media-content">
+                    <p>
+                        <strong>{{teacher.fullname.name}} {{teacher.fullname.surname}}</strong>
+                        <span class="tag">{{teacher.subject}}</span>
+                        <a :href="teacher.photo" target="_blank">
+                            <figure class="image">
+                                <img :src="teacher.photo">
+                            </figure>
+                        </a>
+                        <span>{{teacher.quote}}</span>
+                        <br>
+                        <i><small>{{teacher.date}}</small></i>
+                    </p>
+                    <nav class="level is-mobile">
+                        <div class="level-left">
+                            <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                            </a>
+                            <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                            </a>
+                            <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </article>
+        </div>
+    </div>
+    `
+})
 
-let students_stories = new Zuck('stories_students', {
-    skin: 'snapgram', // Skin used
-    avatars: true, // shows user photo instead of last story item preview
-    list: false, // displays a timeline instead of carousel
-    openEffect: true, // enables effect when opening story
-    cubeEffect: true, // enables the 3d cube effect when sliding story
-    autoFullScreen: true, // enables fullscreen on mobile browsers
-    backButton: true, // adds a back button to close the story viewer
-    backNative: false, // uses window history to enable back button on browsers/android
-    previousTap: true, // use 1/3 of the screen to navigate to previous item when tap the story
-    localStorage: true, // set true to save "seen" position. Element must have a id to save properly.
-    reactive: false, // set true if you use frameworks like React to control the timeline (see react.sample.html)
+// Students
+Vue.component('students', {
+    props: {
+        "students": {
+            type: Array,
+            required: true
+        }
+    },
+    template: 
+    `
+    <div class="columns is-centered is-multiline is-vcentered is-mobile">
+        <div v-for="(student) in students" class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+            <article class="media">
+                <div class="media-content">
+                    <p>
+                        <strong>{{student.fullname.name}} {{student.fullname.surname}}</strong>
+                        <a :href="student.photo" target="_blank">
+                            <figure class="image">
+                                <img :src="student.photo">
+                            </figure>
+                        </a>
+                        <span>{{student.quote}}</span>
+                        <br>
+                        <i><small>{{student.date}}</small></i>
+                    </p>
+                    <nav class="level is-mobile">
+                        <div class="level-left">
+                            <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                            </a>
+                            <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                            </a>
+                            <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </article>
+        </div>
+    </div>
+    `
+})
 
-    stories: students_js,
-    language: lang["stories"]
-});
-// -- Gallery -- //
-var gallery_modal = document.getElementById("gallery_modal");
-var imagen_modal = document.getElementById("imagen_modal");
-var gallery_description = document.getElementById("gallery_description");
-var source_photo = null;
+// Gallery
+Vue.component('gallery', {
+    props: {
+        "gallery": {
+            type: Array,
+            required: true
+        }
+    },
+    template: 
+    `
+    <div class="columns is-centered is-multiline is-vcentered is-mobile">
+        <div v-for="(pic) in gallery" class='column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
+            <div class='container'>
+                <div class='card'>
+                    <div class="card-image">
+                        <a :href="pic.path" target="_blank">
+                            <figure class='image'>
+                                <img :src='pic.path'>
+                            </figure>
+                        </a>
+                    </div>
+                    <div class="content">
+                        {{pic.description}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+})
 
-function viewphoto(id) {
-    imagen_modal.src = gallery_js[id]["path"]
-    // Maybe not working, not tested
-    if (gallery_js[id]["description"] !== undefined) {
-        gallery_description.innerHTML = gallery_js[id]["description"]
+// Vue root
+var main = new Vue({
+    el: '#main',
+    data: {
+        longtimeago: false, // in a galaxy far far away
+        theme: false,
+        teachers: teachers_js, // Teachers data
+        students: students_js, // Students data
+        gallery: gallery_js, // Gallery data
+        ready: false, // Toggle splashscreen when everything loads
+        showNav: false, // Navbar burger (only mobile/tablet)
+        lang: lang // Var in lang.js, language currently used
+    },
+    methods: {
+        // Light/Dark theme
+        toggletheme: function() {
+            let darkLink = document.getElementById('dark-theme');
+            if(darkLink){
+                darkLink.remove();
+            }else{
+                darkLink = document.createElement('link');
+                darkLink.rel = 'stylesheet';
+                darkLink.id = 'dark-theme';
+                darkLink.href = 'styles/vendor/bulma-prefers-dark.min.css'
+                document.head.appendChild(darkLink);
+            }
+        },
+        changelang: changelang, // Function in lang.js
+        easteregg: function (egg) {
+            switch (egg) {
+                case "timeago":
+                    this.longtimeago = true
+                    break;
+                default:
+                    alert("¡Hola!")
+                    break;
+            }
+        }
+    },
+    mounted: function() {
+        // Show yearbook if everything already loaded
+        this.$nextTick(function () {
+            this.ready = true
+            confetti.start(1000)
+        })
     }
-    gallery_modal.classList.add("is-active")
-}
-
-function exitphoto() {
-    gallery_modal.classList.remove("is-active");
-}
+})
 
 // -- About -- //
 var contributors_modal = document.getElementById("contributors_modal")

@@ -4,42 +4,40 @@ session_start();
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("location: ../login.php");
 }
+
+function recursiveRemoveDirectory($directory)
+{
+    foreach(glob("{$directory}/*") as $file)
+    {
+        if(is_dir($file)) { 
+            recursiveRemoveDirectory($file);
+        } else {
+            unlink($file);
+        }
+    }
+    rmdir($directory);
+}
+
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
 
-if (isset($_GET["makeavailable"]) && $_GET["makeavailable"] == "true"){
-    // Make yearbook available to users
-    $stmt = $conn->prepare("UPDATE yearbooks SET available=1 WHERE schoolid=? and schoolyear=?");
-    $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-    if ($stmt->execute() !== true) {
-        die("Error updating record: " . $conn->error);
+if (isset($_GET["action"])) {
+    // Get academic year (2020/2021 for example)
+    $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+    switch ($_GET["action"]) {
+        case "delete":
+            // Delete yearbook
+            $stmt = $conn->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=? and acyear=?");
+            $stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $acyear);
+            if ($stmt->execute() !== true) {
+                die("Error updating record: " . $conn->error);
+            }
+            $stmt->close();
+            recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"]."/$acyear/".$userinfo["yearuser"]);
+        break;
     }
-    $stmt->close();
-}
-
-if (isset($_GET["deleteyearbook"]) && $_GET["deleteyearbook"] == "true"){
-    // Get zip name
-    $stmt = $conn->prepare("SELECT zipname FROM yearbooks WHERE schoolid=? and schoolyear=?");
-    $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-    $stmt->execute();
-    $stmt->store_result();
-    if($stmt->num_rows === 1) {
-        $stmt->bind_result($zipname);
-        $stmt->fetch();
-    }
-    else {
-        die("No existe ese yearbook");
-    }
-    // Delete yearbook
-    $stmt = $conn->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=?");
-    $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-    if ($stmt->execute() !== true) {
-        die("Error updating record: " . $conn->error);
-    }
-    $stmt->close();
-    unlink($ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/".$zipname);
 }
 
 header("Location: dashboard.php");

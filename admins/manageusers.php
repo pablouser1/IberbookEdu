@@ -33,7 +33,7 @@ if ($stmt->execute() !== true) {
     die("Error updating record: " . $conn->error);
 }
 $stmt->close();
-recursiveRemoveDirectory($ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$type."/".$_GET["id"]);
+recursiveRemoveDirectory($uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$type/".$_GET["id"]);
 
 header("Location: dashboard.php");
 exit;

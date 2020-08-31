@@ -1,156 +1,97 @@
 // -- Translations -- //
-// English translations
-const lang_en = {
-    banner: {
-        title: "Graduation"
-    },
-    tabs: {
-        gallery: "Gallery",
-        about: "About"
-    },
-    yearbook: {
-        students: "Students",
-        teachers: "Teachers",
-    },
-    stories: {
-        unmute: 'Touch to unmute',
-        keyboardTip: 'Press space to see next',
-        visitLink: 'Visit link',
-        time: {
-          ago:'ago', 
-          hour:'hour', 
-          hours:'hours', 
-          minute:'minute', 
-          minutes:'minutes', 
-          fromnow: 'from now', 
-          seconds:'seconds', 
-          yesterday: 'yesterday', 
-          tomorrow: 'tomorrow', 
-          days:'days'
-        }
-    },
-    gallery: {
-        modal_title: "Picture"
-    },
-    about: {
-        attribution: `This project wouldn't be possible without the help of the following proyects 
-        distributed under <a href="externalprojects_licenses.txt" target="_blank">the following licenses</a>:<br>
-        Bulma (https://bulma.io)
-        <br>
-        Animate.css (https://animate.style)
-        <br>
-        zuck.js (https://github.com/ramon82/zuck.js)
-        <br>
-        confetti.js (https://github.com/mathusummut/confetti.js)`,
-        credits: `This yearbook was made using 
-        <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, an open source project
-        distributed under the <a href="LICENSE.html" target="_blank">AGPLv3 license</a>`,
-        contributors_button: "See contributors",
-        madewith: "Made with <span style='color: #e25555;'> &#9829; </span> in Github"
-    },
-    misc: {
-        longtime: "Hi!👋 Long time no see, how is everything going?"
-    }
+
+// Common
+const common = {
+    credits: `
+    Bulma (https://bulma.io)
+    <br>
+    bulma-prefers-dark (https://github.com/jloh/bulma-prefers-dark)
+    <br>
+    Vue.js (https://vuejs.org)
+    <br>
+    Animate.css (https://animate.style)
+    <br>
+    zuck.js (https://github.com/ramon82/zuck.js)
+    <br>
+    confetti.js (https://github.com/mathusummut/confetti.js)
+    `
 }
 
-// Spanish translations
-const lang_es = {
-    banner: {
-        title: "Graduación"
-    },
-    tabs: {
-        gallery: "Galería",
-        about: "Acerca de"
-    },
-    yearbook: {
-        students: "Alumnos",
-        teachers: "Profesores",
-    },
-    stories: {
-        unmute: 'Toca para de-silenciar',
-        keyboardTip: 'Presiona espacio para ver la siguiente',
-        visitLink: 'Visitar enlace',
-        time: {
-          ago:'antes', 
-          hour:'hora', 
-          hours:'horas', 
-          minute:'minuto', 
-          minutes:'minutos', 
-          fromnow: 'desde ahora', 
-          seconds:'segundos', 
-          yesterday: 'ayer', 
-          tomorrow: 'mañana', 
-          days:'días'
+const translations = {
+    en: {
+        common,
+        banner: {
+            title: "Graduation"
+        },
+        tabs: {
+            gallery: "Gallery",
+            about: "About",
+            theme: "Change theme"
+        },
+        yearbook: {
+            students: "Students",
+            teachers: "Teachers",
+        },
+        about: {
+            attribution: `This project wouldn't be possible without the help of the following projects 
+            distributed under <a href="externalprojects_licenses.txt" target="_blank">the following licenses</a>:<br>
+            ${common.credits}`,
+            credits: `This yearbook was made using 
+            <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, an open source project
+            distributed under the <a href="LICENSE.html" target="_blank">AGPLv3 license</a>`
+        },
+        footer: {
+            madewith: "Made with <span style='color: #e25555;'> &#9829; </span> in Github"
+        },
+        misc: {
+            longtime: "Hi!👋 Long time no see, how is everything going?"
         }
     },
-    gallery: {
-        modal_title: "Foto"
-    },
-    about: {
-        attribution: `Este proyecto no sería posible sin la ayuda de los siguientes proyectos
-        distribuidos bajo <a href="externalprojects_licenses.txt" target="_blank">las siguientes licencias</a>:<br>
-        Bulma (https://bulma.io)
-        <br>
-        Animate.css (https://animate.style)
-        <br>
-        zuck.js (https://github.com/ramon82/zuck.js)
-        <br>
-        confetti.js (https://github.com/mathusummut/confetti.js)`,
-        credits: `Este yearbook fue generado usando
-        <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
-        distribuido bajo la <a href="LICENSE.html" target="_blank">licencia AGPLv3</a>`,
-        contributors_button: "Ver contribuidores",
-        madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> en Github"
-    },
-    misc: {
-        longtime: "¡Hola!👋 Hace más de cinco años de esta graduación, ¿qué tal va todo?"
+    es: {
+        common,
+        banner: {
+            title: "Graduación"
+        },
+        tabs: {
+            gallery: "Galería",
+            about: "Acerca de",
+            theme: "Cambiar tema"
+        },
+        yearbook: {
+            students: "Alumnos",
+            teachers: "Profesores",
+        },
+        about: {
+            attribution: `Este proyecto no sería posible sin la ayuda de los siguientes proyectos
+            distribuidos bajo <a href="externalprojects_licenses.txt" target="_blank">las siguientes licencias</a>:<br>
+            ${common.credits}`,
+            credits: `Este yearbook fue generado usando
+            <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
+            distribuido bajo la <a href="LICENSE.html" target="_blank">licencia AGPLv3</a>`
+        },
+        footer: {
+            madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> en Github"
+        },
+        misc: {
+            longtime: "¡Hola!👋 Hace más de cinco años de esta graduación, ¿qué tal va todo?"
+        }
     }
-}
-
+  }
 
 // Multilanguage setup
+var lang;
 const allowed_languages = ["es", "en"]
-var userLang = (navigator.language || navigator.userLanguage).substring(0,2);
+var userLang = (navigator.language || navigator.userLanguage).substring(0,2)
 
 // Set the language to english if the user's language isn't in the allowed_languages
 if (!allowed_languages.includes(userLang)){
     console.log("Falling back to English")
-    userLang = "en"
+    lang = translations.en;
+}
+else {
+    lang = translations[userLang];
 }
 
-function translate(){
-    // Insert translated text into necessary parts of HTML, not the greatest way of doing this
-    // Banner
-    document.getElementById("banner_title").innerHTML = lang["banner"]["title"];
-    // Navbar
-    document.getElementById("a_gallery").innerHTML = lang["tabs"]["gallery"];
-    document.getElementById("a_about").innerHTML = lang["tabs"]["about"];
-    // Yearbook
-    document.getElementById("teachers_title").innerHTML = lang["yearbook"]["teachers"];
-    document.getElementById("students_title").innerHTML = lang["yearbook"]["students"];
-    // Gallery
-    document.getElementById("gallery_modal_title").innerHTML = lang["gallery"]["modal_title"];
-    // About
-    document.getElementById("about_attribution").innerHTML = lang["about"]["attribution"];
-    document.getElementById("credits").innerHTML = lang["about"]["credits"];
-    document.getElementById("contributors_button").innerHTML = lang["about"]["contributors_button"];
-    document.getElementById("contributors_title").innerHTML = lang["about"]["contributors_button"];
-    document.getElementById("madewith_footer").innerHTML = lang["about"]["madewith"];
+function changelang(lang) {
+    main.lang = translations[lang]
 }
-
-function changelanguage(new_lang){
-    switch (new_lang){
-        case 'en':
-            lang = lang_en;
-            break;
-        case 'es':
-            lang = lang_es;
-            break;
-        default:
-            alert("What")
-    }
-    translate()
-}
-// Set language and translate document
-changelanguage(userLang)
-translate()

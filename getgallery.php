@@ -17,7 +17,7 @@ $stmt->bind_result($medianame, $mediaid);
 $stmt->fetch();
 $downloadable = 0;
 if ($stmt->num_rows == 1) {
-    $filepath = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/"."gallery/".$medianame;
+    $filepath = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/gallery/".$medianame;
     // https://stackoverflow.com/a/27805443 and https://stackoverflow.com/a/23447332
     if(file_exists($filepath)){
         $finfo = finfo_open(FILEINFO_MIME_TYPE);

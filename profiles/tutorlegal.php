@@ -23,7 +23,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['childlogin'])){
         "iduser" => $child["MATRICULAS"][0]["X_MATRICULA"],
         "nameuser" => $child["NOMBRE"],
         "typeuser" => "ALU",
-        "yearuser" => $child["MATRICULAS"][0]["UNIDAD"],
+        "yearuser" => str_replace(' ', '', $child["MATRICULAS"][0]["UNIDAD"]),
         "photouser" => $picschildren[$_POST['childlogin']],
         "idcentro" => $infocentro["idcentro"],
         "namecentro" => $infocentro["namecentro"]

@@ -82,7 +82,7 @@ function getinfo($cookies, $type){
                 "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
                 "nameuser" => $info["RESULTADO"][0]["USUARIO"],
                 "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
-                "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
+                "yearuser" => str_replace(' ', '', $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"]),
                 "photouser" => $photo,
                 "idcentro" => $infocentro["idcentro"],
                 "namecentro" => $infocentro["namecentro"]

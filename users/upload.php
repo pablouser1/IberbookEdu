@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
     $allowed_vid = array('mp4', 'webm');
     // Upload directory
-    $baseurl = $ybpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/uploads/".$table_name."/";
+    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$table_name/";
     if(strlen($_POST["quote"]) > $max_characters){
         $general_error = "Has excedido la máxima cantidad de caracteres";   
     }

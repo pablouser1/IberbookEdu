@@ -1,8 +1,0 @@
-.figure_yearbook, .figure_gallery {
-  transition: transform .2s;
-}
-
-.figure_yearbook:hover, .figure_gallery:hover {
-  transform: scale(1.5);
-  cursor: zoom-in;
-}

@@ -1,6 +1,6 @@
 // -- Stuff not necessary for the operation of the program. Mostly easter eggs -- //
 
-// Current date + 5 years
+// Current date
 var currentDate = new Date();
 
 // Yearbook generated date + 5 years
@@ -8,10 +8,12 @@ var FiveYearsFromYearbook = new Date(ybdate_js * 1000);
 FiveYearsFromYearbook.setFullYear(FiveYearsFromYearbook.getFullYear() + 5);
 
 if(currentDate > FiveYearsFromYearbook){
-    document.getElementById("recap").innerHTML = lang["misc"]["longtime"]
+    main.easteregg("timeago")
+}
 
-    // Support translations
-    document.getElementById("languages").addEventListener("click", () => {
-        document.getElementById("recap").innerHTML = lang["misc"]["longtime"]
-    })
+// Check if user accepts prefers-color-scheme
+
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    console.log("El navegador soporte tema oscuro")
+    main.theme = true
 }
