@@ -27,8 +27,8 @@ Vue.component('schools', {
             </span>
             <span>Centros</span>
         </p>
-        <div class="columns is-centered is-multiline is-vcentered is-mobile animate__animated animate__zoomIn">
-            <div class="column is-full-mobile is-narrow" v-for="(school, schoolid, acyears) in schools">
+        <div class="columns is-mobile is-centered is-multiline is-vcentered animate__animated animate__zoomIn">
+            <div class="column is-narrow" v-for="(school, schoolid, acyears) in schools">
                 <nav class="panel">
                     <p class="panel-heading">
                         <span class="icon">

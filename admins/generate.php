@@ -8,7 +8,7 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
 
 require_once("../helpers/db.php");
 
-// Get vars from before and set a new one
+// Get vars from before
 $students = $_SESSION["students"];
 $teachers = $_SESSION["teachers"];
 $gallery = $_SESSION["gallery"];
@@ -76,9 +76,9 @@ ob_start();
                         <span class="icon">
                             <i class="fas fa-graduation-cap"></i>
                         </span>
-                        <span>{{ lang.banner.title }} <?php echo($acyear);?></span>
+                        <span>{{ lang.banner.title }} <?php echo($userinfo["yearuser"]);?></span>
                     </p>
-                    <h2 class="subtitle has-text-centered"><?php echo($userinfo["yearuser"]);?></h2>
+                    <h2 class="subtitle has-text-centered"><?php echo($acyear);?></h2>
                     <h2 v-if="longtimeago" class="subtitle has-text-centered">{{ lang.misc.longtime }}</h2>
                 </div>
             </div>

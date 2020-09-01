@@ -52,7 +52,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
 
   // Check if user didn't manipulate input
   if(isset($finalschools[$schoolid]["groups"][$groupid])) {
-    $group = str_replace(' ', '', $finalschools[$schoolid]["groups"][$groupid]["name"]);
+    $group = $finalschools[$schoolid]["groups"][$groupid]["name"];
     $subject = $finalschools[$schoolid]["groups"][$groupid]["subject"];
     $valid["groupinfo"] = true;
   }

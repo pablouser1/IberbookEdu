@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $login_error[] = "Su centro no está permitido";
                 }
                 // Check if user is from 4º ESO, 2º BCT or 6º Primaria
-                if(!preg_match("/(4ºESO)|(2ºBCT)|(6.)P/", $userinfo["yearuser"])) {
+                if(!preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $userinfo["yearuser"])) {
                     $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
                 }
             }
@@ -131,7 +131,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     Login
                                 </button>
                             </div>
-                            <a href="about.html">Acerca de</a>
                         </form>
                         <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
                             <span>

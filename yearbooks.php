@@ -14,15 +14,6 @@ if ($result->num_rows > 0) {
             "link" => $ybpath.$row["schoolid"]."/".$row["acyear"]."/".$row["schoolyear"]
         ];
     }
-    $yearbooks[354667]["schoolname"] = "IES Pepe";
-    $yearbooks[354667]["acyears"]["2019-2020"]["2º BCT A"] = [
-        "zip" => $ybpath."354667"."/"."2019-2020"."/"."2º BCT A"."/"."test.zip",
-        "link" => $ybpath."354667"."/"."2019-2020"."/"."2º BCT A"
-    ];
-    $yearbooks[354667]["acyears"]["2019-2020"]["2º BCT B"] = [
-        "zip" => $ybpath."354667"."/"."2019-2020"."/"."2º BCT A"."/"."test.zip",
-        "link" => $ybpath."354667"."/"."2019-2020"."/"."2º BCT A"
-    ];
 }
 ?>
 
@@ -33,6 +24,7 @@ if ($result->num_rows > 0) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yearbooks - IberbookEdu</title>
+    <!-- Dev -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>

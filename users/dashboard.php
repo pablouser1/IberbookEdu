@@ -21,7 +21,7 @@ $stmt = $conn->prepare("SELECT generated FROM yearbooks WHERE schoolid=? AND sch
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($generated, $available);
+$stmt->bind_result($generated);
 if ($stmt->num_rows == 1) {
     if(($result = $stmt->fetch()) == true){
         $yearbook = array(
