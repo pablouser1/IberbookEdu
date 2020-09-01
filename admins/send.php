@@ -41,15 +41,16 @@ function recursivecopy($source, $dest){
 }
 
 $userinfo = $_SESSION["userinfo"];
+$yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 
 // Get academic year (2020/2021 for example)
 $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
-if(!is_dir($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$userinfo["yearuser"])) {
-    mkdir($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$userinfo["yearuser"], 0755, true);
+if(!is_dir($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$yearuser)) {
+    mkdir($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$yearuser, 0755, true);
 }
 
 // Zip file location
-$baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$userinfo["yearuser"];
+$baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$yearuser;
 $_SESSION["baseurl"] = $baseurl;
 
 // Teachers

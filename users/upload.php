@@ -8,6 +8,7 @@ require_once("../helpers/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
+$yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 $table_name = $_SESSION["table_name"];
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 $max_characters = 280; // "Quote" max characters

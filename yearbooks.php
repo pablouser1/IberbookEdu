@@ -8,10 +8,12 @@ $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        // Year without spaces (used for URLs)
+        $yearuser = str_replace(' ', '', $row["schoolyear"]);
         $yearbooks[$row["schoolid"]]["schoolname"] = $row["schoolname"];
         $yearbooks[$row["schoolid"]]["acyears"][$row["acyear"]][$row["schoolyear"]] = [
-            "zip" => $ybpath.$row["schoolid"]."/".$row["acyear"]."/".$row["schoolyear"]."/".$row["zipname"],
-            "link" => $ybpath.$row["schoolid"]."/".$row["acyear"]."/".$row["schoolyear"]
+            "zip" => $ybpath.$row["schoolid"]."/".$row["acyear"]."/".$yearuser."/".$row["zipname"],
+            "link" => $ybpath.$row["schoolid"]."/".$row["acyear"]."/".$yearuser
         ];
     }
 }

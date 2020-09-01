@@ -121,7 +121,7 @@ Vue.component('yearbook', {
                     <span>Facebook</span>
                 </a>
                 <a
-                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20%23IberbookEdu%20en%3A%20' + encodeURI($root.url + yearbook.link)"
+                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20%23IberbookEdu%20en%3A%20' + $root.url + yearbook.link"
                 class="button is-info">
                     <span class="icon">
                         <i class="fab fa-twitter"></i>
@@ -129,7 +129,7 @@ Vue.component('yearbook', {
                     <span>Twitter</span>
                 </a>
                 <a
-                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu%20en%3A%20' + encodeURI($root.url + yearbook.link)"
+                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu%20en%3A%20' + $root.url + yearbook.link"
                 data-action="share/whatsapp/share"
                 class="button is-success">
                     <span class="icon">
@@ -138,7 +138,7 @@ Vue.component('yearbook', {
                     <span>Whatsapp</span>
                 </a>
                 <a
-                :href="'https://t.me/share/url?url=' + encodeURI($root.url + yearbook.link) + '&text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu'"
+                :href="'https://t.me/share/url?url=' + $root.url + yearbook.link + '&text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu'"
                 class="button is-link">
                     <span class="icon">
                         <i class="fab fa-telegram"></i>
