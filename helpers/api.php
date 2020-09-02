@@ -81,24 +81,16 @@ function getinfo($cookies, $type){
             // Get school id and name
             $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
             $infocentro = getcentrostudent($cookies, $datacentro);
-
-            if (empty($info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"])) {
-                $userinfo = [
-                    "error" => "No tienes un grupo asignado"
-                ];
-            }
-            else {
-                // Set user info
-                $userinfo = [
-                    "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
-                    "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
-                    "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
-                    "photouser" => $photo,
-                    "idcentro" => $infocentro["idcentro"],
-                    "namecentro" => $infocentro["namecentro"]
-                ];                
-            }
+            // Set user info
+            $userinfo = [
+                "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
+                "nameuser" => $info["RESULTADO"][0]["USUARIO"],
+                "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
+                "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
+                "photouser" => $photo,
+                "idcentro" => $infocentro["idcentro"],
+                "namecentro" => $infocentro["namecentro"]
+            ];
             break;
         // -- Tutor legal -- //
         case 'tutorlegal':

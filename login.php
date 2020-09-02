@@ -31,21 +31,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$loginres["error"]){
             // Get user info
             $userinfo = getinfo($loginres["cookies"], $type);
-            if (isset($userinfo["error"])) {
-                $login_error[] = $userinfo["error"];
-            }
-            else {
-                // Check if school is allowed, only for students. Teachers' schools are checked in users/teachers.php
-                if ($userinfo["typeuser"] == "ALU"){
-                    $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
-                    $result = $conn->query($sql);
-                    if ($result !== false && $result->num_rows == 0) {
-                        $login_error[] = "Su centro no está permitido";
-                    }
-                    // Check if user is from 4º ESO, 2º BCT or 6º Primaria
-                    if(!preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $userinfo["yearuser"])) {
-                        $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
-                    }
+            // Check if school is allowed, only for students. Teachers' schools are checked in users/teachers.php
+            if ($userinfo["typeuser"] == "ALU"){
+                $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
+                $result = $conn->query($sql);
+                if ($result !== false && $result->num_rows == 0) {
+                    $login_error[] = "Su centro no está permitido";
+                }
+                // Check if user is from 4º ESO, 2º BCT or 6º Primaria
+                if(!preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $userinfo["yearuser"])) {
+                    $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
                 }
             }
             if(!$login_error){
