@@ -8,14 +8,13 @@ require_once("../helpers/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
-$yearuser = str_replace(' ', '', $userinfo["yearuser"]);
-$table_name = $_SESSION["table_name"];
+$typeuser = $_SESSION["typeuser"];
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 $max_characters = 280; // "Quote" max characters
 $pic_error = $vid_error = $general_error = "";
 
 // Check if user uploaded pic and vid before
-$stmt = $conn->prepare("SELECT id FROM $table_name where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id FROM $typeuser where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -29,8 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
     $allowed_vid = array('mp4', 'webm');
     // Upload directory
-    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$table_name/";
-    if(strlen($_POST["quote"]) > $max_characters){
+    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$typeuser/";
+    if(isset($_POST["quote"]) && strlen($_POST["quote"]) > $max_characters){
         $general_error = "Has excedido la máxima cantidad de caracteres";   
     }
     // Continue with the files upload if the quote didn't excede the max amount
@@ -54,8 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
-        else{
-            $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
+        else {
+            $pic_error = "Foto: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
         }
         // Vid upload
         if(isset($_FILES['vid'])){
@@ -76,8 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
-        else{
-            $general_error = "Ha habido un error al procesar la solicitud, quizás alguno de los archivos pesa más de lo aceptado<br>";
+        else {
+            $vid_error = "Video: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
         }
     }
     // Inject to DB
@@ -85,12 +84,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $qoute = ($_POST["quote"]) ? nl2br(htmlspecialchars($_POST["quote"])) : null;
         // Create row with user data, nl2br is used to follow line breaks.
         if ($userinfo["typeuser"] == "P"){
-            $stmt = $conn->prepare("INSERT INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssissssss",
             $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute, $userinfo["subject"]);
         }
         else{
-            $stmt = $conn->prepare("INSERT INTO $table_name (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssisssss", $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute);
         }
         if ($stmt->execute() !== true) {

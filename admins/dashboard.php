@@ -269,7 +269,7 @@ if ($stmt->num_rows == 1) {
         // -- Yearbook options when generated -- //
         if (isset($yearbook)){
             $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
-            $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&year=$userinfo[yearuser]";
+            $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&group=$userinfo[yearuser]";
             echo "
             <hr>
             <h1 class='title'>Yearbook</h1>

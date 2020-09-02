@@ -8,14 +8,7 @@ require_once("../helpers/db.php");
 
 // User data
 $userinfo = $_SESSION["userinfo"];
-if ($userinfo["typeuser"] == "P"){
-    $typeuser = "teachers";
-}
-else{
-    $typeuser = "students";
-}
-$_SESSION["table_name"] = $typeuser;
-
+$typeuser = $_SESSION["typeuser"];
 // Check if yearbook is available
 $stmt = $conn->prepare("SELECT generated FROM yearbooks WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
@@ -81,7 +74,7 @@ if ($result->num_rows > 0){
             <?php
             if(isset($yearbook)){
                 $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
-                $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&year=$userinfo[yearuser]";
+                $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&group=$userinfo[yearuser]";
                 echo "
                 <section class='hero is-medium is-success is-bold'>
                     <div class='hero-body'>

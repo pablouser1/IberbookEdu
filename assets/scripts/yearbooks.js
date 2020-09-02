@@ -9,7 +9,7 @@ Vue.component('schools', {
     },
     template:
     `
-    <div v-if="Object.keys(schools).length === 0" class="container">
+    <div class="container">
         <p class="title has-text-centered">
             <span class="icon">
                 <i class="fas fa-school"></i>
@@ -17,15 +17,8 @@ Vue.component('schools', {
             <span>Centros</span>
         </p>
         <p class="subtitle has-text-centered">
-            No hay ningún centro con yearbooks disponibles
-        </p>
-    </div>
-    <div v-else class="container">
-        <p class="title has-text-centered">
-            <span class="icon">
-                <i class="fas fa-school"></i>
-            </span>
-            <span>Centros</span>
+            <span v-if="Object.keys(schools).length === 0">No hay ningún centro con yearbooks disponible</span>
+            <span v-else>Elige un centro</span>
         </p>
         <div class="columns is-mobile is-centered is-multiline is-vcentered animate__animated animate__zoomIn">
             <div class="column is-narrow" v-for="(school, schoolid, acyears) in schools">

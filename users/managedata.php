@@ -19,13 +19,7 @@ function delete_files($dir) {
 }
 
 $userinfo = $_SESSION["userinfo"];
-
-if ($userinfo["typeuser"] == "P"){
-    $typeuser = "teachers";
-}
-elseif ($userinfo["typeuser"] == "ALU") {
-    $typeuser = "students";
-}
+$typeuser = $_SESSION["typeuser"];
 
 if (isset($_GET["action"], $typeuser)) {
     switch ($_GET["action"]) {

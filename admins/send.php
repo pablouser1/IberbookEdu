@@ -41,6 +41,7 @@ function recursivecopy($source, $dest){
 }
 
 $userinfo = $_SESSION["userinfo"];
+// Used later for directories without spaces
 $yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 
 // Get academic year (2020/2021 for example)

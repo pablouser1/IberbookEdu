@@ -1,6 +1,7 @@
 <?php
 require_once("config.php");
 require_once("requests.php");
+
 // Login user
 function login($username, $password, $type){
     if ($type === "alumno" || $type === "tutorlegal"){
@@ -62,10 +63,13 @@ function getinfo($cookies, $type){
     $_SESSION["cookies"] = $cookies;
     if ($type == "alumno" || $type == "tutorlegal"){
         $url = $GLOBALS["base_url"].'pasendroid/infoSesion';
+        $typeuser = "students";
     }
     elseif ($type == "profesor") {
         $url = $GLOBALS["base_url"]."senecadroid/infoSesion";
+        $typeuser = "teachers";
     }
+    $_SESSION["typeuser"] = $typeuser;
     $info = get($url, $cookies);
     // Save common user info to array
     switch($type){
@@ -77,16 +81,24 @@ function getinfo($cookies, $type){
             // Get school id and name
             $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
             $infocentro = getcentrostudent($cookies, $datacentro);
-            // Set user info
-            $userinfo = array(
-                "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
-                "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
-                "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
-                "photouser" => $photo,
-                "idcentro" => $infocentro["idcentro"],
-                "namecentro" => $infocentro["namecentro"]
-            );
+
+            if (empty($info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"])) {
+                $userinfo = [
+                    "error" => "No tienes un grupo asignado"
+                ];
+            }
+            else {
+                // Set user info
+                $userinfo = [
+                    "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
+                    "nameuser" => $info["RESULTADO"][0]["USUARIO"],
+                    "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
+                    "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
+                    "photouser" => $photo,
+                    "idcentro" => $infocentro["idcentro"],
+                    "namecentro" => $infocentro["namecentro"]
+                ];                
+            }
             break;
         // -- Tutor legal -- //
         case 'tutorlegal':

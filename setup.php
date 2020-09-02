@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "CREATE TABLE `staff` (
         `id` int NOT NULL AUTO_INCREMENT,
         `username` varchar(14) NOT NULL UNIQUE,
-        `password` varchar(255),
+        `password` varchar(80) NOT NULL,
         `permissions` varchar(14) NOT NULL,
         primary key(id)
         )";

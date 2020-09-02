@@ -22,9 +22,11 @@ require_once("../helpers/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
+// Year without spaces
+$yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 
 if (isset($_GET["action"])) {
-    // Get academic year (2020/2021 for example)
+    // Get academic year (2020-2021 for example)
     $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
     switch ($_GET["action"]) {
         case "delete":
@@ -35,7 +37,7 @@ if (isset($_GET["action"])) {
                 die("Error updating record: " . $conn->error);
             }
             $stmt->close();
-            recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"]."/$acyear/".$userinfo["yearuser"]);
+            recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"]."/$acyear/".$yearuser);
         break;
     }
 }
