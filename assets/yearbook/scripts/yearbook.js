@@ -182,14 +182,3 @@ var main = new Vue({
         })
     }
 })
-
-// -- About -- //
-var contributors_modal = document.getElementById("contributors_modal")
-
-function contributors_open() {
-    contributors_modal.classList.add("is-active")
-}
-
-function contributors_close() {
-    contributors_modal.classList.remove("is-active");
-}
