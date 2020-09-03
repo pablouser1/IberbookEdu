@@ -95,11 +95,11 @@ function getinfo($cookies, $type){
         // -- Tutor legal -- //
         case 'tutorlegal':
             // Set user info
-            $userinfo = array(
+            $userinfo = [
                 "nameuser" => $info["RESULTADO"][0]["USUARIO"],
                 "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
                 "children" => $info["RESULTADO"][0]["HIJOS"],
-            );
+            ];
             break;
         // -- Profesor -- //
         case 'profesor':
