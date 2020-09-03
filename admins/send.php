@@ -97,7 +97,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 // Gallery
-$stmt = $conn->prepare("SELECT picname, picdescription FROM gallery where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT name, description, type FROM gallery where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -105,9 +105,9 @@ $gallery = array();
 $gallery_dir = 'gallery/';
 $i = 0;
 while($row = mysqli_fetch_assoc($result)) {
-    $gallery[$i] = array();
-    $gallery[$i]["path"] = $gallery_dir.$row["picname"];
-    $gallery[$i]["description"] = $row["picdescription"];
+    $gallery[$i]["path"] = $gallery_dir.$row["name"];
+    $gallery[$i]["description"] = $row["description"];
+    $gallery[$i]["type"] = $row["type"];
     $i++;
 }
 $stmt->close();

@@ -5,8 +5,6 @@ const common = {
     credits: `
     Bulma (https://bulma.io)
     <br>
-    bulma-prefers-dark (https://github.com/jloh/bulma-prefers-dark)
-    <br>
     Vue.js (https://vuejs.org)
     <br>
     Animate.css (https://animate.style)
@@ -26,7 +24,6 @@ const translations = {
         tabs: {
             gallery: "Gallery",
             about: "About",
-            theme: "Change theme"
         },
         yearbook: {
             students: "Students",
@@ -55,7 +52,6 @@ const translations = {
         tabs: {
             gallery: "Galería",
             about: "Acerca de",
-            theme: "Cambiar tema"
         },
         yearbook: {
             students: "Alumnos",

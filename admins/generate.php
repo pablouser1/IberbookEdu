@@ -31,6 +31,8 @@ ob_start();
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico">
     <!-- Scripts -->
+
+    <!-- Dev Vue -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <script src="scripts/vendor/vue.js"></script>
     <script defer src="scripts/vendor/solid.min.js"></script>
@@ -38,7 +40,6 @@ ob_start();
     <script src="scripts/vendor/confetti.min.js"></script>
     <!-- Styles -->
     <link rel="stylesheet" href="styles/vendor/bulma.min.css"/>
-    <link id="dark-theme" rel="stylesheet" type="text/css" href="styles/vendor/bulma-prefers-dark.min.css"/>
     <link rel="stylesheet" href="styles/vendor/animate.min.css"/>
     <link rel="stylesheet" href="styles/vendor/zuck.min.css"/>
     <link rel="stylesheet" href="styles/vendor/snapgram.min.css"/>
@@ -51,10 +52,10 @@ ob_start();
     </script>
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
     <!-- NoScript Warning -->
     <noscript>This program needs Javascript</noscript>
-    <div id="main" class="has-navbar-fixed-top">
+    <div id="main">
         <!-- Splashscreen -->
         <section v-if="!ready" class="hero is-fullheight">
             <div id="loading_body" class="hero-body">
@@ -73,9 +74,7 @@ ob_start();
             <div class="hero-body">
                 <div class="container">
                     <p class="title has-text-centered">
-                        <span class="icon">
-                            <i class="fas fa-graduation-cap"></i>
-                        </span>
+                        <i class="fas fa-graduation-cap"></i>
                         <span>{{ lang.banner.title }} <?php echo($userinfo["yearuser"]);?></span>
                     </p>
                     <h2 class="subtitle has-text-centered"><?php echo($acyear);?></h2>
@@ -87,7 +86,9 @@ ob_start();
         <nav id="navbar" v-if="ready" class="navbar is-primary is-bold is-fixed-top" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
                 <a href="<?php echo($schoolurl); ?>" target="_blank" class="navbar-item">
-                    <i class="fas fa-graduation-cap"></i>
+                    <span class="icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </span>
                     <span><?php echo($userinfo["namecentro"]);?></span>
                 </a>
                 <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button" aria-label="menu" aria-expanded="false">
@@ -106,7 +107,7 @@ ob_start();
                     </a>
                     <a href="#gallery" class="navbar-item">
                         <span class="icon">
-                            <i class="fas fa-images"></i>
+                            <i class="fas fa-photo-video"></i>
                         </span>
                         <span>{{ lang.tabs.gallery }}</span>
                     </a>
@@ -115,14 +116,6 @@ ob_start();
                             <i class="fas fa-info-circle"></i>
                         </span>
                         <span>{{ lang.tabs.about }}</span>
-                    </a>
-                </div>
-                <div class="navbar-end">
-                    <a v-if="theme" v-on:click="toggletheme" class="navbar-item">
-                        <span class="icon">
-                            <i class="fas fa-adjust"></i>
-                        </span>
-                        <span>{{ lang.tabs.theme }}</span>
                     </a>
                 </div>
             </div>

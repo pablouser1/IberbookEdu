@@ -10,10 +10,3 @@ FiveYearsFromYearbook.setFullYear(FiveYearsFromYearbook.getFullYear() + 5);
 if(currentDate > FiveYearsFromYearbook){
     main.easteregg("timeago")
 }
-
-// Check if user accepts prefers-color-scheme
-
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    console.log("El navegador soporte tema oscuro")
-    main.theme = true
-}

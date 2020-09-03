@@ -46,6 +46,26 @@ if ($result->num_rows > 0){
         }
     }
 }
+$stmt->close();
+
+// Get gallery items
+$stmt = $conn->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
+$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+$stmt->execute();
+$result = $stmt->get_result();
+// Set array with values
+$gallery = [];
+if ($result->num_rows > 0){
+    while ($row = mysqli_fetch_assoc($result)) {
+        $id = $row["id"];
+        $gallery[$id] = array();
+        foreach ($row as $field => $value) {
+            $gallery[$id][] = $value;
+        }
+    }
+}
+$stmt->close();
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -54,7 +74,7 @@ if ($result->num_rows > 0){
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Dashboard Usuarios - IberbookEdu</title>
-        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+        <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     </head>
 
@@ -97,21 +117,27 @@ if ($result->num_rows > 0){
             if (empty($user_values)){
                 echo '
                 <div class="content has-text-centered">
-                    <h1 class="title">¡Hola! Bienvenido</h1>
-                    <p>Parece ser que no tienes ninguna foto o vídeo subido, puedes comenzar pulsando el botón:</p>
+                    <h1 class="title">👋 ¡Hola! Bienvenido</h1>
+                    <p>Parece ser que no tienes datos subidos, puedes comenzar pulsando el botón:</p>
                     <a class="button is-info" href="upload.php">
                         <span class="icon">
-                            <i class="far fa-images"></i>
+                            <i class="fas fa-upload"></i>
                         </span>
-                        <span>Agregar foto y vídeo</span>
+                        <span>Agregar datos</span>
                     </a>
                 </div>
                 ';
             }
             else {
-                echo("<h1 class='title'>Tus datos</h1>");
+                echo '
+                <h1 class="title">
+                    <i class="fas fa-upload"></i>
+                    <span>Tus datos</span>
+                </h1>
+                ';
             }
             ?>
+            <!-- Datos subidos del usuario -->
             <div class="table-container">
                 <table class="table is-bordered is-striped is-narrow is-hoverable">
                     <thead>
@@ -120,7 +146,7 @@ if ($result->num_rows > 0){
                             if(!empty($user_values)){
                                 echo "
                                 <th>ID</th>
-                                <th>Nombre y apellidos</th>
+                                <th>Nombre completo</th>
                                 <th>Foto</th>
                                 <th>Vídeo</th>
                                 <th>Enlace</th>
@@ -136,7 +162,7 @@ if ($result->num_rows > 0){
                         <?php
                         // Get all values from user' table
                         if (!empty($user_values)) {
-                            foreach($user_values as $value => $individual){
+                            foreach($user_values as $individual){
                                 echo "
                                 <tr>
                                     <td>$individual[0]</td>
@@ -156,6 +182,51 @@ if ($result->num_rows > 0){
                                 }
                                 echo("</tr>");
                             }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Galería -->
+            <p class='title'>
+                <i class="fas fa-photo-video"></i>
+                <span>Galería de tu grupo</span>
+            </p>
+            <div class="table-container">
+                <table class="table is-bordered is-striped is-narrow is-hoverable">
+                    <thead>
+                        <tr>
+                            <?php
+                            if(!empty($gallery)){
+                                echo "
+                                <th>Archivo</th>
+                                <th>Descripción</th>
+                                <th>Tipo</th>
+                                ";
+                            }
+                            ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Get all values from user' table
+                        if (!empty($gallery)) {
+                            foreach($gallery as $item){
+                                echo "
+                                <tr>
+                                    <td>$item[1]</td>
+                                    <td>$item[2]</td>
+                                    <td><a href='../getgallery.php?id=$item[0]' target='_blank'>$item[3]</a></td>
+                                </tr>
+                                ";
+                            }
+                        }
+                        else {
+                            echo "
+                            <tr>
+                                <td>No hay ninguna foto disponible</td>
+                            </tr>
+                            ";
                         }
                         ?>
                     </tbody>

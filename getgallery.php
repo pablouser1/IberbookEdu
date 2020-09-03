@@ -3,19 +3,18 @@
 session_start();
 require_once("helpers/db.php");
 require_once("helpers/config.php");
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
+if (!isset($_SESSION["loggedin"])){
     header("Location: login.php");
     exit;
 }
 $userinfo = $_SESSION["userinfo"];
 
-$stmt = $conn->prepare("SELECT picname, id FROM gallery where id=? and schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT name, id FROM gallery where id=? and schoolid=? and schoolyear=?");
 $stmt->bind_param("sis", $_GET["id"], $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($medianame, $mediaid);
 $stmt->fetch();
-$downloadable = 0;
 if ($stmt->num_rows == 1) {
     $filepath = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/gallery/".$medianame;
     // https://stackoverflow.com/a/27805443 and https://stackoverflow.com/a/23447332

@@ -88,10 +88,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Gallery
     $sql = "CREATE TABLE gallery(
         id int not null auto_increment,
-        picname varchar(255) not null,
+        name varchar(255) not null,
         schoolid varchar(10) not null,
         schoolyear varchar(10) not null,
-        picdescription varchar(255),
+        description varchar(255),
+        type varchar(8) not null,
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -167,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yearbook Setup</title>
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
 </head>

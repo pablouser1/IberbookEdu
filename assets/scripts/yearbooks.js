@@ -11,9 +11,7 @@ Vue.component('schools', {
     `
     <div class="container">
         <p class="title has-text-centered">
-            <span class="icon">
-                <i class="fas fa-school"></i>
-            </span>
+            <i class="fas fa-school"></i>
             <span>Centros</span>
         </p>
         <p class="subtitle has-text-centered">

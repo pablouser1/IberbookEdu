@@ -47,7 +47,7 @@ $students_amount = (!isset($students)) ? 0 : count($students);
 
 // Gallery
 
-$stmt = $conn->prepare("SELECT id, picname, picdescription FROM gallery where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -61,7 +61,7 @@ while ($row = $result->fetch_assoc()) {
     $gallery_i++;
 }
 $stmt->close();
-// Get amount pics
+// Get amount items
 $gallery_amount = (!isset($gallery)) ? 0 : count($gallery);
 
 // Check if admin generated yearbook before
@@ -86,7 +86,7 @@ if ($stmt->num_rows == 1) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard admins - IberbookEdu</title>
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
 </head>
 <body>
@@ -114,7 +114,7 @@ if ($stmt->num_rows == 1) {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nombre y apellidos</th>
+                        <th>Nombre completo</th>
                         <th>Foto</th>
                         <th>Vídeo</th>
                         <th>Enlace</th>
@@ -197,7 +197,6 @@ if ($stmt->num_rows == 1) {
                 </tbody>
             </table>
         </div>
-        <hr>
         <p class="title">Administrar usuarios</p>
         <div class="field is-grouped">
             <div class="control">
@@ -234,7 +233,7 @@ if ($stmt->num_rows == 1) {
         <hr>
         <!-- Gallery -->
         <p class="title">
-            <i class="far fa-images"></i>
+            <i class="fas fa-photo-video"></i>
             <span>Galería</span>
         </p>
         <p class="subtitle">Total: <?php echo($gallery_amount); ?></p>
@@ -245,6 +244,7 @@ if ($stmt->num_rows == 1) {
                         <th>ID</th>
                         <th>Foto</th>
                         <th>Descripción</th>
+                        <th>Tipo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -252,12 +252,13 @@ if ($stmt->num_rows == 1) {
                     // Get all values from gallery's table
                     if (!isset($gallery)) echo '<td>No hay fotos disponibles</td>';
                     else {
-                        foreach($gallery as $picture){
+                        foreach($gallery as $item){
                             echo "
                             <tr>
-                                <td>$picture[0]</td>
-                                <td><a href='../getgallery.php?id=$picture[0]' target='_blank'>$picture[1]</a></td>
-                                <td>$picture[2]</td>
+                                <td>$item[0]</td>
+                                <td><a href='../getgallery.php?id=$item[0]' target='_blank'>$item[1]</a></td>
+                                <td>$item[2]</td>
+                                <td>$item[3]</td>
                             ";
                         }
                     }
@@ -306,9 +307,9 @@ if ($stmt->num_rows == 1) {
             </button>
             <a class="button is-info" href="gallery.php">
                 <span class="icon">
-                    <i class="far fa-images"></i>
+                    <i class="fas fa-photo-video"></i>
                 </span>
-                <span>Agregar fotos a galería</span>
+                <span>Modificar galería</span>
             </a>
         </div>
     </section>

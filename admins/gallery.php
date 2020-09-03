@@ -25,35 +25,55 @@ function delete_files($target) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userinfo = $_SESSION["userinfo"];
     $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/";
-    $gallery_dir = '/gallery/';
+    $gallery_dir = 'gallery/';
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
-    if(count($_FILES['gallery']['name']) > 0){
-        // The user wants to overwrite data
-        if(isset($_POST["overwrite"])){
-            $stmt = $conn->prepare("DELETE FROM gallery WHERE schoolid=? AND schoolyear=?");
-            $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-            if ($stmt->execute() !== TRUE) {
-                die("Error deleting gallery data: " . $conn->error);
-            }
-            delete_files($uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/gallery/");
+    $allowed_vid = array('mp4', "webm");
+
+    // The user wants to overwrite data
+    if(isset($_POST["overwrite"])){
+        $stmt = $conn->prepare("DELETE FROM gallery WHERE schoolid=? AND schoolyear=?");
+        $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+        if ($stmt->execute() !== TRUE) {
+            die("Error deleting gallery data: " . $conn->error);
         }
-        
-        if (!is_dir($baseurl.$gallery_dir)){
-            mkdir($baseurl.$gallery_dir, 0700, true);
-        }
-        for($i=0; $i<count($_FILES['gallery']['name']); $i++) {
-            $tmpFilePath = $_FILES['gallery']['tmp_name'][$i];
+        delete_files($uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/gallery/");
+    }
+    
+    if (!is_dir($baseurl.$gallery_dir)){
+        mkdir($baseurl.$gallery_dir, 0700, true);
+    }
+    if(count($_FILES['pic']['name']) > 0){
+        for($i=0; $i<count($_FILES['pic']['name']); $i++) {
+            $tmpFilePath = $_FILES['pic']['tmp_name'][$i];
             if($tmpFilePath != ""){
-                $filePath = $baseurl.$gallery_dir.$_FILES['gallery']['name'][$i];
+                $filePath = $baseurl.$gallery_dir.$_FILES['pic']['name'][$i];
                 $ext = pathinfo($filePath, PATHINFO_EXTENSION);
                 if (!in_array($ext, $allowed_pic)) {
                     echo 'error';
                 }
                 else{
-                    $gallery[] = $i;
-                    $gallery[$i] = array();
-                    $gallery[$i]["path"] = basename($filePath);
-                    $gallery[$i]["description"] = htmlspecialchars($_POST["gallery_description"][$i]);
+                    $pictures[$i]["path"] = basename($filePath);
+                    $pictures[$i]["description"] = htmlspecialchars($_POST["pic_description"][$i]);
+                    $pictures[$i]["type"] = "picture";
+                    move_uploaded_file($tmpFilePath, $filePath);
+                }
+            }
+        }
+    }
+
+    if(count($_FILES['vid']['name']) > 0){
+        for($i=0; $i<count($_FILES['vid']['name']); $i++) {
+            $tmpFilePath = $_FILES['vid']['tmp_name'][$i];
+            if($tmpFilePath != ""){
+                $filePath = $baseurl.$gallery_dir.$_FILES['vid']['name'][$i];
+                $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+                if (!in_array($ext, $allowed_vid)) {
+                    echo 'error';
+                }
+                else{
+                    $videos[$i]["path"] = basename($filePath);
+                    $videos[$i]["description"] = htmlspecialchars($_POST["vid_description"][$i]);
+                    $videos[$i]["type"] = "video";
                     move_uploaded_file($tmpFilePath, $filePath);
                 }
             }
@@ -61,16 +81,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     // Insert to DB
     // Create row with user data
-    $stmt = $conn->prepare("insert ignore into gallery(picname, schoolid, schoolyear, picdescription) VALUES (?, ?, ?, ?)");
-    foreach ($gallery as $id => $pic) {
-        $stmt->bind_param("siss", $pic["path"], $userinfo["idcentro"], $userinfo["yearuser"], $pic["description"]);
-        if ($stmt->execute() !== TRUE) {
-            die("Error inserting user data: " . $conn->error);
+    if (isset($videos) || isset($pictures)) {
+        $stmt = $conn->prepare("insert ignore into gallery(name, schoolid, schoolyear, description, type) VALUES (?, ?, ?, ?, ?)");
+
+        if (isset($pictures)) {
+            foreach ($pictures as $pic) {
+                $stmt->bind_param("sisss", $pic["path"], $userinfo["idcentro"], $userinfo["yearuser"], $pic["description"], $pic["type"]);
+                if ($stmt->execute() !== TRUE) {
+                    die("Error inserting pic data: " . $conn->error);
+                }
+            }
         }
+
+        if (isset($videos)) {
+            foreach ($videos as $video) {
+                $stmt->bind_param("sisss", $video["path"], $userinfo["idcentro"], $userinfo["yearuser"], $video["description"], $video["type"]);
+                if ($stmt->execute() !== TRUE) {
+                    die("Error inserting vid data: " . $conn->error);
+                }
+            }
+        }
+        $stmt->close();
+        // Done
+        header("Location: dashboard.php");
+        exit;
     }
-    $stmt->close();
-    // Done
-    header("Location: dashboard.php");
 }
 
 
@@ -102,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <br>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
-            <div id="gallery_columns" class="columns is-centered is-multiline">
+            <div id="pic_columns" class="columns is-centered is-multiline">
                 <div class="column is-narrow">
                     <div class="card">
                         <div class="card-content">
@@ -110,21 +145,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="field">
                                 <p class="control">
                                     <label>Foto: </label>
-                                    <input type="file" name="gallery[]" accept="image/*" multiple="multiple">
+                                    <input type="file" name="pic[]" accept="image/gif, image/jpeg, image/png" multiple="multiple">
                                     <br>
-                                    <label for="gallery_description[]">Descripción: </label>
-                                    <textarea class="textarea" name="gallery_description[]" rows="10" cols="30"></textarea>
+                                    <label for="pic_description[]">Descripción: </label>
+                                    <textarea class="textarea" name="pic_description[]" rows="10" cols="30"></textarea>
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <hr>
+            <div class="control has-text-centered">
+                <button id="addvid" class="button is-info" type="button">Agregar vídeo</button>
+            </div>
+            <br>
+            <div id="vid_columns" class="columns is-centered is-multiline">
+                <div class="column is-narrow">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title has-text-centered">Vídeo 0</p>
+                            <div class="field">
+                                <p class="control">
+                                    <label>Vídeo: </label>
+                                    <input type="file" name="vid[]" accept="video/mp4, video/webm" multiple="multiple">
+                                    <br>
+                                    <label for="vid_description[]">Descripción: </label>
+                                    <textarea class="textarea" name="vid_description[]" rows="10" cols="30"></textarea>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <div class="field is-grouped is-grouped-centered">
                 <div class="control">
                     <label class="checkbox">
                         <input name="overwrite" type="checkbox">
-                        Sobrescribir
+                        Sobrescribir datos ya existentes
                     </label>
                 </div>
             </div>
@@ -133,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <button type="submit" class="button is-primary">Enviar</button>
                 </p>
                 <p class="control">
-                    <button type="button" name="cancel_gallery" class="button is-danger">Cancelar</button>
+                    <a href="dashboard.php" class="button is-danger">Cancelar</a>
                 </p>
             </div>
         </form>
