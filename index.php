@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html>
 
@@ -29,17 +32,41 @@
 
                 <div id="navbarMain" class="navbar-menu">
                     <div class="navbar-end">
-                        <a class="navbar-item" href="login.php">
-                            <span class="icon">
-                                <i class="fas fa-user-circle"></i>
-                            </span>
-                            <span><b>Iniciar sesión</b></span>
-                        </a>
+                        <?php
+                        // If user is logged in
+                        if (isset($_SESSION["loggedin"])) {
+                            echo '
+                            <a class="navbar-item" href="users/dashboard.php">
+                                <span class="icon">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <span><b>Panel de control</b></span>
+                            </a>
+                            ';
+                        }
+                        // User is not logged in
+                        else {
+                            echo '
+                            <a class="navbar-item" href="login.php">
+                                <span class="icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </span>
+                                <span><b>Iniciar sesión</b></span>
+                            </a>
+                            ';
+                        }
+                        ?>
                         <a class="navbar-item" href="yearbooks.php">
                             <span class="icon">
                                 <i class="fas fa-book"></i>
                             </span>
                             <span><b>Yearbooks</b></span>
+                        </a>
+                        <a class="navbar-item" href="about.html">
+                            <span class="icon">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                            <span><b>Acerca de</b></span>
                         </a>
                     </div>
                 </div>
@@ -57,24 +84,9 @@
                 </h2>
             </div>
         </div>
-
-        <!-- Foot -->
-        <div class="hero-foot">
-            <div class="tabs is-centered">
-                <ul>
-                    <li>
-                        <a href="about.html">
-                            <span class="icon">
-                                <i class="fas fa-info-circle"></i>
-                            </span>
-                            <span>Acerca de</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
     </section>
     <script src="assets/scripts/index.js"></script>
 </body>
 
 </html>
+

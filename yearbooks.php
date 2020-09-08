@@ -27,8 +27,8 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yearbooks - IberbookEdu</title>
     <!-- Dev -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> --->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
     <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
@@ -38,7 +38,6 @@ if ($result->num_rows > 0) {
 </head>
 
 <body>
-    <noscript>Esta página neceista Javascript para funcionar</noscript>
     <!-- Banner -->
     <section class="hero is-primary is-bold">
         <div class="hero-body">
@@ -54,6 +53,8 @@ if ($result->num_rows > 0) {
         <hr>
         <!-- Grupos -->
         <groups v-bind:groups="groups" v-bind:groupsextra="groupsextra"></groups>
+        <!-- NoScript Alert -->
+        <noscript>Esta página neceista Javascript para funcionar</noscript>
         <hr>
         <!-- Yearbook -->
         <yearbook v-bind:yearbook="yearbook" v-bind:yearbookextra="yearbookextra"></yearbook>
@@ -70,3 +71,4 @@ if ($result->num_rows > 0) {
 </body>
 
 </html>
+

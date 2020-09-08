@@ -144,15 +144,15 @@ require_once("getstaff.php");
         <div onclick="closeclear()" class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">Archivar datos</p>
+                <p class="modal-card-title">Limpiar datos subida</p>
                 <button onclick="closeclear()" class="delete" aria-label="close"></button>
             </header>
             <form action="clear.php" method="POST">
                 <section class="modal-card-body">
-                    <p>Archiva los yearbooks</p>
+                    <p>Limpia la carpeta de subida</p>
                     <p>
                         <span class="has-background-danger"><strong>ADVERTENCIA</strong></span>,
-                        esta función elimina todos los datos subidos por el usuario en la carpeta de subidas.
+                        esta función elimina todos los datos subidos por los usuarios en la carpeta de subidas.
                         <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span><br>
                     </p>
                     <div class="field">
@@ -194,3 +194,4 @@ require_once("getstaff.php");
   </body>
 
 </html>
+

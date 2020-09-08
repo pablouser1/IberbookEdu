@@ -84,12 +84,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $qoute = ($_POST["quote"]) ? nl2br(htmlspecialchars($_POST["quote"])) : null;
         // Create row with user data, nl2br is used to follow line breaks.
         if ($userinfo["typeuser"] == "P"){
-            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, picname, vidname, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, photo, video, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssissssss",
             $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute, $userinfo["subject"]);
         }
         else{
-            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, picname, vidname, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, photo, video, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssisssss", $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute);
         }
         if ($stmt->execute() !== true) {

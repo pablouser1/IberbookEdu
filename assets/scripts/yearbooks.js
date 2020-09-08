@@ -59,7 +59,7 @@ Vue.component('groups', {
     
     <div v-else-if="groups" class="container">
         <p class="title has-text-centered">Cursos</p>
-        <p class="subtitle has-text-centered">{{ groupsextra.schoolname }} {{groupsextra.acyear }}</p>
+        <p class="subtitle has-text-centered">{{ groupsextra.schoolname }} / {{groupsextra.acyear }}</p>
         <div class="columns is-mobile is-centered is-vcentered is-multiline">
             <div class="column is-narrow animate__animated animate__fadeIn" v-for="(group, index) in groups">
                 <button @click="$root.showyearbook(group, index)" class="button is-success">{{ index }}</button>
@@ -137,9 +137,6 @@ Vue.component('yearbook', {
                     <span>Telegram</span>
                 </a>
             </div>
-            <div class="container">
-                <div id="qrcode"></div>
-            </div>
         </div>
     </div>
     `
@@ -175,11 +172,11 @@ var yb_vue = new Vue({
         quicktravel: function(schoolid, acyear, group) {
             // If schoolid and academic year are in object
             if ( (schoolid in yearbooks_js) && (acyear in yearbooks_js[schoolid]["acyears"]) ) {
-                this.setgroup(yearbooks_js[schoolid]["acyears"][acyear])
+                this.setgroup(yearbooks_js[schoolid]["acyears"][acyear], yearbooks_js[schoolid]["schoolname"], acyear)
 
                 // If group is in object
                 if (group in yearbooks_js[schoolid]["acyears"][acyear]) {
-                    this.showyearbook(yearbooks_js[schoolid]["acyears"][acyear][group])
+                    this.showyearbook(yearbooks_js[schoolid]["acyears"][acyear][group], group)
                 }
             }
         }

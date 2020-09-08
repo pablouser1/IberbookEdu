@@ -8,6 +8,9 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("Location: ../login.php");
     exit;
 }
+
+$max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
+
 function delete_files($target) {
     if(is_dir($target)){
         $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
@@ -195,9 +198,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <a href="dashboard.php" class="button is-danger">Cancelar</a>
                 </p>
             </div>
+            <div class="container notification is-info">
+                <b>Formatos admitidos:</b><br>
+                Fotos: gif, png, jpg, jpeg.<br>
+                Vídeos: mp4, webm.<br>
+                <span class="has-background-danger">Tamaño máximo <?php echo($max_mb);?> MB</span>
+            </div>
         </form>
     </section>
     <script src="../assets/scripts/admins/gallery.js"></script>
 </body>
 
 </html>
+

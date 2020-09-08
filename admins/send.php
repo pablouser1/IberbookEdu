@@ -55,7 +55,7 @@ $baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."
 $_SESSION["baseurl"] = $baseurl;
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, uploaded, subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -64,20 +64,21 @@ while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
     $teachers[] = [
         "userid" => $id,
-        "photo" => $teachers_dir.$id.'/'.$row["picname"],
-        "video" => $teachers_dir.$id.'/'.$row["vidname"],
+        "photo" => $teachers_dir.$id.'/'.$row["photo"],
+        "video" => $teachers_dir.$id.'/'.$row["video"],
         "fullname" => getname("full", $row["fullname"]),
         "abbr" => getname("abbr", $row["fullname"]),
         "url" => $row["link"],
         "quote" => $row["quote"], // User quote
         "date" => $row["uploaded"],
+        "zuckdate" => strtotime($row["uploaded"]),
         "subject" => $row["subject"]
     ];
 }
 $stmt->close();
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, uploaded FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -86,16 +87,18 @@ while ($row = $result->fetch_assoc()) {
     $id = $row["id"];
     $students[] = [
         "userid" => $id,
-        "photo" => $students_dir.$id.'/'.$row["picname"],
-        "video" => $students_dir.$id.'/'.$row["vidname"],
+        "photo" => $students_dir.$id.'/'.$row["photo"],
+        "video" => $students_dir.$id.'/'.$row["video"],
         "fullname" => getname("full", $row["fullname"]),
         "abbr" => getname("abbr", $row["fullname"]),
         "url" => $row["link"],
         "quote" => $row["quote"], // User quote
-        "date" => $row["uploaded"]
+        "date" => $row["uploaded"],
+        "zuckdate" => strtotime($row["uploaded"])
     ];
 }
 $stmt->close();
+
 // Gallery
 $stmt = $conn->prepare("SELECT name, description, type FROM gallery where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
@@ -142,3 +145,4 @@ copy("../favicon.ico",  $baseurl.'/favicon.ico');
 
 header("Location: generate.php");
 ?>
+

@@ -84,36 +84,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 
 <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Iberbook Login</title>
+    <title>Login - IberbookEdu</title>
     <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
 </head>
 
 <body>
-    <section class="hero is-primary is-fullheight">
+    <section class="hero is-success is-fullheight">
         <div class="hero-body">
-            <div class="container">
-                <div class="columns is-centered">
-                    <div class="column is-5-tablet is-4-desktop is-3-widescreen">
-                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="box">
+            <div class="container has-text-centered">
+                <div class="column is-4 is-offset-4">
+                    <h3 class="title has-text-black">IberbookEdu - Login</h3>
+                    <hr class="login-hr">
+                    <p class="subtitle has-text-black">Por favor, inicia sesión con tu cuenta de PASEN/SENECA o ROBLE.</p>
+                    <div class="box">
+                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                             <div class="field">
-                                <label for="" class="label">Usuario</label>
+                                <label class="label">Usuario</label>
                                 <div class="control has-icons-left">
-                                    <input name="username" type="text" placeholder="usuario" class="input" required>
                                     <span class="icon is-small is-left">
                                         <i class="fas fa-user"></i>
                                     </span>
+                                    <input name="username" type="text" placeholder="usuario" class="input" required>
                                 </div>
                             </div>
                             <div class="field">
-                                <label for="" class="label">Contraseña</label>
+                                <label class="label">Contraseña</label>
                                 <div class="control has-icons-left">
-                                    <input name="password" type="password" placeholder="*******" class="input" required>
                                     <span class="icon is-small is-left">
                                         <i class="fa fa-lock"></i>
                                     </span>
+                                    <input name="password" type="password" placeholder="**********" class="input" required>
                                 </div>
                             </div>
                             <div class="field">
@@ -126,25 +129,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </select>
                                 </div>
                             </div>
-                            <div class="field">
-                                <button type="submit" class="button is-success">
-                                    Login
-                                </button>
-                            </div>
+                            <button type="submit" class="button is-block is-info is-fullwidth">Iniciar sesión</button>
                         </form>
-                        <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
-                            <span>
-                                <p>Hubo un error al procesar tu solicitud:</p>
-                                <?php
-                                    if($login_error) {
-                                        foreach($login_error as $error) {
-                                            echo "<p>$error</p>";
-                                        }
-                                    }
-                                ?>
-                            </span>
-                        </div>
+                        <p class="has-text-grey">
+                            <a href="about.html">Acerca de</a>
+                        </p>
                     </div>
+                </div>
+                <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
+                    <span>
+                        <p>Hubo un error al procesar tu solicitud:</p>
+                        <?php
+                        if($login_error) {
+                            foreach($login_error as $error) {
+                                echo "<p>$error</p>";
+                            }
+                        }
+                        ?>
+                    </span>
                 </div>
             </div>
         </div>
@@ -152,3 +154,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 
 </html>
+

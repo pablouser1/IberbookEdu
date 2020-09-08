@@ -9,7 +9,7 @@ if (!isset($_SESSION["loggedin"])){
 }
 
 $userinfo = $_SESSION["userinfo"];
-switch($_GET["type"]){
+switch($_GET["type"]) {
     case "ALU":
         $type = "students";
     break;
@@ -20,10 +20,19 @@ switch($_GET["type"]){
         die("Ese tipo de usuario no existe");
 }
 
-if ($_GET["media"] == "picname" || "vidname"){
-    $stmt = $conn->prepare("SELECT $_GET[media], id FROM $type where id=?");
-    $stmt->bind_param("s", $_GET["id"]);
+switch ($_GET["media"]) {
+    case "photo":
+        $media = "photo";
+    break;
+    case "video":
+        $media = "video";
+    break;
+    default:
+        die("Ese tipo de archivo no existe");
 }
+
+$stmt = $conn->prepare("SELECT $media, id FROM $type where id=?");
+$stmt->bind_param("s", $_GET["id"]);
 $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($medianame, $mediaid);
@@ -120,3 +129,4 @@ if ($downloadable == 1){
     }
 }
 ?>
+

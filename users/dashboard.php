@@ -25,11 +25,11 @@ if ($stmt->num_rows == 1) {
 $stmt->close();
 // Check if user uploaded pic and vid before
 if (isset($userinfo["subject"])){
-    $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
+    $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
     FROM $typeuser where schoolid=? and schoolyear=?");
 }
 else{
-    $stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
+    $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
     FROM $typeuser where schoolid=? and schoolyear=?");
 }
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
@@ -167,8 +167,8 @@ $stmt->close();
                                 <tr>
                                     <td>$individual[0]</td>
                                     <td>$individual[1]</td>
-                                    <td><a href='../getmedia.php?id=$individual[0]&media=picname&type=$userinfo[typeuser]' target='_blank'>$individual[2]</a></td>
-                                    <td><a href='../getmedia.php?id=$individual[0]&media=vidname&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
+                                    <td><a href='../getmedia.php?id=$individual[0]&media=photo&type=$userinfo[typeuser]' target='_blank'>$individual[2]</a></td>
+                                    <td><a href='../getmedia.php?id=$individual[0]&media=video&type=$userinfo[typeuser]' target='_blank'>$individual[3]</a></td>
                                 ";
                                 if (empty($individual[4])) echo '<td class="has-text-centered">-</td>';
                                 else echo '<td><a href="'.$individual[4].'" target="_blank">Abrir enlace</a></td>';
@@ -214,9 +214,9 @@ $stmt->close();
                             foreach($gallery as $item){
                                 echo "
                                 <tr>
-                                    <td>$item[1]</td>
+                                    <td><a href='../getgallery.php?id=$item[0]' target='_blank'>$item[1]</a></td>
                                     <td>$item[2]</td>
-                                    <td><a href='../getgallery.php?id=$item[0]' target='_blank'>$item[3]</a></td>
+                                    <td>$item[3]</td>
                                 </tr>
                                 ";
                             }
@@ -317,3 +317,4 @@ $stmt->close();
     </footer>
     </body>
 </html>
+

@@ -12,7 +12,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
 $userinfo = $_SESSION["userinfo"];
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject FROM teachers where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -29,7 +29,7 @@ $stmt->close();
 $teachers_amount = (!isset($teachers)) ? 0 : count($teachers);
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, picname, vidname, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -133,8 +133,8 @@ if ($stmt->num_rows == 1) {
                             echo "
                                 <td>$teacher[0]</td>
                                 <td>$teacher[1]</td>
-                                <td><a href='../getmedia.php?id=$teacher[0]&media=picname&type=P' target='_blank'>$teacher[2]</a></td>
-                                <td><a href='../getmedia.php?id=$teacher[0]&media=vidname&type=P' target='_blank'>$teacher[3]</a></td>
+                                <td><a href='../getmedia.php?id=$teacher[0]&media=photo&type=P' target='_blank'>$teacher[2]</a></td>
+                                <td><a href='../getmedia.php?id=$teacher[0]&media=video&type=P' target='_blank'>$teacher[3]</a></td>
                             ";
                             if (empty($teacher[4])) echo '<td class="has-text-centered">-</td>';
                             else echo '<td><a href="'.$teacher[4].'" target="_blank">Abrir enlace</a></td>';
@@ -182,8 +182,8 @@ if ($stmt->num_rows == 1) {
                             <tr>
                                 <td>$student[0]</td>
                                 <td>$student[1]</td>
-                                <td><a href='../getmedia.php?id=$student[0]&media=picname&type=ALU' target='_blank'>$student[2]</a></td>
-                                <td><a href='../getmedia.php?id=$student[0]&media=vidname&type=ALU' target='_blank'>$student[3]</a></td>
+                                <td><a href='../getmedia.php?id=$student[0]&media=photo&type=ALU' target='_blank'>$student[2]</a></td>
+                                <td><a href='../getmedia.php?id=$student[0]&media=video&type=ALU' target='_blank'>$student[3]</a></td>
                             ";
                             if (empty($student[4])) echo '<td class="has-text-centered">-</td>';
                             else echo '<td><a href="'.$student[4].'" target="_blank">Abrir enlace</a></td>';
@@ -352,3 +352,4 @@ if ($stmt->num_rows == 1) {
     <script src="../assets/scripts/admins/dashboard.js"></script>
 </body>
 </html>
+

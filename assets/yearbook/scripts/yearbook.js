@@ -123,7 +123,7 @@ Vue.component('gallery', {
                     <a :href="item.path" target="_blank">
                         <figure class="image">
                             <img v-if="item.type == 'picture'" :src="item.path">
-                            <video v-else controls>
+                            <video v-else preload="metadata" controls>
                                 <source :src="item.path"></script>
                             </video>
                         </figure>
@@ -182,3 +182,4 @@ var main = new Vue({
         })
     }
 })
+

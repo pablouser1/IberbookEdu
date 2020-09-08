@@ -28,10 +28,10 @@ students_js.forEach(student => {
                 id: student.userid,
                 type: "video",
                 src: student.video,
-                link: student.url
+                link: student.url,
+                time: student.zuckdate
             }
         ]
-
     })
 })
 
@@ -46,10 +46,10 @@ teachers_js.forEach(teacher => {
                 id: teacher.userid,
                 type:"video",
                 src: teacher.video,
-                link: teacher.url
+                link: teacher.url,
+                time: teacher.zuckdate
             }
         ]
-
     })
 })
 
@@ -64,3 +64,4 @@ let sstudents = new Zuck('stories_students', {
     story_settings,
     stories: stories_students,
 });
+

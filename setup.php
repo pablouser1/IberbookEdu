@@ -40,7 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // General
     $base_url = "'.$base_url.'"; // Remote server url
     $base_path = "'.dirname(__FILE__).'/"; // Program base dir
-    $ybpath = "'.$global_config[1].'"; // Base dir for user uploads and generated yearbooks
+    $uploadpath = "'.$global_config[1].'"; // Uploads dir
+    $ybpath = "'.$global_config[2].'"; // Base dir for user uploads and generated yearbooks
     // Api
     $ssloptions = '.$ssloptions.'
     ?>';
@@ -56,8 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
-        picname varchar(255) not null,
-        vidname varchar(255) not null,
+        photo varchar(255) not null,
+        video varchar(255) not null,
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -73,8 +74,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
-        picname varchar(255) not null,
-        vidname varchar(255) not null,
+        photo varchar(255) not null,
+        video varchar(255) not null,
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -270,9 +271,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
                 <div class="field">
+                    <label class="label">Ubicación del directorio de subida</label>
+                    <div class="control">
+                        <input name="global[]" class="input" type="text" value="<?php echo(dirname(__FILE__)."/uploads/");?>" required>
+                    </div>
+                    <p class="help">Aquí se guardan los archivos subidos por los usuarios, MUY recomendable que sea un directorio privado</p>
+                </div>
+                <div class="field">
                     <label class="label">Ubicación de los yearbooks</label>
                     <div class="control">
-                        <input name="global[]" id="yearbook" class="input" type="text" value="<?php echo(dirname($_SERVER['PHP_SELF'])."/yearbooks/");?>" required>
+                        <input name="global[]" class="input" type="text" value="<?php echo(dirname($_SERVER['PHP_SELF'])."/yearbooks/");?>" required>
                     </div>
                     <p class="help">Aquí se guardan los yearbooks ya generados, MUY recomendable que sea un directorio público</p>
                 </div>
@@ -315,3 +323,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 
 </html>
+
