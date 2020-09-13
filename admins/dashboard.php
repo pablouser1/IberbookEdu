@@ -1,66 +1,30 @@
 <?php
 // Initialize the session
 session_start();
-require_once("../helpers/db.php");
-require_once("../helpers/config.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("Location: ../login.php");
     exit;
 }
 
+require_once("../helpers/db/db.php");
+require_once("../helpers/config.php");
+require_once("yearbook/themes.php");
+
 $userinfo = $_SESSION["userinfo"];
 
-// Teachers
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject FROM teachers where schoolid=? and schoolyear=?");
-$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-$stmt->execute();
-$result = $stmt->get_result();
+require_once("../helpers/db/getinfo.php");
 
-while ($row = $result->fetch_assoc()) {
-    $id = $row["id"];
-    $teachers[$id] = array();
-    foreach ($row as $field => $value) {
-        $teachers[$id][] = $value;
-    }
-}
-$stmt->close();
+$DBInfo = new DBInfo($userinfo);
+$teachers = $DBInfo->teachers();
 // Get amount teachers
 $teachers_amount = (!isset($teachers)) ? 0 : count($teachers);
 
-// Students
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i') FROM students where schoolid=? and schoolyear=?");
-$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-$stmt->execute();
-$result = $stmt->get_result();
-
-while ($row = $result->fetch_assoc()) {
-    $id = $row["id"];
-    $students[$id] = array();
-    foreach ($row as $field => $value) {
-        $students[$id][] = $value;
-    }
-}
-$stmt->close();
+$students = $DBInfo->students();
 // Get amount students
 $students_amount = (!isset($students)) ? 0 : count($students);
 
-// Gallery
-
-$stmt = $conn->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
-$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
-$stmt->execute();
-$result = $stmt->get_result();
-$gallery_i = 0;
-while ($row = $result->fetch_assoc()) {
-    $id = $row["id"];
-    $gallery[$id] = array();
-    foreach ($row as $field => $value) {
-        $gallery[$id][] = $value;
-    }
-    $gallery_i++;
-}
-$stmt->close();
+$gallery = $DBInfo->gallery();
 // Get amount items
 $gallery_amount = (!isset($gallery)) ? 0 : count($gallery);
 
@@ -131,20 +95,14 @@ if ($stmt->num_rows == 1) {
                     else {
                         foreach($teachers as $teacher){
                             echo "
-                                <td>$teacher[0]</td>
-                                <td>$teacher[1]</td>
-                                <td><a href='../getmedia.php?id=$teacher[0]&media=photo&type=P' target='_blank'>$teacher[2]</a></td>
-                                <td><a href='../getmedia.php?id=$teacher[0]&media=video&type=P' target='_blank'>$teacher[3]</a></td>
-                            ";
-                            if (empty($teacher[4])) echo '<td class="has-text-centered">-</td>';
-                            else echo '<td><a href="'.$teacher[4].'" target="_blank">Abrir enlace</a></td>';
-    
-                            if (empty($teacher[5])) echo("<td class='has-text-centered'>-</td>");
-                            else echo '<td>'.$teacher[5].'</td>';
-    
-                            echo "
-                            <td>$teacher[6]</td>
-                            <td>$teacher[7]</td>
+                                <td>$teacher[id]</td>
+                                <td>$teacher[name]</td>
+                                <td><a href='../getmedia.php?id=$teacher[id]&media=photo&type=P' target='_blank'>$teacher[photo]</a></td>
+                                <td><a href='../getmedia.php?id=$teacher[id]&media=video&type=P' target='_blank'>$teacher[video]</a></td>
+                                <td><a href='$teacher[link]' target='_blank'>Abrir enlace</a></td>
+                                <td>$teacher[quote]</td>
+                                <td>$teacher[uploaded]</td>
+                                <td>$teacher[subject]</td>
                             ";
                         }
                     }
@@ -179,18 +137,14 @@ if ($stmt->num_rows == 1) {
                     else {
                         foreach($students as $student){
                             echo "
-                            <tr>
-                                <td>$student[0]</td>
-                                <td>$student[1]</td>
-                                <td><a href='../getmedia.php?id=$student[0]&media=photo&type=ALU' target='_blank'>$student[2]</a></td>
-                                <td><a href='../getmedia.php?id=$student[0]&media=video&type=ALU' target='_blank'>$student[3]</a></td>
+                                <td>$student[id]</td>
+                                <td>$student[name]</td>
+                                <td><a href='../getmedia.php?id=$student[id]&media=photo&type=ALU' target='_blank'>$student[photo]</a></td>
+                                <td><a href='../getmedia.php?id=$student[id]&media=video&type=ALU' target='_blank'>$student[video]</a></td>
+                                <td><a href='$student[link]' target='_blank'>Abrir enlace</a></td>
+                                <td>$student[quote]</td>
+                                <td>$student[uploaded]</td>
                             ";
-                            if (empty($student[4])) echo '<td class="has-text-centered">-</td>';
-                            else echo '<td><a href="'.$student[4].'" target="_blank">Abrir enlace</a></td>';
-    
-                            if (empty($student[5])) echo('<td class="has-text-centered">-</td>');
-                            else echo '<td>'.$student[5].'</td>';
-                            echo '<td>'.$student[6].'</td></tr>';
                         }
                     }
                     ?>
@@ -206,14 +160,14 @@ if ($stmt->num_rows == 1) {
                     echo("<option disabled>Profesores</option>");
                     if (isset($teachers)){
                         foreach ($teachers as $teacher){
-                            echo ('<option value="'.$teacher[0].'">'.$teacher[1].'</option>');
+                            echo ("<option value='$teacher[id]'>$teacher[name]</option>");
                         }
                     }
                     else echo("<option>No hay profesores disponibles");
                     echo("<option disabled>Alumnos</option>");
                     if (isset($students)){
                         foreach ($students as $student){
-                            echo ('<option value="'.$student[0].'">'.$student[1].'</option>');
+                            echo ("<option value='$student[id]'>$student[name]</option>");
                         }
                     }
                     else echo("<option>No hay alumnos disponibles</option>");
@@ -255,10 +209,11 @@ if ($stmt->num_rows == 1) {
                         foreach($gallery as $item){
                             echo "
                             <tr>
-                                <td>$item[0]</td>
-                                <td><a href='../getgallery.php?id=$item[0]' target='_blank'>$item[1]</a></td>
-                                <td>$item[2]</td>
-                                <td>$item[3]</td>
+                                <td>$item[id]</td>
+                                <td><a href='../getgallery.php?id=$item[id]' target='_blank'>$item[name]</a></td>
+                                <td>$item[description]</td>
+                                <td>$item[type]</td>
+                            </tr>
                             ";
                         }
                     }
@@ -298,13 +253,28 @@ if ($stmt->num_rows == 1) {
         <progress class="progress is-primary" max="100"></progress>
     </div>
     <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
+        <p class="title">Administrar yearbook</p>
+        <div class="field">
+            <label class="label">Plantilla</label>
+            <div class="control">
+                <div class="select">
+                    <select id="theme_selector">
+                        <?php
+                        foreach ($themes as $theme) {
+                            echo("<option>$theme</option>");
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+        </div>
         <div class="buttons">
-            <button id="genyearbook" class="button is-success" <?php if(!isset($students, $teachers)) echo("disabled"); ?>>
+            <a id="genyearbook" href="yearbook/send.php?theme=default" class="button is-success">
                 <span class="icon">
                     <i class="fas fa-check"></i>
                 </span>
                 <span>Generar Yearbook</span>
-            </button>
+            </a>
             <a class="button is-info" href="gallery.php">
                 <span class="icon">
                     <i class="fas fa-photo-video"></i>
@@ -330,14 +300,32 @@ if ($stmt->num_rows == 1) {
                     ';
                 }
                 ?>
-                <li>
-                    <a href="../users/dashboard.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                        </span>
-                        <span>Cambiar a usuario</span>
-                    </a>
-                </li>
+                <?php
+                if (!isset($_SESSION["owner"])) {
+                    echo '
+                    <li>
+                        <a href="../users/dashboard.php">
+                            <span class="icon is-small">
+                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                            </span>
+                            <span>Cambiar a usuario</span>
+                        </a>
+                    </li>
+                    ';
+                }
+                else {
+                    echo '
+                    <li>
+                        <a href="../owner/dashboard.php">
+                            <span class="icon is-small">
+                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                            </span>
+                            <span>Volver al panel de control de dueño</span>
+                        </a>
+                    </li>
+                    ';
+                }
+                ?>
                 <li>
                     <a href="../logout.php">
                         <span class="icon is-small">

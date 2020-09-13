@@ -1,10 +1,10 @@
 <?php
 session_start();
 if (!isset($_SESSION["owner"])){
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
-require_once("../helpers/db.php");
+require_once("../helpers/db/db.php");
 if (isset($_POST["sendstaff"], $_POST["action"])) {
     switch ($_POST["sendstaff"]) {
         case "owner":

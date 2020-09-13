@@ -4,10 +4,18 @@
 session_start();
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
-    header("Location: ../login.php");
+    header("Location: ../../login.php");
 }
-require_once("../helpers/db.php");
-require_once("../helpers/config.php");
+require_once("../../helpers/db/db.php");
+require_once("../../helpers/config.php");
+require_once("themes.php");
+
+if (isset($_GET["theme"]) && in_array($_GET["theme"], $themes)) {
+    $theme = $_GET["theme"];
+}
+else {
+    die("Esa plantilla no es válida o no has elegido ninguna");
+}
 
 // -- Functions -- //
 // Separate names
@@ -55,7 +63,7 @@ $baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."
 $_SESSION["baseurl"] = $baseurl;
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -78,7 +86,7 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -98,9 +106,11 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 $stmt->close();
-
+if ( (count($students) || count($teachers)) == 0 ) {
+    die("Necesitas un mínimo de 1 alumno y un profesor para continuar");
+}
 // Gallery
-$stmt = $conn->prepare("SELECT name, description, type FROM gallery where schoolid=? and schoolyear=?");
+$stmt = $conn->prepare("SELECT name, description, type FROM gallery WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -117,7 +127,7 @@ $stmt->close();
 
 // Get school info
 $schoolurl = null;
-$stmt = $conn->prepare("SELECT url FROM schools where id=?");
+$stmt = $conn->prepare("SELECT url FROM schools WHERE id=?");
 $stmt->bind_param("i", $userinfo["idcentro"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -132,17 +142,19 @@ $_SESSION["gallery"] = $gallery;
 $_SESSION["schoolurl"] = $schoolurl;
 $_SESSION["acyear"] = $acyear;
 
-// Copying all files to final folder
+// Copy all user uploaded files
 $source = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/";
 $dest = $baseurl;
 recursivecopy($source, $dest);
 
-$source = "../assets/yearbook";
-// Copy all assets/yearbook dir
+// Copy all theme-specific assets
+$source = "../../assets/yearbook/{$theme}";
 recursivecopy($source, $dest);
 
-copy("../favicon.ico",  $baseurl.'/favicon.ico');
+// Copy all common assets
+$source = "../../assets/yearbook/common";
+recursivecopy($source, $dest);
 
-header("Location: generate.php");
+copy("../../favicon.ico",  $baseurl.'/favicon.ico');
+header("Location: themes/$theme.php");
 ?>
-

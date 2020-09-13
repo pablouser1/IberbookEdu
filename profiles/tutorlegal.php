@@ -4,46 +4,23 @@ if (!isset($_SESSION["loggedin"], $_SESSION["tutorinfo"])){
     header("Location: login.php");
     exit;
 }
-require_once("../helpers/api.php");
-require_once("../helpers/db.php");
-$cookies = $_SESSION["cookies"];
-
 $tutorinfo = $_SESSION["tutorinfo"];
 
-$children = array();
-foreach($tutorinfo["children"] as $child){
-    // Picture
-    $datapic = array('X_MATRICULA' => $child["MATRICULAS"][0]["X_MATRICULA"], "ANCHO" => 64, "ALTO" => 64);
-    $child["FOTO"] = getpicstudent($cookies, $datapic);
-    // Get student school
-
-    // Check if student is allowed
-    $datacentro = array("X_CENTRO" => $child["MATRICULAS"][0]["X_CENTRO"]);
-    $infocentro = getcentrostudent($cookies, $datacentro);
-    $sql = "SELECT `id` FROM `schools` WHERE id=$infocentro[idcentro]";
-    $result = $conn->query($sql);
-    // If student is allowed, include him in array
-    if ($result !== false && $result->num_rows == 1 && preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $child["MATRICULAS"][0]["UNIDAD"])) {
-        $children[] = $child;
-    }
-}
-
+$child_error = [];
 if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
-    if (!isset($children[$_POST['childlogin']])) {
+    if (!isset($tutorinfo["children"][$_POST['childlogin']])) {
         $child_error[] = "Ese usuario no existe";
     }
     else {
-        $child = $children[$_POST['childlogin']];
-        $datacentro = array("X_CENTRO" => $child["MATRICULAS"][0]["X_CENTRO"]);
-        $infocentro = getcentrostudent($cookies, $datacentro);
+        $child = $tutorinfo["children"][$_POST['childlogin']];
         $childinfo = array(
             "iduser" => $child["MATRICULAS"][0]["X_MATRICULA"],
             "nameuser" => $child["NOMBRE"],
             "typeuser" => "ALU",
             "yearuser" => $child["MATRICULAS"][0]["UNIDAD"],
             "photouser" => $child["FOTO"],
-            "idcentro" => $infocentro["idcentro"],
-            "namecentro" => $infocentro["namecentro"]
+            "idcentro" => $child["idcentro"],
+            "namecentro" => $child["namecentro"]
         );
         $_SESSION["userinfo"] = $childinfo;
         header("Location: ../users/dashboard.php");
@@ -77,7 +54,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
     <section class="section">
         <div class="columns is-multiline is-centered is-vcentered is-mobile">
             <?php
-            if (empty($children)) {
+            if (empty($tutorinfo["children"])) {
                 echo '
                 <div class="column is-narrow is-full-mobile">
                     <div class="card">
@@ -91,7 +68,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
                 ';
             }
             else {
-                foreach($children as $id => $child){
+                foreach($tutorinfo["children"] as $id => $child){
                     echo '
                     <div class="column is-narrow is-full-mobile">
                         <div class="card">

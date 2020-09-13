@@ -9,10 +9,6 @@ document.getElementById("clear").addEventListener("click", function (){
     modalclear.classList.add("is-active")
 })
 
-function closeadmin(){
-    modaladmin.classList.remove("is-active")
-}
-
 function closeschool(){
     modalschool.classList.remove("is-active")
 }

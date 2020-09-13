@@ -18,7 +18,7 @@ function recursiveRemoveDirectory($directory)
     rmdir($directory);
 }
 
-require_once("../helpers/db.php");
+require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];

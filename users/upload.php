@@ -4,11 +4,23 @@ if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     header("Location: ../login.php");
     exit;
 }
-require_once("../helpers/db.php");
+
+require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
-$typeuser = $_SESSION["typeuser"];
+
+switch ($userinfo["typeuser"]) {
+    case "ALU":
+        $typeuser = "students";
+    break;
+    case "P":
+        $typeuser = "teachers";
+    break;
+    default:
+        die("Ese usuario no es válido");
+}
+
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 $max_characters = 280; // "Quote" max characters
 $pic_error = $vid_error = $general_error = "";

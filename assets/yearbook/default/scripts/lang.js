@@ -31,7 +31,7 @@ const translations = {
         },
         about: {
             attribution: `This project wouldn't be possible without the help of the following projects 
-            distributed under <a href="externalprojects_licenses.txt" target="_blank">the following licenses</a>:<br>
+            distributed under <a href="externalprojects.html" target="_blank">the following licenses</a>:<br>
             ${common.credits}`,
             credits: `This yearbook was made using 
             <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, an open source project
@@ -59,7 +59,7 @@ const translations = {
         },
         about: {
             attribution: `Este proyecto no sería posible sin la ayuda de los siguientes proyectos
-            distribuidos bajo <a href="externalprojects_licenses.txt" target="_blank">las siguientes licencias</a>:<br>
+            distribuidos bajo <a href="externalprojects.html" target="_blank">las siguientes licencias</a>:<br>
             ${common.credits}`,
             credits: `Este yearbook fue generado usando
             <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un proyecto de código abierto 

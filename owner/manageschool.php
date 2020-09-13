@@ -4,7 +4,7 @@ if (!isset($_SESSION["owner"])){
     header("Location: login.php");
     exit;
 }
-require_once("../helpers/db.php");
+require_once("../helpers/db/db.php");
 if (isset($_POST["id"])){
     if (isset($_POST["addschool"])){
         $stmt = $conn->prepare("INSERT INTO `schools` (`id`, `url`) VALUES (?, ?)");

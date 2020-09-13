@@ -1,8 +1,8 @@
 <?php
 // Get pic and vid of user
 session_start();
-require_once ("helpers/db.php");
-require_once ("helpers/config.php");
+require_once("helpers/db/db.php");
+require_once("helpers/config.php");
 if (!isset($_SESSION["loggedin"])){
     header("Location: login.php");
     exit;

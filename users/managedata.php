@@ -6,7 +6,8 @@ if (!isset($_SESSION["loggedin"])) {
     header("Location: ../login.php");
     exit;
 }
-require_once("../helpers/db.php");
+
+require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 function delete_files($dir) {
     $it = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
@@ -19,7 +20,17 @@ function delete_files($dir) {
 }
 
 $userinfo = $_SESSION["userinfo"];
-$typeuser = $_SESSION["typeuser"];
+
+switch ($userinfo["typeuser"]) {
+    case "ALU":
+        $typeuser = "students";
+    break;
+    case "P":
+        $typeuser = "teachers";
+    break;
+    default:
+        die("Ese usuario no es válido");
+}
 
 if (isset($_GET["action"], $typeuser)) {
     switch ($_GET["action"]) {

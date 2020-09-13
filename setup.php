@@ -2,6 +2,12 @@
 if (!extension_loaded('mysqli') || !extension_loaded('zip') || !extension_loaded('curl')) {
     die("Este programa necesita los siguientes plugins para funcionar: php-mysqli, php-zip y php-curl");
 }
+
+$dirs = [
+    "upload" => dirname(__FILE__)."/uploads/",
+    "yearbook" => dirname($_SERVER['PHP_SELF'])."/yearbooks/"
+];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db_config = $_POST["db"]; // DB data
     $global_config = $_POST["global"]; // Server-level config
@@ -17,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db_username = "'.$db_config[3].'";
     $db_password = "'.$db_config[4].'";
     ?>';
-    file_put_contents("helpers/db_config.php", $db_file);
+    file_put_contents("helpers/db/dbconf.php", $db_file);
 
     // Config info
     if($global_config[0] == "andalucia"){
@@ -158,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Elimina setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
-    header("Location: index.html");
+    header("Location: index.php");
     exit;
 }
 ?>
@@ -169,156 +175,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yearbook Setup</title>
+    <script>
+        const dirs = <?php echo json_encode($dirs); ?>;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
 </head>
 
 <body>
-    <section id="welcome" class="hero is-success is-fullheight">
-        <div class="hero-body">
-            <div class="container">
-                <h1 class="title animate__animated animate__fadeInDown">
-                    Bienvenido a Iberbook
-                </h1>
-                <h2 class="subtitle animate__animated animate__fadeInUp">
-                    Vamos a empezar con las preparaciones...
-                </h2>
-                <p class="subtitle animate__animated animate__fadeInUp">
-                    <button id="preparations" type="button" class="button is-link">Continuar</button>
-                </p>
+    <section id="main">
+        <section v-if="$root.stage === 'splashscreen'" class="hero is-success is-fullheight">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title animate__animated animate__fadeInDown">
+                        Bienvenido a Iberbook
+                    </h1>
+                    <h2 class="subtitle animate__animated animate__fadeInUp">
+                        Vamos a empezar con las preparaciones...
+                    </h2>
+                    <p class="subtitle animate__animated animate__fadeInUp">
+                        <button v-on:click="stage = 'database'" type="button" class="button is-link">Continuar</button>
+                    </p>
+                </div>
             </div>
-        </div>
+        </section>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+            <div class="container">
+                <noscript>Este programa necesita Javascript</noscript>
+                <database v-if="$root.stage === 'database'"></database>
+                <owner v-if="$root.stage === 'owner'"></owner>
+                <server v-bind:dirs="dirs" v-if="$root.stage === 'server'"></server>
+            </div>
+        </form>
     </section>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-        <section id="database" class="section is-hidden animate__animated animate__bounceInLeft">
-            <div class="container">
-                <div class="section">
-                    <h1 class="title">Base de datos</h1>
-                    <hr>
-                    <div class="field">
-                        <label class="label">Nombre de la base de datos</label>
-                        <div class="control">
-                            <input name="db[]" id="name" class="input" type="text" placeholder="Ej: iberbook_db" required>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Host</label>
-                        <div class="control">
-                            <input name="db[]" id="host" class="input" type="text" placeholder="Ej: localhost" required>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Puerto</label>
-                        <div class="control">
-                            <input name="db[]" id="port" class="input" type="text" value="3306" required>
-                        </div>
-                        <p class="help">Por detecto es 3306</p>
-                    </div>
-                    <div class="field">
-                        <label class="label">Nombre de usuario</label>
-                        <div class="control">
-                            <input name="db[]" id="username" class="input" type="text" placeholder="Ej: usuario" required>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Contraseña</label>
-                        <div class="control">
-                            <input name="db[]" id="password" class="input" type="password" placeholder="**********" required>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <button id="database_next" type="button" class="button is-success">
-                                <span class="icon">
-                                    <i class="fas fa-forward"></i>
-                                </span>
-                                <span>Siguiente</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="owner" class="section is-hidden animate__animated animate__bounceInDown">
-            <div class="container">
-                <h1 class="title">Datos del servidor</h1>
-                <hr>
-                <h2 class="title">Cuenta del dueño</h2>
-                <h2 class="subtitle">Esta cuenta tendrá los máximos permisos posibles</h2>
-                <div class="field">
-                    <label class="label">Nombre de usuario</label>
-                    <div class="control">
-                        <input name="owner[]" id="username" class="input" type="text" placeholder="Ej: usuario" required>
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Contraseña</label>
-                    <div class="control">
-                        <input name="owner[]" id="password" class="input" type="password" placeholder="***********" required>
-                    </div>
-                </div>
-                <hr>
-                <div class="field">
-                    <label class="label">Selecciona tu comunidad autónoma</label>
-                    <div class="control">
-                        <div class="select">
-                            <select name="global[]" id="comunidadaut">
-                                <option value="andalucia">Andalucía</option>
-                                <option value="madrid">Madrid</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Ubicación del directorio de subida</label>
-                    <div class="control">
-                        <input name="global[]" class="input" type="text" value="<?php echo(dirname(__FILE__)."/uploads/");?>" required>
-                    </div>
-                    <p class="help">Aquí se guardan los archivos subidos por los usuarios, MUY recomendable que sea un directorio privado</p>
-                </div>
-                <div class="field">
-                    <label class="label">Ubicación de los yearbooks</label>
-                    <div class="control">
-                        <input name="global[]" class="input" type="text" value="<?php echo(dirname($_SERVER['PHP_SELF'])."/yearbooks/");?>" required>
-                    </div>
-                    <p class="help">Aquí se guardan los yearbooks ya generados, MUY recomendable que sea un directorio público</p>
-                </div>
-                <div class="field">
-                    <h2 class="title">Centro admitido</h2>
-                    <label class="label">ID del centro</label>
-                    <div class="control">
-                        <input name="schoolinfo[]" class="input" type="number" placeholder="Ej: 181206713" required>
-                    </div>
-                    <p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
-                    <label class="label">URL (opcional)<i class="fas fa-link"></i></label>
-                    <div class="control">
-                        <input name="schoolinfo[]" class="input" type="text">
-                        <p class="help">Esta URL saldrá en cada orla generada</p>
-                    </div>
-                </div>
-                <div class="field is-grouped">
-                    <div class="control">
-                        <button id="database_back" type="button" class="button is-info">
-                            <span class="icon">
-                                <i class="fas fa-backward"></i>
-                            </span>
-                            <span>Atrás</span>
-                        </button>
-                    </div>
-                    <div class="control">
-                        <button id="sendall" type="submit" class="button is-success">
-                            <span class="icon">
-                                <i class="fas fa-paper-plane"></i>
-                            </span>
-                            <span>Enviar todo</span>
-                        </button>
-                    </div>
-                </div>
-                <progress id="progress" class="progress is-primary is-hidden" max="100"></progress>
-            </div>
-        </section>
-    </form>
     <script src="assets/scripts/setup.js"></script>
 </body>
 

@@ -4,7 +4,7 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
     header("Location: ../login.php");
     exit;
 }
-require_once("../helpers/db.php");
+require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];

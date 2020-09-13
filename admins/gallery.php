@@ -1,7 +1,7 @@
 <?php
 // Initialize the session
 session_start();
-require_once("../helpers/db.php");
+require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){

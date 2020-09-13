@@ -6,60 +6,25 @@ if (!isset($_SESSION["loggedin"]) && !isset($_SESSION["teacherinfo"])){
 }
 $finalschools = array();
 require_once("../helpers/api.php");
-require_once("../helpers/db.php");
+
 $teacherinfo = $_SESSION["teacherinfo"];
-// Get groups
-$cookies = $_SESSION["cookies"];
-// Set array with only allowed schools
-$stmt = $conn->prepare("SELECT name, id FROM schools WHERE id=?");
-// Check each school available
-foreach($teacherinfo["centros"] as $id => $centro){
-  $stmt->bind_param("i", $centro["id"]);
-  $stmt->execute();
-  $stmt->store_result();
-  $stmt->bind_result($allowed_name, $allowed_id);
-  if($stmt->num_rows == 1) {
-    if(!empty($centro["X_CENTRO"])){
-      $data = ["X_CENTRO" => $centro["X_CENTRO"], "C_PERFIL" => "P"];
-      changeschoolteachers($cookies, $data);
-    }
-    $groups = getgroupsteachers($cookies);
-    while ($stmt->fetch()) {
-      // Set basic school info
-      $finalschools[$id] = [
-        "name" => $allowed_name,
-        "id" => $allowed_id,
-      ];
-    }
-    // Set groups info
-    if(empty($groups)){
-      $finalschools[$id]["groups"][] = [];
-    }
-    else {
-      foreach ($groups as $group) {
-        $finalschools[$id]["groups"][] = $group;
-      }
-    }
-  }
-}
-$stmt->close();
+
 // User submitted info
-if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
+if (isset($_GET["select_curso"], $_GET["schoolid"])){
   $valid = array();
   // School id and group id
   $schoolid = $_GET["schoolid"];
   $groupid = $_GET["select_curso"];
-
+  $finalschools = $teacherinfo["schools"];
   // Check if user didn't manipulate input
   if(isset($finalschools[$schoolid]["groups"][$groupid])) {
     $group = $finalschools[$schoolid]["groups"][$groupid]["name"];
     $subject = $finalschools[$schoolid]["groups"][$groupid]["subject"];
     $valid["groupinfo"] = true;
   }
-  if($_GET["schoolname"] == $finalschools[$schoolid]["name"]){
-    $valid["schoolname"] = true;
-  }
+  
   if($_GET["schoolid"] == $finalschools[$schoolid]["id"]){
+    $schoolname = $finalschools[$schoolid]["name"];
     $valid["schoolid"] = true;
   }
 
@@ -73,7 +38,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
       "yearuser" => $group,
       "photouser" => base64_encode(file_get_contents("../assets/img/PortraitPlaceholder.png")), // SENECA doesn't have photos
       "idcentro" => $_GET["schoolid"],
-      "namecentro" => $_GET["schoolname"]
+      "namecentro" => $schoolname
     );
     $_SESSION["userinfo"] = $userinfo;
     header("Location: ../users/dashboard.php");
@@ -109,7 +74,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
     <section class="section">
         <div class="columns is-mobile is-multiline">
             <?php
-            if (empty($finalschools)){
+            if (empty($teacherinfo["schools"])){
               echo '
               <div class="column">
                 <p class="title">No tienes centros aceptados</p>
@@ -117,7 +82,7 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
               ';
             }
             else {
-              foreach($finalschools as $id => $school){
+              foreach($teacherinfo["schools"] as $id => $school){
                 echo '
                 <div class="column">
                   <div class="card">
@@ -130,7 +95,6 @@ if (isset($_GET["select_curso"], $_GET["schoolname"], $_GET["schoolid"])){
                       <p class="subtitle">Selecciona un curso</p>
                       <form method="get" action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'">
                         <input name="schoolid" type="hidden" value="'.$school["id"].'"></input>
-                        <input name="schoolname" type="hidden" value="'.$school["name"].'"></input>
                         <div class="field">
                           <div class="control">
                             <div class="select">

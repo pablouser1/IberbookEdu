@@ -1,14 +1,15 @@
 <?php
 session_start();
 if (!isset($_SESSION["owner"])){
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
 
 $ownerinfo = $_SESSION["ownerinfo"];
 
-// Get staff
+// Get users
 require_once("getstaff.php");
+require_once("getschools.php");
 ?>
 
 <!DOCTYPE html>
@@ -35,56 +36,80 @@ require_once("getstaff.php");
         </div>
     </section>
     <section class="section">
-        <div class="columns">
-            <div class="column">
-                <p class="title">
+        <div class="columns is-mobile is-centered">
+            <div class="column is-narrow">
+                <p class="title is-4">
                     <i class="fas fa-user-shield"></i>
                     <span>Staff</span>
                 </p>
                 <table class="table is-bordered is-striped is-hoverable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre de usuario</th>
-                        <th>Permisos</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    foreach($staff as $user){
-                        echo "
+                    <thead>
                         <tr>
-                        <td>$user[0]</td>
-                        <td>$user[1]</td>
-                        <td>$user[2]</td>
+                            <th>ID</th>
+                            <th>Nombre de usuario</th>
+                            <th>Permisos</th>
                         </tr>
-                        ";
-                    }
-                    ?>
-                </tbody>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($staff as $user){
+                            echo "
+                            <tr>
+                            <td>$user[0]</td>
+                            <td>$user[1]</td>
+                            <td>$user[2]</td>
+                            </tr>
+                            ";
+                        }
+                        ?>
+                    </tbody>
                 </table>
+                <a href="staff.php" class="button is-info">
+                    <span class="icon">
+                        <i class="fas fa-user-friends"></i>
+                    </span>
+                    <span>Agregar/eliminar staff</span>
+                </a>
+            </div>
+            <div class="column is-narrow">
+                <p class="title is-4">
+                    <i class="fas fa-school"></i>
+                    <span>Centros</span>
+                </p>
+                <table class="table is-bordered is-striped is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($schools as $school){
+                            echo "
+                            <tr>
+                                <td>$school[id]</td>
+                                <td>$school[url]</td>
+                            </tr>
+                            ";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+                <button id="manageschool" type="button" class="button is-info">
+                    <span class="icon">
+                        <i class="fas fa-school"></i>
+                    </span>
+                    <span>Agregar/eliminar centro</span>
+                </button> 
             </div>
         </div>
-        <a href="staff.php" class="button is-info">
-            <span class="icon">
-                <i class="fas fa-user-friends"></i>
-            </span>
-            <span>Agregar/eliminar staff</span>
-        </a>
         <hr>
-        <p class="title">
-            <span class="icon">
-                <i class="fas fa-tasks"></i>
-            </span>
-            <span>Administración general</span>
+        <p class="title has-text-centered">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Danger zone</span>
         </p>
-        <div class="buttons">
-            <button id="manageschool" type="button" class="button is-info">
-                <span class="icon">
-                    <i class="fas fa-school"></i>
-                </span>
-                <span>Agregar/eliminar centro</span>
-            </button>  
+        <div class="buttons is-centered"> 
             <button id="clear" type="button" class="button is-danger">
                 <span class="icon">
                     <i class="fas fa-archive"></i>
@@ -194,4 +219,3 @@ require_once("getstaff.php");
   </body>
 
 </html>
-

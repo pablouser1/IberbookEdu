@@ -37,6 +37,7 @@ Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes com
 # TODO
 
 * Agregar soporte para Formación Profesional
+* Recordar sesión
 
 # Credits
 

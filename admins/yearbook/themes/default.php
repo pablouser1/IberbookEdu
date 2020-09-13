@@ -6,7 +6,7 @@ if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
     header("Location: ../login.php");
 }
 
-require_once("../helpers/db.php");
+require_once("../../../helpers/db/db.php");
 
 // Get vars from before
 $students = $_SESSION["students"];
@@ -245,5 +245,5 @@ if ($stmt->execute() !== true) {
     die("Error writing data: " . $conn->error);
 }
 
-header("Location: dashboard.php");
+header("Location: ../../dashboard.php");
 ?>

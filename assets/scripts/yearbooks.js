@@ -4,6 +4,7 @@ var baseUrl = getUrl .protocol + "//" + getUrl.host;
 Vue.component('schools', {
     props: {
         "schools": {
+            type: Array,
             requiered: true
         }
     },
@@ -44,21 +45,29 @@ Vue.component('schools', {
 Vue.component('groups', {
     props: {
         "groups": {
+            type: Array,
             required: true
         },
         "groupsextra": {
+            type: Array,
             requiered: true
         }
     },
     template: 
     `
     <div v-if="!groups" class="container has-text-centered">
-        <p class="title">Cursos</p>
+        <p class="title has-text-centered">
+            <i class="fas fa-users"></i>
+            <span>Cursos</span>
+        </p>
         <p class="subtitle">Elige un centro y curso académico...</p>
     </div>
     
     <div v-else-if="groups" class="container">
-        <p class="title has-text-centered">Cursos</p>
+        <p class="title has-text-centered">
+            <i class="fas fa-users"></i>
+            <span>Cursos</span>
+        </p>
         <p class="subtitle has-text-centered">{{ groupsextra.schoolname }} / {{groupsextra.acyear }}</p>
         <div class="columns is-mobile is-centered is-vcentered is-multiline">
             <div class="column is-narrow animate__animated animate__fadeIn" v-for="(group, index) in groups">
@@ -72,22 +81,38 @@ Vue.component('groups', {
 Vue.component('yearbook', {
     props: {
         "yearbook": {
+            type: Array,
             required: true
         },
         "yearbookextra": {
+            type: Array,
             requiered: true
+        }
+    },
+    methods: {
+        clipboard: function () {
+            document.getElementById("inputlink").select()
+            document.execCommand('copy')
+            alert("Enlace copiado con éxito")
         }
     },
     template:
     `
     <div v-if="!yearbook" class="container has-text-centered">
-        <p class="title">Yearbook</p>
+        <p class="title">
+            <i class="fas fa-book"></i>
+            <span>Yearbook</span>
+        </p>
         <p class="subtitle">Elige un curso...</p>
     </div>
 
     <div v-else-if="yearbook" class="container has-text-centered animate__animated animate__fadeIn">
-        <p class="title">Yearbook</p>
+        <p class="title">
+            <i class="fas fa-book"></i>
+            <span>Yearbook</span>
+        </p>
         <p class="subtitle">{{ yearbookextra.groupname }}</p>
+        <!-- Opciones básicas -->
         <div class="buttons is-centered">
             <a :href="yearbook.link" target="_blank" class="button is-link">
                 <span class="icon">
@@ -102,8 +127,23 @@ Vue.component('yearbook', {
                 <span>Descargar zip</span>
             </a>
         </div>
+        <!-- Compartir -->
         <div class="container">
-            <span>También puedes compartir este yearbook por redes sociales:</span>
+            <div class="field has-addons has-addons-centered">
+                <div class="control">
+                    <input type="text" id="inputlink" class="input" readonly :value="encodeURI($root.url + yearbook.link)">
+                </div>
+                <div class="control">
+                    <button v-on:click="clipboard" class="button is-success">
+                        <span class="icon">
+                            <i class="fas fa-clipboard"></i>
+                        </span>
+                        <span>Copiar enlace</span>
+                    </button>
+                </div>
+            </div>
+            <br>
+            <label class="label">También puedes compartir este yearbook por redes sociales:</label>
             <div class="buttons is-centered">
                 <a :href="'https://www.facebook.com/sharer/sharer.php?u=' + encodeURI($root.url + yearbook.link)" class="button is-link">
                     <span class="icon">
@@ -112,7 +152,7 @@ Vue.component('yearbook', {
                     <span>Facebook</span>
                 </a>
                 <a
-                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20%23IberbookEdu%20en%3A%20' + $root.url + yearbook.link"
+                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20IberbookEdu&url=' + encodeURI($root.url + yearbook.link) + '&hashtags=IberbookEdu'"
                 class="button is-info">
                     <span class="icon">
                         <i class="fab fa-twitter"></i>
@@ -120,7 +160,7 @@ Vue.component('yearbook', {
                     <span>Twitter</span>
                 </a>
                 <a
-                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu%20en%3A%20' + $root.url + yearbook.link"
+                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20berbookEdu%20en%3A%20' + $root.url + yearbook.link"
                 data-action="share/whatsapp/share"
                 class="button is-success">
                     <span class="icon">
@@ -129,7 +169,7 @@ Vue.component('yearbook', {
                     <span>Whatsapp</span>
                 </a>
                 <a
-                :href="'https://t.me/share/url?url=' + $root.url + yearbook.link + '&text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu'"
+                :href="'https://t.me/share/url?url=' + encodeURI($root.url + yearbook.link) + '&text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu'"
                 class="button is-link">
                     <span class="icon">
                         <i class="fab fa-telegram"></i>
@@ -181,28 +221,18 @@ var yb_vue = new Vue({
             }
         }
     },
+    mounted() {
+        // Check if user has predifined yearbook (GET Parameter)
+        let uri = window.location.search.substring(1);
+        if (uri !== "") {
+            let params = new URLSearchParams(uri);
+            let schoolid = params.get("schoolid")
+            let acyear = params.get("acyear")
+            let group = params.get("group")
+            // Show yearbook info directly
+            if (schoolid && acyear && group) {
+                this.quicktravel(schoolid, acyear, group)
+            }
+        }
+    }
 })
-
-// Check if user has predifined yearbook (GET Parameter)
-
-function findGetParameter(parameterName) {
-    var result = null,
-        tmp = [];
-    location.search
-        .substr(1)
-        .split("&")
-        .forEach(function (item) {
-          tmp = item.split("=");
-          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-        });
-    return result;
-}
-
-var schoolid = findGetParameter("schoolid")
-var acyear = findGetParameter("acyear")
-var group = findGetParameter("group")
-
-// Show yearbook info directly
-if (schoolid && acyear && group) {
-    yb_vue.quicktravel(schoolid, acyear, group)
-}

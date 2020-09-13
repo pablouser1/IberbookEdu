@@ -1,14 +1,19 @@
 <?php
 session_start();
-if (isset($_SESSION["loggedin"]) && isset($_SESSION["userinfo"])){
+if (isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     $userinfo = $_SESSION["userinfo"];
     header("Location: users/dashboard.php");
     exit;
 }
-$login_error = array();
-require_once("helpers/db.php");
-require_once("helpers/api.php");
+elseif (isset($_SESSION["owner"])) {
+    $ownerinfo = $_SESSION["ownerinfo"];
+    header("Location: owner/dashboard.php");
+}
 
+$login_error = array();
+require_once("helpers/db/db.php");
+require_once("helpers/api.php");
+$api = new Api;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!$_POST["username"]){
         $login_error[] = "No has escrito ningún nombre de usuario.";
@@ -23,58 +28,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else{
         $password = trim($_POST["password"]);
     }
-    if(!$login_error){
-        // Get type
-        $type = $_POST["type"];
-        // Login user to pasen and check if there are any errors
-        $loginres = login($username, $password, $type);
-        if (!$loginres["error"]){
-            // Get user info
-            $userinfo = getinfo($loginres["cookies"], $type);
-            // Check if school is allowed, only for students. Teachers' schools are checked in users/teachers.php
-            if ($userinfo["typeuser"] == "ALU"){
-                $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
-                $result = $conn->query($sql);
-                if ($result !== false && $result->num_rows == 0) {
-                    $login_error[] = "Su centro no está permitido";
-                }
-                // Check if user is from 4º ESO, 2º BCT or 6º Primaria
-                if(!preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $userinfo["yearuser"])) {
-                    $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
-                }
-            }
-            if(!$login_error){
-                // Check if user is admin
-                $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
-                $result = $conn->query($sql);
-                if ($result->num_rows == 1) {
-                    // User is admin
-                    $_SESSION["loggedin"] = "admin";
-                }
-                else{
-                    // User is not admin
-                    $_SESSION["loggedin"] = "user";
-                }
+    
+    // Get type
+    $type = $_POST["type"];
 
-                switch ($userinfo["typeuser"]){
-                    case "ALU":
-                        $_SESSION["userinfo"] = $userinfo;
-                        header("Location: users/dashboard.php");
-                    break;
-                    case "TUT_LEGAL":
-                        $_SESSION["tutorinfo"] = $userinfo;
-                        header("Location: profiles/tutorlegal.php");
-                    break;
-                    case "P":
-                        $_SESSION["teacherinfo"] = $userinfo;
-                        header("Location: profiles/teachers.php");
-                    break;
+    if (!$login_error) {
+        // -- User is owner (login using own DB) -- //
+        if ($type === "owner") {
+            // Prepare a select statement
+            $sql = "SELECT username, password FROM staff WHERE username = ? and permissions='owner'";
+            if($stmt = mysqli_prepare($conn, $sql)){
+                // Bind variables to the prepared statement as parameters
+                mysqli_stmt_bind_param($stmt, "s", $param_username);
+            
+                // Set parameters
+                $param_username = $username;
+                
+                // Attempt to execute the prepared statement
+                if(mysqli_stmt_execute($stmt)){
+                    // Store result
+                    mysqli_stmt_store_result($stmt);
+                    
+                    // Check if username exists, if yes then verify password
+                    if(mysqli_stmt_num_rows($stmt) == 1){                    
+                        // Bind result variables
+                        mysqli_stmt_bind_result($stmt, $username, $hashed_password);
+                        if(mysqli_stmt_fetch($stmt)){
+                            if(password_verify($password, $hashed_password)){
+                                // Store data in session variables
+                                $_SESSION["owner"] = true;
+                                $ownerinfo = [
+                                    "username" => $username
+                                ];
+                                $_SESSION["ownerinfo"] = $ownerinfo;
+                                // Redirect user to welcome page
+                                header("location: owner/dashboard.php");
+                                exit;
+                            } else{
+                                // Display an error message if password is not valid
+                                $login_error[] = "Esta contraseña no es válida.";
+                            }
+                        }
+                    } else{
+                        // Display an error message if username doesn't exist
+                        $login_error[] = "No existe ninguna cuenta con este nombre de usuario.";
+                    }
+                } else{
+                    $login_error[] = "Ha habido un error, por favor inténtelo más tarde";
                 }
-                exit;
+                // Close statement
+                $stmt->close();
             }
         }
-        else{
-            $login_error[] = $loginres["error"];
+
+        // -- User is not owner, using normal PASEN/SENECA login system -- //
+        else {
+            // Login user to pasen and check if there are any errors
+            $loginres = $api->login($username, $password, $type);
+            if ($loginres["code"] === "C"){
+                // Get user info
+                $userinfo = $api->getinfo();
+                // Check if school is allowed, only for students. Teachers and parents are checked in users/teachers.php and users/tutorlegal.php
+                if ($userinfo["typeuser"] == "ALU"){
+                    $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
+                    $result = $conn->query($sql);
+                    if ($result !== false && $result->num_rows == 0) {
+                        $login_error[] = "Su centro no está permitido";
+                    }
+                    // Check if user is from 4º ESO, 2º BCT or 6º Primaria
+                    if(!preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $userinfo["yearuser"])) {
+                        $login_error[] = "Sólo se admiten usuarios de 4º ESO, 2º BACH o 6º Primaria";
+                    }
+                }
+                if(!$login_error){
+                    // Check if user is admin
+                    $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
+                    $result = $conn->query($sql);
+                    if ($result->num_rows == 1) {
+                        // User is admin
+                        $_SESSION["loggedin"] = "admin";
+                    }
+                    else{
+                        // User is not admin
+                        $_SESSION["loggedin"] = "user";
+                    }
+                    switch ($userinfo["typeuser"]){
+                        case "ALU":
+                            $_SESSION["userinfo"] = $userinfo;
+                            header("Location: users/dashboard.php");
+                        break;
+                        case "TUT_LEGAL":
+                            $_SESSION["tutorinfo"] = $userinfo;
+                            header("Location: profiles/tutorlegal.php");
+                        break;
+                        case "P":
+                            $_SESSION["teacherinfo"] = $userinfo;
+                            $api->settype("students");
+                            header("Location: profiles/teachers.php");
+                        break;
+                    }
+                    exit;
+                }
+            }
+            else{
+                $login_error[] = $loginres["description"];
+            }
         }
     }
 }
@@ -98,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="column is-4 is-offset-4">
                     <h3 class="title has-text-black">IberbookEdu - Login</h3>
                     <hr class="login-hr">
-                    <p class="subtitle has-text-black">Por favor, inicia sesión con tu cuenta de PASEN/SENECA o ROBLE.</p>
+                    <p class="subtitle has-text-black">Por favor, inicia sesión con tus credenciales.</p>
                     <div class="box">
                         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                             <div class="field">
@@ -123,9 +181,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <label for="" class="label">Soy...</label>
                                 <div class="select">
                                     <select name="type">
-                                        <option value="alumno">Alumno</option>
+                                        <option value="students">Alumno</option>
                                         <option value="tutorlegal">Tutor legal</option>
-                                        <option value="profesor">Profesor</option>
+                                        <option value="teachers">Profesor</option>
+                                        <option value="owner">Dueño</option>
                                     </select>
                                 </div>
                             </div>

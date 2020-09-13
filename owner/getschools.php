@@ -8,16 +8,16 @@ if (!isset($_SESSION["owner"])){
 }
 require_once("../helpers/db/db.php");
 
-// Get all staff members
-$stmt = $conn->prepare("SELECT id, username, permissions FROM staff");
+// Get all schools
+$stmt = $conn->prepare("SELECT id, url FROM schools");
 $stmt->execute();
 $result = $stmt->get_result();
+$schools = [];
 while ($row = mysqli_fetch_assoc($result)) {
-    $id = $row["id"];
-    $staff[$id] = array();
-    foreach ($row as $value) {
-        $staff[$id][] = $value;
-    }
+    $schools[] = [
+        "id" => $row["id"],
+        "url" => (empty($row["url"]))? "-" : $row["url"]
+    ];
 }
 $stmt->close();
 ?>

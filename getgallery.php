@@ -1,7 +1,7 @@
 <?php
 // Get pic of gallery
 session_start();
-require_once("helpers/db.php");
+require_once("helpers/db/db.php");
 require_once("helpers/config.php");
 if (!isset($_SESSION["loggedin"])){
     header("Location: login.php");

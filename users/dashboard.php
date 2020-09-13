@@ -1,14 +1,15 @@
 <?php
 session_start();
-if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
+if(!isset($_SESSION["loggedin"])){
     header("Location: ../login.php");
     exit;
 }
-require_once("../helpers/db.php");
+
+require_once("../helpers/db/db.php");
 
 // User data
 $userinfo = $_SESSION["userinfo"];
-$typeuser = $_SESSION["typeuser"];
+
 // Check if yearbook is available
 $stmt = $conn->prepare("SELECT generated FROM yearbooks WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
@@ -26,16 +27,16 @@ $stmt->close();
 // Check if user uploaded pic and vid before
 if (isset($userinfo["subject"])){
     $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
-    FROM $typeuser where schoolid=? and schoolyear=?");
+    FROM 'teachers' where schoolid=? and schoolyear=?");
 }
 else{
     $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
-    FROM $typeuser where schoolid=? and schoolyear=?");
+    FROM students where schoolid=? and schoolyear=?");
 }
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
-// Set array with values
+// Set array with user values
 $user_values = [];
 if ($result->num_rows > 0){
     while ($row = mysqli_fetch_assoc($result)) {
@@ -231,6 +232,7 @@ $stmt->close();
                         ?>
                     </tbody>
                 </table>
+                <p class="help">Estos son las fotos y los vídeos de tu curso, estos datos los inserta el administrador de tu grupo</p>
             </div>
             <?php
             // Comprobar si ya hay información subida
@@ -262,59 +264,58 @@ $stmt->close();
                 </footer>
             </div>
         </div>
-        <script src="../assets/scripts/users/dashboard.js"></script>
         <footer class="footer">
-        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
-            <ul>
-            <?php
-            if($_SESSION["loggedin"] == "admin") {
-                echo '
-                <li>
-                    <a href="../admins/dashboard.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                        </span>
-                        <span>Cambiar a administrador</span>
-                    </a>
-                </li>
-                ';
-            }
-            if(isset($_SESSION["tutorinfo"])) {
-                echo '
-                <li>
-                    <a href="../profiles/tutorlegal.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                        </span>
-                        <span>Cambiar hijo</span>
-                    </a>
-                </li>
-                ';
-            }
-            if(isset($_SESSION["teacherinfo"])) {
-                echo '
-                <li>
-                    <a href="../profiles/teachers.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
-                        </span>
-                        <span>Cambiar de curso/centro escolar</span>
-                    </a>
-                </li>
-                ';
-            }
-            ?>
-                <li>
-                    <a href="../logout.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-                        </span>
-                        <span>Cerrar sesión</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </footer>
+            <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+                <ul>
+                    <?php
+                    if($_SESSION["loggedin"] == "admin") {
+                        echo '
+                        <li>
+                            <a href="../admins/dashboard.php">
+                                <span class="icon is-small">
+                                    <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                                </span>
+                                <span>Cambiar a administrador</span>
+                            </a>
+                        </li>
+                        ';
+                    }
+                    if(isset($_SESSION["tutorinfo"])) {
+                        echo '
+                        <li>
+                            <a href="../profiles/tutorlegal.php">
+                                <span class="icon is-small">
+                                    <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                                </span>
+                                <span>Cambiar hijo</span>
+                            </a>
+                        </li>
+                        ';
+                    }
+                    if(isset($_SESSION["teacherinfo"])) {
+                        echo '
+                        <li>
+                            <a href="../profiles/teachers.php">
+                                <span class="icon is-small">
+                                    <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
+                                </span>
+                                <span>Cambiar de curso/centro escolar</span>
+                            </a>
+                        </li>
+                        ';
+                    }
+                    ?>
+                    <li>
+                        <a href="../logout.php">
+                            <span class="icon is-small">
+                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                            </span>
+                            <span>Cerrar sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </footer>
+        <script src="../assets/scripts/users/dashboard.js"></script>
     </body>
 </html>
-
