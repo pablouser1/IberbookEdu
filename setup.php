@@ -26,24 +26,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     file_put_contents("helpers/db/dbconf.php", $db_file);
 
     // Config info
-    if($global_config[0] == "andalucia"){
-        $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
-        $ssloptions = 'array(
-            // The cafile is necessary only in Andalucia
-            CURLOPT_CAINFO => $base_path."helpers/cert/juntadeandalucia-es-chain.pem",
-            CURLOPT_SSL_VERIFYPEER => true
-        );';
+    switch ($global_config[0]) { // Login system used
+        case "andalucia":
+            $login = "ced";
+            $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
+            $ssloptions = 'array(
+                // The cafile is necessary only in Andalucia
+                CURLOPT_CAINFO => $base_path."helpers/cert/juntadeandalucia-es-chain.pem",
+                CURLOPT_SSL_VERIFYPEER => true
+            );';
+        break;
+        case "madrid":
+            $login = "ced";
+            $base_url = "https://raices.madrid.org/raiz_app/jsp/";
+            $ssloptions = '
+            array(
+                CURLOPT_SSL_VERIFYPEER => true
+            );';
+        break;
+        case "logal":
+            $login = "local";
+        break;
+        default:
+        die("Has elegido un sistema de login incorrecto");
     }
-    elseif($global_config[0] == "madrid"){
-        $base_url = "https://raices.madrid.org/raiz_app/jsp/";
-        $ssloptions = '
-        array(
-            CURLOPT_SSL_VERIFYPEER => true
-        );';
-    }
+
     $global_config_file =
     '<?php
     // General
+    $login = "'.$login.'"; // Login system used
     $base_url = "'.$base_url.'"; // Remote server url
     $base_path = "'.dirname(__FILE__).'/"; // Program base dir
     $uploadpath = "'.$global_config[1].'"; // Uploads dir
@@ -143,6 +154,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Error creating admins' table: " . $conn->error);
     }
     
+    if($global_config[0] == "local"){
+        $sql = "CREATE TABLE `users` (
+            `id` int NOT NULL AUTO_INCREMENT,
+            `username` varchar(14) NOT NULL UNIQUE,
+            `password` varchar(80) NOT NULL,
+            `fullname` varchar(255) NOT NULL,
+            `type` varchar(10) NOT NULL,
+            `school` varchar(128) NOT NULL,
+            `group` varchar(24) NOT NULL,
+            primary key(id)
+        )";
+    }
     // Writes data to DB
 
     // School info
@@ -178,7 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script>
         const dirs = <?php echo json_encode($dirs); ?>;
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
@@ -214,4 +237,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 
 </html>
-

@@ -22,10 +22,8 @@ switch($_GET["type"]) {
 
 switch ($_GET["media"]) {
     case "photo":
-        $media = "photo";
-    break;
     case "video":
-        $media = "video";
+        $media = $_GET["media"];
     break;
     default:
         die("Ese tipo de archivo no existe");

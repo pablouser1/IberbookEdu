@@ -108,6 +108,7 @@ Vue.component("server", {
                     <select name="global[]" id="comunidadaut">
                         <option value="andalucia">Andalucía</option>
                         <option value="madrid">Madrid</option>
+                        <option value="local">Otros</option>
                     </select>
                 </div>
             </div>

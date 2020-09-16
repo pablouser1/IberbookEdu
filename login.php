@@ -33,56 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $type = $_POST["type"];
 
     if (!$login_error) {
-        // -- User is owner (login using own DB) -- //
-        if ($type === "owner") {
-            // Prepare a select statement
-            $sql = "SELECT username, password FROM staff WHERE username = ? and permissions='owner'";
-            if($stmt = mysqli_prepare($conn, $sql)){
-                // Bind variables to the prepared statement as parameters
-                mysqli_stmt_bind_param($stmt, "s", $param_username);
-            
-                // Set parameters
-                $param_username = $username;
-                
-                // Attempt to execute the prepared statement
-                if(mysqli_stmt_execute($stmt)){
-                    // Store result
-                    mysqli_stmt_store_result($stmt);
-                    
-                    // Check if username exists, if yes then verify password
-                    if(mysqli_stmt_num_rows($stmt) == 1){                    
-                        // Bind result variables
-                        mysqli_stmt_bind_result($stmt, $username, $hashed_password);
-                        if(mysqli_stmt_fetch($stmt)){
-                            if(password_verify($password, $hashed_password)){
-                                // Store data in session variables
-                                $_SESSION["owner"] = true;
-                                $ownerinfo = [
-                                    "username" => $username
-                                ];
-                                $_SESSION["ownerinfo"] = $ownerinfo;
-                                // Redirect user to welcome page
-                                header("location: owner/dashboard.php");
-                                exit;
-                            } else{
-                                // Display an error message if password is not valid
-                                $login_error[] = "Esta contraseña no es válida.";
-                            }
-                        }
-                    } else{
-                        // Display an error message if username doesn't exist
-                        $login_error[] = "No existe ninguna cuenta con este nombre de usuario.";
-                    }
-                } else{
-                    $login_error[] = "Ha habido un error, por favor inténtelo más tarde";
-                }
-                // Close statement
-                $stmt->close();
-            }
-        }
-
-        // -- User is not owner, using normal PASEN/SENECA login system -- //
-        else {
+        // -- User is not owner, using API login system -- //
+        if ($type !== "owner") {
             // Login user to pasen and check if there are any errors
             $loginres = $api->login($username, $password, $type);
             if ($loginres["code"] === "C"){
@@ -132,6 +84,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             else{
                 $login_error[] = $loginres["description"];
+            }
+        }
+
+        // -- User is owner (login using own DB) -- //
+        else {
+            // Prepare a select statement
+            $sql = "SELECT username, password FROM staff WHERE username = ? and permissions='owner'";
+            if($stmt = mysqli_prepare($conn, $sql)){
+                // Bind variables to the prepared statement as parameters
+                mysqli_stmt_bind_param($stmt, "s", $param_username);
+            
+                // Set parameters
+                $param_username = $username;
+                
+                // Attempt to execute the prepared statement
+                if(mysqli_stmt_execute($stmt)){
+                    // Store result
+                    mysqli_stmt_store_result($stmt);
+                    
+                    // Check if username exists, if yes then verify password
+                    if(mysqli_stmt_num_rows($stmt) == 1){                    
+                        // Bind result variables
+                        mysqli_stmt_bind_result($stmt, $username, $hashed_password);
+                        if(mysqli_stmt_fetch($stmt)){
+                            if(password_verify($password, $hashed_password)){
+                                // Store data in session variables
+                                $_SESSION["owner"] = true;
+                                $ownerinfo = [
+                                    "username" => $username
+                                ];
+                                $_SESSION["ownerinfo"] = $ownerinfo;
+                                // Redirect user to welcome page
+                                header("location: owner/dashboard.php");
+                                exit;
+                            } else{
+                                // Display an error message if password is not valid
+                                $login_error[] = "Esta contraseña no es válida.";
+                            }
+                        }
+                    } else{
+                        // Display an error message if username doesn't exist
+                        $login_error[] = "No existe ninguna cuenta con este nombre de usuario.";
+                    }
+                } else{
+                    $login_error[] = "Ha habido un error, por favor inténtelo más tarde";
+                }
+                // Close statement
+                $stmt->close();
             }
         }
     }

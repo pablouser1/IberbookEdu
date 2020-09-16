@@ -189,13 +189,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
                     <div class="field">
-                        <label class="label">(Opcional) Cita - Máximo 280 caracteres</label>
+                        <label class="label">(Opcional) Cita - Máximo 100 caracteres</label>
                         <div class="control">
                             <textarea id="quote" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="280"></textarea>
                         </div>
                         <p>
-                            <span id="remain_characters">280</span>
-                            <span> de 280 caracteres restantes</span>
+                            <span id="remain_characters">100</span>
+                            <span> de 100 caracteres restantes</span>
                         </p>
                     </div>
                     <div class="field">

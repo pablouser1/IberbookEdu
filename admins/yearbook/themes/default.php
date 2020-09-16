@@ -99,19 +99,19 @@ ob_start();
             </div>
             <div class="navbar-menu" :class="{ 'is-active': showNav }">
                 <div class="navbar-start">
-                    <a href="#yearbook" class="navbar-item">
+                    <a v-on:click="showNav = false" href="#yearbook" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-book-open"></i>
                         </span>
                         <span>Yearbook</span>
                     </a>
-                    <a href="#gallery" class="navbar-item">
+                    <a v-on:click="showNav = false" href="#gallery" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-photo-video"></i>
                         </span>
                         <span>{{ lang.tabs.gallery }}</span>
                     </a>
-                    <a href="#about" class="navbar-item">
+                    <a v-on:click="showNav = false" href="#about" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-info-circle"></i>
                         </span>
@@ -128,6 +128,7 @@ ob_start();
                 <span>{{ lang.yearbook.teachers }}</span>
             </h1>
             <p class="subtitle has-text-centered">Total: <?php echo(count($teachers));?></p>
+            <!-- Teachers stories -->
             <div class="container box">
                 <div id="stories_teachers"></div>
             </div>
@@ -140,6 +141,7 @@ ob_start();
                 <span>{{ lang.yearbook.students }}</span>
             </h1>
             <p class="subtitle has-text-centered">Total: <?php echo(count($students));?></p>
+            <!-- Students stories -->
             <div class="container box">
                 <div id="stories_students"></div>
             </div>
@@ -151,7 +153,7 @@ ob_start();
             <gallery v-bind:gallery="gallery"></gallery>
         </section>
         <!-- About section -->
-        <section id="about" class="section is-hidden tab">
+        <section id="about" class="section is-hidden tab animate__animated animate__slideInLeft">
             <div class="container">
                 <p v-html="lang.about.attribution"></p>
                 <hr>
@@ -164,8 +166,8 @@ ob_start();
         <footer v-if="ready" id="footer" class="footer">
             <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
                 <ul id="languages">
-                    <li><a v-on:click="changelang('en')">English</a></li>
-                    <li><a v-on:click="changelang('es')">Español</a></li>
+                    <li><a v-on:click="changelang('en')">🇬🇧 English</a></li>
+                    <li><a v-on:click="changelang('es')">🇪🇸 Español</a></li>
                 </ul>
             </nav>
             <p v-html="lang.footer.madewith" class="has-text-centered"></p>
@@ -186,7 +188,7 @@ ob_start();
 <?php
 // Generate HTML file
 file_put_contents($baseurl.'/index.html', ob_get_contents());
-// https://stackoverflow.com/a/19730838 Literally have no clue how this works, but it just works. Generate ZIP
+// https://stackoverflow.com/a/19730838 Generate ZIP file from yearbook folder
 class HZip 
 { 
   /** 

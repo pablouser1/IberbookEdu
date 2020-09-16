@@ -14,7 +14,7 @@ vidInput.onchange = () => {
   }
 }
 const quote =  document.getElementById("quote")
-const max_characters = 280;
+const max_characters = 100;
 document.getElementById("quote").addEventListener("input", () => {
   let remain_characters = max_characters - quote.value.length;
   document.getElementById("remain_characters").innerHTML = remain_characters

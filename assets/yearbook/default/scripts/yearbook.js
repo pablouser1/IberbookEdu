@@ -1,5 +1,5 @@
 // Changes active tab
-function changewindow() {
+function changetab() {
     var hash = window.location.hash.substring(1);
     if(hash == ""){
         hash = "yearbook"
@@ -11,7 +11,7 @@ function changewindow() {
     new_tab.classList.remove("is-hidden")
 }
 
-window.addEventListener("hashchange", changewindow)
+window.addEventListener("hashchange", changetab)
 
 // -- Yearbook -- //
 
@@ -37,7 +37,7 @@ Vue.component('teachers', {
                                 <img :src="teacher.photo">
                             </figure>
                         </a>
-                        <span>{{teacher.quote}}</span>
+                        <q>{{teacher.quote}}</q>
                         <br>
                         <i><small>{{teacher.date}}</small></i>
                     </p>
@@ -82,7 +82,7 @@ Vue.component('students', {
                                 <img :src="student.photo">
                             </figure>
                         </a>
-                        <span>{{student.quote}}</span>
+                        <q>{{student.quote}}</q>
                         <br>
                         <i><small>{{student.date}}</small></i>
                     </p>
@@ -157,7 +157,7 @@ var main = new Vue({
         teachers: teachers_js, // Teachers data
         students: students_js, // Students data
         gallery: gallery_js, // Gallery data
-        ready: false, // Toggle splashscreen when everything loads
+        ready: false, // Hide splashscreen when everything loads
         showNav: false, // Navbar burger (only mobile/tablet)
         lang: lang // Var in lang.js, language currently used
     },
@@ -169,7 +169,7 @@ var main = new Vue({
                     this.longtimeago = true
                     break;
                 default:
-                    alert("¡Hola!")
+                    alert("Aquí no hay ningun easter egg")
                     break;
             }
         }
