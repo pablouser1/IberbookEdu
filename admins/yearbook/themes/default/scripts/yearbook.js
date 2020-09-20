@@ -37,7 +37,7 @@ Vue.component('teachers', {
                                 <img :src="teacher.photo">
                             </figure>
                         </a>
-                        <q>{{teacher.quote}}</q>
+                        <q v-html="teacher.quote"></q>
                         <br>
                         <i><small>{{teacher.date}}</small></i>
                     </p>
@@ -82,7 +82,7 @@ Vue.component('students', {
                                 <img :src="student.photo">
                             </figure>
                         </a>
-                        <q>{{student.quote}}</q>
+                        <q v-html="student.quote"></q>
                         <br>
                         <i><small>{{student.date}}</small></i>
                     </p>
@@ -157,6 +157,7 @@ var main = new Vue({
         teachers: teachers_js, // Teachers data
         students: students_js, // Students data
         gallery: gallery_js, // Gallery data
+        ybinfo: ybinfo_js, // General yearbook info
         ready: false, // Hide splashscreen when everything loads
         showNav: false, // Navbar burger (only mobile/tablet)
         lang: lang // Var in lang.js, language currently used
@@ -177,6 +178,7 @@ var main = new Vue({
     mounted: function() {
         // Show yearbook if everything already loaded
         this.$nextTick(function () {
+            document.title = `Yearbook ${this.ybinfo.year}`
             this.ready = true
             confetti.start(1000)
         })

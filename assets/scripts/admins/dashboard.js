@@ -1,22 +1,31 @@
 var genyearbook = document.getElementById("genyearbook")
-var theme = document.getElementById("theme_selector")
+var theme_select = document.getElementById("theme_selector")
+var theme = "default" // Set default theme
 
-theme.addEventListener("change", function () {
+theme_select.addEventListener("change", function () {
     // Get theme
-    let gentheme = theme.options[theme.selectedIndex].text;
-    // Get current url
-    let url = new URL(genyearbook.href)
-    // Get params
-    let search_params = url.searchParams;
-    // Set new param from select
-    search_params.set('theme', gentheme);
-    // Insert to anchor
-    url.theme = search_params.toString()
-    genyearbook.href = url.toString();
+    theme = theme_select.options[theme_select.selectedIndex].text;
 })
 
-genyearbook.addEventListener("click", () => {
-    document.getElementById("progress").classList.remove("is-hidden")
+genyearbook.addEventListener("click", function () {
+    // Set loading
+    genyearbook.classList.add("is-loading")
+    document.body.style.cursor = "progress"; 
+    // Send id and action to do
+    fetch(`yearbook/generate.php?theme=${theme}`)
+
+    // Get json response
+    .then(res => {
+        return res.json()
+    })
+    .then(json_res => {
+        alert(json_res["description"])
+        document.body.style.cursor = "pointer"; 
+        if (json_res["code"] == "C") {
+            // If everyting went ok, reload page
+            location.reload();
+        }
+    })
 })
 
 document.getElementById("delete_user").addEventListener("click", () => {

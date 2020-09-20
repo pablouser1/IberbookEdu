@@ -1,8 +1,13 @@
 <?php
 session_start();
+$enabled = true;
 if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
     header("Location: ../login.php");
     exit;
+}
+
+if (!$enabled) {
+    die("El sistema de subida no está activo");
 }
 
 require_once("../helpers/db/db.php");
@@ -142,6 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
         </section>
+        <?php include("../helpers/navbar/navbar.php"); ?>
         <section id="upload" class="section">
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
                 <div class="container has-text-centered">
@@ -191,7 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="field">
                         <label class="label">(Opcional) Cita - Máximo 100 caracteres</label>
                         <div class="control">
-                            <textarea id="quote" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="280"></textarea>
+                            <textarea id="quote" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="100"></textarea>
                         </div>
                         <p>
                             <span id="remain_characters">100</span>
@@ -238,6 +244,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </form>
         </section>
+        <script src="../helpers/navbar/navbar.js"></script>
         <script src="../assets/scripts/users/upload.js"></script>
     </body>
 </html>

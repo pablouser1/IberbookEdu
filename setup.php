@@ -79,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        voted varchar(12),
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -97,6 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         subject varchar(24) not null,
+        voted varchar(12),
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -125,6 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `zipname` varchar(32) NOT NULL,
         `generated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `acyear` varchar(16) NOT NULL,
+        `voted` int DEFAULT '0',
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {

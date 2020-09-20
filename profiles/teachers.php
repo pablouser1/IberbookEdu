@@ -41,7 +41,7 @@ if (isset($_GET["select_curso"], $_GET["schoolid"])){
       "namecentro" => $schoolname
     );
     $_SESSION["userinfo"] = $userinfo;
-    header("Location: ../users/dashboard.php");
+    header("Location: ../index.php");
     exit;
   }
   else {

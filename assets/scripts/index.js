@@ -1,3 +1,4 @@
+// Burger menu (mobile/tablet only)
 var burger = document.getElementById("navbar-burger")
 burger.addEventListener("click", () => {
     const target = burger.dataset.target

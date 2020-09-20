@@ -1,4 +1,5 @@
 <?php
+// -- Get user info from database -- //
 require_once("db.php");
 class DBInfo {
     private $userinfo = array();

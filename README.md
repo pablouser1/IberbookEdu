@@ -6,7 +6,7 @@ PASEN/SÉNECA (Andalucía)
 
 ROBLE (Madrid) (Sin verificar su funcionamiento)
 
-Este programa solo funciona para 2º de Bachillerato, 4º ESO y 6º Primaria
+Este programa funciona para 2º de Bachillerato, 4º ESO y 6º Primaria (FP planeado)
 
 Todos los datos del usuario se extraen a partir de la información de los servidores de PASEN/SENECA o ROBLE.
 
@@ -24,6 +24,8 @@ Todos los datos del usuario se extraen a partir de la información de los servid
   * Usuario: Puede subir y administrar sus datos
   * Administrador: Puede administrar los datos de su curso
   * Dueño: Puede agregar/eliminar administradores y dueños, además de cambiar los centros admitidos
+* Sistema público para ver orlas ya generadas
+* Sistema de votación de orlas
 
 # Installation
 
@@ -37,7 +39,7 @@ Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes com
 # TODO
 
 * Agregar soporte para Formación Profesional
-* Recordar sesión
+* API local
 
 # Credits
 

@@ -91,6 +91,18 @@ $stmt->close();
                 </div>
             </div>
         </section>
+        <div class="tabs is-centered">
+            <ul>
+                <li>
+                    <a href="../index.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-home" aria-hidden="true"></i>
+                        </span>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
         <section id="dashboard" class="section">
             <?php
             if(isset($yearbook)){
@@ -102,7 +114,7 @@ $stmt->close();
                         <div class='container'>
                             <h1 class='title'>Tu yearbook está listo</h1>
                             <p class='subtitle'>
-                                <a href='../yearbooks.php{$params}' target='_blank' class='button is-success'>
+                                <a href='../yearbooks.php{$params}' class='button is-success'>
                                     <span class='icon'>
                                         <i class='fas fa-eye'></i>
                                     </span>

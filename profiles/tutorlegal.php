@@ -23,7 +23,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
             "namecentro" => $child["namecentro"]
         );
         $_SESSION["userinfo"] = $childinfo;
-        header("Location: ../users/dashboard.php");
+        header("Location: ../index.php");
         exit;
     }
 }

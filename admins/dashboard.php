@@ -12,25 +12,26 @@ require_once("../helpers/config.php");
 require_once("yearbook/themes.php");
 
 $userinfo = $_SESSION["userinfo"];
+$acyear = date("Y",strtotime("-1 year"))."-".date("Y");
 
 require_once("../helpers/db/getinfo.php");
 
 $DBInfo = new DBInfo($userinfo);
+// Get teachers + amount
 $teachers = $DBInfo->teachers();
-// Get amount teachers
 $teachers_amount = (!isset($teachers)) ? 0 : count($teachers);
 
+// Get students + amount
 $students = $DBInfo->students();
-// Get amount students
 $students_amount = (!isset($students)) ? 0 : count($students);
 
+// Get gallery + amount
 $gallery = $DBInfo->gallery();
-// Get amount items
 $gallery_amount = (!isset($gallery)) ? 0 : count($gallery);
 
 // Check if admin generated yearbook before
-$stmt = $conn->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i') FROM yearbooks WHERE schoolid=? AND schoolyear=?");
-$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+$stmt = $conn->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i') FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
+$stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $acyear);
 $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($generated);
@@ -66,6 +67,18 @@ if ($stmt->num_rows == 1) {
             </div>
         </div>
     </section>
+    <div class="tabs is-centered">
+        <ul>
+            <li>
+                <a href="../index.php">
+                    <span class="icon is-small">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                    </span>
+                    <span>Inicio</span>
+                </a>
+            </li>
+        </ul>
+    </div>
     <section class="section">
         <!-- Teachers -->
         <p class="title">
@@ -224,7 +237,6 @@ if ($stmt->num_rows == 1) {
         <?php
         // -- Yearbook options when generated -- //
         if (isset($yearbook)){
-            $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
             $params = "?schoolid=$userinfo[idcentro]&acyear=$acyear&group=$userinfo[yearuser]";
             echo "
             <hr>
@@ -248,10 +260,6 @@ if ($stmt->num_rows == 1) {
         }
         ?>
     </section>
-    <div id="progress" class="is-hidden container">
-        <p class="subtitle">Generando yearbook, este proceso puede tardar varios minutos, por favor <strong>NO</strong> cierre su navegador</p>
-        <progress class="progress is-primary" max="100"></progress>
-    </div>
     <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
         <p class="title">Administrar yearbook</p>
         <div class="field">
@@ -269,12 +277,12 @@ if ($stmt->num_rows == 1) {
             </div>
         </div>
         <div class="buttons">
-            <a id="genyearbook" href="yearbook/send.php?theme=default" class="button is-success">
+            <button id="genyearbook" class="button is-success">
                 <span class="icon">
                     <i class="fas fa-check"></i>
                 </span>
                 <span>Generar Yearbook</span>
-            </a>
+            </button>
             <a class="button is-info" href="gallery.php">
                 <span class="icon">
                     <i class="fas fa-photo-video"></i>

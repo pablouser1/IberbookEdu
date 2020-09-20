@@ -48,4 +48,5 @@ if (isset($_GET["action"], $typeuser)) {
     }
 }
 header("Location: dashboard.php");
+exit;
 ?>

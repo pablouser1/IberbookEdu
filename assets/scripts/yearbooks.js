@@ -1,14 +1,8 @@
-// Get website url
-var getUrl = window.location;
-var baseUrl = getUrl .protocol + "//" + getUrl.host;
+// -- Yearbooks expositor handler -- //
 
+// Show all schools and years availables
 Vue.component('schools', {
-    props: {
-        "schools": {
-            type: Array,
-            requiered: true
-        }
-    },
+    props: ["schools"],
     template:
     `
     <div class="container">
@@ -43,17 +37,9 @@ Vue.component('schools', {
     `
 })
 
+// Show all groups available
 Vue.component('groups', {
-    props: {
-        "groups": {
-            type: Array,
-            required: true
-        },
-        "groupsextra": {
-            type: Array,
-            requiered: true
-        }
-    },
+    props: ["groups", "groupsextra"],
     template: 
     `
     <div v-if="!groups" class="container has-text-centered">
@@ -79,15 +65,13 @@ Vue.component('groups', {
     `
 })
 
+// Show yearbook
 Vue.component('yearbook', {
-    props: {
-        "yearbook": {
-            type: Array,
-            required: true
-        },
-        "yearbookextra": {
-            type: Array,
-            requiered: true
+    props: ["yearbook", "yearbookextra"],
+    data: function () {
+        return {
+          voted: null,
+          url: null
         }
     },
     methods: {
@@ -95,7 +79,34 @@ Vue.component('yearbook', {
             document.getElementById("inputlink").select()
             document.execCommand('copy')
             alert("Enlace copiado con éxito")
+        },
+        // Vote system
+        vote: function(id) {
+            // Send id and action to do
+            fetch(`vote.php?id=${id}`)
+
+            // Get json response
+            .then(res => {
+                return res.json()
+            })
+            .then(json_res => {
+                // Check if there were any errors
+                if (json_res["code"] == "C") {
+                    this.voted = id
+                    this.yearbook.votes = this.yearbook.votes + 1
+                    alert("Has votado con éxito")
+                }
+                else {
+                    alert(`Ha habido un error al procesar tu solicitud, ${json_res.description}`);
+                }
+            })
         }
+    },
+    mounted() {
+        this.voted = voted_js
+        // Get website url
+        let getUrl = window.location;
+        this.url = getUrl.protocol + "//" + getUrl.host;
     },
     template:
     `
@@ -112,7 +123,7 @@ Vue.component('yearbook', {
             <i class="fas fa-book"></i>
             <span>Yearbook</span>
         </p>
-        <p class="subtitle">{{ yearbookextra.groupname }}</p>
+        <p class="subtitle">{{ yearbookextra.groupname }} / {{ yearbook.votes }} voto(s)</p>
         <!-- Opciones básicas -->
         <div class="buttons is-centered">
             <a :href="yearbook.link" target="_blank" class="button is-link">
@@ -127,12 +138,18 @@ Vue.component('yearbook', {
                 </span>
                 <span>Descargar zip</span>
             </a>
+            <button :disabled="voted == yearbook.id ? true : false" v-on:click="vote(yearbook.id)" class="button is-primary">
+                <span class="icon">
+                    <i class="fas fa-star"></i>
+                </span>
+                <span>Votar</span>
+            </button>
         </div>
         <!-- Compartir -->
         <div class="container">
             <div class="field has-addons has-addons-centered">
                 <div class="control">
-                    <input type="text" id="inputlink" class="input" readonly :value="encodeURI($root.url + yearbook.link)">
+                    <input type="text" id="inputlink" class="input" readonly :value="encodeURI(url + yearbook.link)">
                 </div>
                 <div class="control">
                     <button v-on:click="clipboard" class="button is-success">
@@ -146,14 +163,14 @@ Vue.component('yearbook', {
             <br>
             <label class="label">También puedes compartir este yearbook por redes sociales:</label>
             <div class="buttons is-centered">
-                <a :href="'https://www.facebook.com/sharer/sharer.php?u=' + encodeURI($root.url + yearbook.link)" class="button is-link">
+                <a :href="'https://www.facebook.com/sharer/sharer.php?u=' + encodeURI(url + yearbook.link)" class="button is-link">
                     <span class="icon">
                         <i class="fab fa-facebook"></i>
                     </span>
                     <span>Facebook</span>
                 </a>
                 <a
-                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20IberbookEdu&url=' + encodeURI($root.url + yearbook.link) + '&hashtags=IberbookEdu'"
+                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20IberbookEdu&url=' + encodeURI(url + yearbook.link) + '&hashtags=IberbookEdu'"
                 class="button is-info">
                     <span class="icon">
                         <i class="fab fa-twitter"></i>
@@ -161,7 +178,7 @@ Vue.component('yearbook', {
                     <span>Twitter</span>
                 </a>
                 <a
-                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20berbookEdu%20en%3A%20' + $root.url + yearbook.link"
+                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20berbookEdu%20en%3A%20' + url + yearbook.link"
                 data-action="share/whatsapp/share"
                 class="button is-success">
                     <span class="icon">
@@ -170,7 +187,7 @@ Vue.component('yearbook', {
                     <span>Whatsapp</span>
                 </a>
                 <a
-                :href="'https://t.me/share/url?url=' + encodeURI($root.url + yearbook.link) + '&text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu'"
+                :href="'https://t.me/share/url?url=' + encodeURI(url + yearbook.link) + '&text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20%23IberbookEdu'"
                 class="button is-link">
                     <span class="icon">
                         <i class="fab fa-telegram"></i>
@@ -183,15 +200,46 @@ Vue.component('yearbook', {
     `
 })
 
+Vue.component('leaderboards', {
+    props: ["leaderboards"],
+    template:
+    `
+    <div class="container has-text-centered">
+        <div class="columns is-mobile is-centered is-multiline is-vcentered animate__animated animate__jackInTheBox">
+            <div class="column is-narrow" v-for="(yearbook, index) in leaderboards">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            {{ yearbook.schoolyear }} ({{ yearbook.acyear }})
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <p>{{ yearbook.schoolname }}</p>
+                            <p>{{ yearbook.voted }} voto(s)</p>
+                        </div>
+                    </div>
+                    <footer class="card-footer">
+                        <a :href="yearbook.link" class="card-footer-item" target="_blank">Ver yearbook</a>
+                        <a :href="'?schoolid=' + yearbook.schoolid + '&acyear=' + yearbook.acyear + '&group=' + yearbook.schoolyear" class="card-footer-item">Opciones</a>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+})
+
 var yb_vue = new Vue({
     el: '#yearbooks',
     data: {
-      schools: yearbooks_js,
-      groups: null,
-      groupsextra: null,
-      yearbook: null,
-      yearbookextra: null,
-      url: baseUrl,
+        showNav: false,
+        schools: yearbooks_js,
+        groups: null,
+        groupsextra: null,
+        yearbook: null,
+        yearbookextra: null,
+        leaderboards: leaderboards_js
     },
     methods: {
         setgroup: function(groups, schoolname, acyear) {

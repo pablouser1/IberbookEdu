@@ -4,7 +4,9 @@
 var currentDate = new Date();
 
 // Yearbook generated date + 5 years
-var FiveYearsFromYearbook = new Date(ybdate_js * 1000);
+let yearbookDate = main.$data.ybinfo["ybdate"]
+
+var FiveYearsFromYearbook = new Date( yearbookDate * 1000);
 FiveYearsFromYearbook.setFullYear(FiveYearsFromYearbook.getFullYear() + 5);
 
 if(currentDate > FiveYearsFromYearbook){

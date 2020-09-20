@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     switch ($userinfo["typeuser"]){
                         case "ALU":
                             $_SESSION["userinfo"] = $userinfo;
-                            header("Location: users/dashboard.php");
+                            header("Location: index.php");
                         break;
                         case "TUT_LEGAL":
                             $_SESSION["tutorinfo"] = $userinfo;
@@ -190,9 +190,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <button type="submit" class="button is-block is-info is-fullwidth">Iniciar sesión</button>
                         </form>
-                        <p class="has-text-grey">
-                            <a href="about.html">Acerca de</a>
-                        </p>
+                        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+                            <ul>
+                                <li>
+                                    <a href="index.php">Volver al inicio</a>
+                                </li>
+                                <li>
+                                    <a href="about.html">Acerca de</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
                 <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
