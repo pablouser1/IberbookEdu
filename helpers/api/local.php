@@ -73,7 +73,7 @@ class Api {
                 "yearuser" => $row["group"],
                 "photouser" => base64_encode(file_get_contents(__DIR__. "/../../assets/img/PortraitPlaceholder.png")),
                 "idcentro" => $row["schoolid"],
-                "namecentro" => "Test"
+                "namecentro" => "Test" // TODO, get school name
             ];
         }
         $stmt->close();

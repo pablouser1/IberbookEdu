@@ -1,6 +1,6 @@
 <?php
 // -- Get user info from database -- //
-require_once("db.php");
+require_once("../helpers/db/db.php");
 class DBInfo {
     private $userinfo = array();
     private $conn;
@@ -11,7 +11,7 @@ class DBInfo {
 
     function teachers() {
         // Teachers
-        $stmt = $this->conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=?");
+        $stmt = $this->conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
         $stmt->bind_param("is", $this->userinfo["idcentro"], $this->userinfo["yearuser"]);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -33,7 +33,7 @@ class DBInfo {
 
     function students() {
         // Students
-        $stmt = $this->conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students where schoolid=? and schoolyear=?");
+        $stmt = $this->conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students where schoolid=? and schoolyear=? ORDER BY fullname");
         $stmt->bind_param("is", $this->userinfo["idcentro"], $this->userinfo["yearuser"]);
         $stmt->execute();
         $result = $stmt->get_result();

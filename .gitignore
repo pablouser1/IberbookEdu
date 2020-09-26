@@ -1,5 +1,10 @@
+# IDE
 .vscode
+
+# Default yearbook and upload dir
 yearbooks/
 uploads/
+
+# User generated info about instance
 helpers/db/dbconf.php
 helpers/config.php

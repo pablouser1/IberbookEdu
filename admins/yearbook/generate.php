@@ -80,7 +80,7 @@ if(!is_dir($baseurl)) {
 }
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -103,7 +103,7 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students WHERE schoolid=? AND schoolyear=?");
+$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();

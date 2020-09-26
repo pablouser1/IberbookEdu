@@ -16,7 +16,7 @@ window.addEventListener("hashchange", changetab)
 // -- Yearbook -- //
 
 // Teachers
-Vue.component('teachers', {
+var teachers = {
     props: {
         "teachers": {
             type: Array,
@@ -31,7 +31,6 @@ Vue.component('teachers', {
                 <div class="media-content">
                     <p>
                         <strong>{{teacher.fullname.name}} {{teacher.fullname.surname}}</strong>
-                        <span class="tag">{{teacher.subject}}</span>
                         <a :href="teacher.photo" target="_blank">
                             <figure class="image">
                                 <img :src="teacher.photo">
@@ -40,6 +39,7 @@ Vue.component('teachers', {
                         <q v-html="teacher.quote"></q>
                         <br>
                         <i><small>{{teacher.date}}</small></i>
+                        <span class="tag">{{teacher.subject}}</span>
                     </p>
                     <nav class="level is-mobile">
                         <div class="level-left">
@@ -58,11 +58,18 @@ Vue.component('teachers', {
             </article>
         </div>
     </div>
-    `
-})
+    `,
+    mounted() {
+        let stories_prof = setupStories("teachers")
+        new Zuck('stories_teachers', {
+            story_settings,
+            stories: stories_prof,
+        });
+    }
+}
 
 // Students
-Vue.component('students', {
+var students = {
     props: {
         "students": {
             type: Array,
@@ -103,11 +110,18 @@ Vue.component('students', {
             </article>
         </div>
     </div>
-    `
-})
+    `,
+    mounted() {
+        let stories_alu = setupStories("students")
+        new Zuck('stories_students', {
+            story_settings,
+            stories: stories_alu,
+        });
+    }
+}
 
 // Gallery
-Vue.component('gallery', {
+var gallery = {
     props: {
         "gallery": {
             type: Array,
@@ -147,11 +161,16 @@ Vue.component('gallery', {
         </div>
     </div>
     `
-})
+}
 
 // Vue root
 var main = new Vue({
     el: '#main',
+    components: {
+        "teachers": teachers,
+        "students": students,
+        "gallery": gallery,
+    },
     data: {
         longtimeago: false, // in a galaxy far far away
         teachers: teachers_js, // Teachers data
@@ -176,7 +195,7 @@ var main = new Vue({
         }
     },
     mounted: function() {
-        // Show yearbook if everything already loaded
+        // Show yearbook if everything is already loaded
         this.$nextTick(function () {
             document.title = `Yearbook ${this.ybinfo.year}`
             this.ready = true
@@ -184,4 +203,3 @@ var main = new Vue({
         })
     }
 })
-

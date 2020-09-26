@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
             else{
-                $login_error[] = $loginres["description"];
+                $login_error[] = $loginres["error"];
             }
         }
 
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 ];
                                 $_SESSION["ownerinfo"] = $ownerinfo;
                                 // Redirect user to welcome page
-                                header("location: owner/dashboard.php");
+                                header("Location: owner/dashboard.php");
                                 exit;
                             } else{
                                 // Display an error message if password is not valid

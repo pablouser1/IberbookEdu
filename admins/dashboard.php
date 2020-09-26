@@ -14,7 +14,7 @@ require_once("yearbook/themes.php");
 $userinfo = $_SESSION["userinfo"];
 $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
 
-require_once("../helpers/db/getinfo.php");
+require_once("getinfo.php");
 
 $DBInfo = new DBInfo($userinfo);
 // Get teachers + amount
@@ -90,7 +90,6 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre completo</th>
                         <th>Foto</th>
                         <th>Vídeo</th>
@@ -101,14 +100,13 @@ if ($stmt->num_rows == 1) {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
                     <?php
                     // Get all values from teachers' table
                     if (!isset($teachers)) echo '<td>No hay profesores disponibles</td>';
                     else {
                         foreach($teachers as $teacher){
                             echo "
-                                <td>$teacher[id]</td>
+                            <tr>
                                 <td>$teacher[name]</td>
                                 <td><a href='../getmedia.php?id=$teacher[id]&media=photo&type=P' target='_blank'>$teacher[photo]</a></td>
                                 <td><a href='../getmedia.php?id=$teacher[id]&media=video&type=P' target='_blank'>$teacher[video]</a></td>
@@ -116,11 +114,11 @@ if ($stmt->num_rows == 1) {
                                 <td>$teacher[quote]</td>
                                 <td>$teacher[uploaded]</td>
                                 <td>$teacher[subject]</td>
+                            </tr>
                             ";
                         }
                     }
                     ?>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -134,7 +132,6 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre y apellidos</th>
                         <th>Foto</th>
                         <th>Vídeo</th>
@@ -150,13 +147,14 @@ if ($stmt->num_rows == 1) {
                     else {
                         foreach($students as $student){
                             echo "
-                                <td>$student[id]</td>
+                            <tr>
                                 <td>$student[name]</td>
                                 <td><a href='../getmedia.php?id=$student[id]&media=photo&type=ALU' target='_blank'>$student[photo]</a></td>
                                 <td><a href='../getmedia.php?id=$student[id]&media=video&type=ALU' target='_blank'>$student[video]</a></td>
                                 <td><a href='$student[link]' target='_blank'>Abrir enlace</a></td>
                                 <td>$student[quote]</td>
                                 <td>$student[uploaded]</td>
+                            </tr>
                             ";
                         }
                     }
@@ -208,7 +206,6 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Foto</th>
                         <th>Descripción</th>
                         <th>Tipo</th>
@@ -222,7 +219,6 @@ if ($stmt->num_rows == 1) {
                         foreach($gallery as $item){
                             echo "
                             <tr>
-                                <td>$item[id]</td>
                                 <td><a href='../getgallery.php?id=$item[id]' target='_blank'>$item[name]</a></td>
                                 <td>$item[description]</td>
                                 <td>$item[type]</td>

@@ -1,7 +1,3 @@
-// -- TODO, limpiar y adaptar a Vue -- //
-
-var stories_teachers = [];
-var stories_students = [];
 // Common zuck.js settings
 const story_settings = {
     skin: 'snapgram',
@@ -17,51 +13,36 @@ const story_settings = {
     reactive: false
 }
 
-// Students stories
-students_js.forEach(student => {
-    stories_students.push({
-        id: student.userid,
-        photo: student.photo,
-        name: student.abbr,
-        items: [
-            {
-                id: student.userid,
-                type: "video",
-                src: student.video,
-                link: student.url,
-                time: student.zuckdate
-            }
-        ]
+// Return array with story info
+function setupStories(type) {
+    let group = {}
+    let stories = []
+    switch (type) {
+        case "students":
+            group = students_js
+            break;
+        case "teachers":
+            group = teachers_js
+            break;
+        default:
+            console.log(`Error loading stories ${type}, this group does not exist`)
+            break;
+    }
+    group.forEach(person => {
+        stories.push({
+            id: person.userid,
+            photo: person.photo,
+            name: person.abbr,
+            items: [
+                {
+                    id: person.userid,
+                    type: "video",
+                    src: person.video,
+                    link: person.url,
+                    time: person.zuckdate
+                }
+            ]
+        })
     })
-})
-
-// Teachers stories
-teachers_js.forEach(teacher => {
-    stories_teachers.push({
-        id: teacher.userid,
-        photo: teacher.photo,
-        name: teacher.abbr,
-        items: [
-            {
-                id: teacher.userid,
-                type:"video",
-                src: teacher.video,
-                link: teacher.url,
-                time: teacher.zuckdate
-            }
-        ]
-    })
-})
-
-// Teachers
-let steachers = new Zuck('stories_teachers', {
-    story_settings,
-    stories: stories_teachers,
-});
-
-// Students
-let sstudents = new Zuck('stories_students', {
-    story_settings,
-    stories: stories_students,
-});
-
+    return stories
+}

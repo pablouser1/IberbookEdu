@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1.0, user-scalable=no">
     <title>IberbookEdu</title>
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico">
@@ -42,7 +42,7 @@
         <!-- Banner -->
         <section v-if="ready" class="hero is-primary">
             <div class="hero-body">
-                <div class="container">
+                <div class="container animate__animated animate__lightSpeedInLeft">
                     <p class="title has-text-centered">
                         <i class="fas fa-graduation-cap"></i>
                         <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
@@ -147,10 +147,10 @@
     <script src="scripts/vendor/zuck.min.js"></script>
     <!-- Multilang manager -->
     <script src="scripts/lang.js"></script>
+    <!-- Stories manager-->
+    <script src="scripts/stories.js"></script>
     <!-- Yearbook manager -->
     <script src="scripts/yearbook.js"></script>
-    <!-- Stories manager -->
-    <script src="scripts/stories.js"></script>
     <!-- Misc -->
     <script src="scripts/misc.js"></script>
 </body>
