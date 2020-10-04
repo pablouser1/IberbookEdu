@@ -1,14 +1,16 @@
 // Changes active tab
 function changetab() {
-    var hash = window.location.hash.substring(1);
-    if(hash == ""){
-        hash = "yearbook"
-    }
+    let hash = window.location.hash.substring(1);
     // Choose tab not hidden (currently active)
-    var old_tab = document.querySelector(".tab:not(.is-hidden)")
-    var new_tab = document.getElementById(hash);
-    old_tab.classList.add("is-hidden")
-    new_tab.classList.remove("is-hidden")
+    let old_tab = document.querySelector(".tab:not(.is-hidden)")
+    let new_tab = document.getElementById(hash);
+    if (!new_tab) {
+        console.error(`Error while loading ${hash}, that tab doesn't exist`)
+    }
+    else {
+        old_tab.classList.add("is-hidden")
+        new_tab.classList.remove("is-hidden")
+    }
 }
 
 window.addEventListener("hashchange", changetab)
@@ -26,7 +28,7 @@ var teachers = {
     template: 
     `
     <div class="columns is-centered is-multiline is-vcentered is-mobile">
-        <div v-for="(teacher) in teachers" class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+        <div v-for="(teacher) in teachers" class="animate__animated animate__fadeIn column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
             <article class="media">
                 <div class="media-content">
                     <p>
@@ -79,7 +81,7 @@ var students = {
     template: 
     `
     <div class="columns is-centered is-multiline is-vcentered is-mobile">
-        <div v-for="(student) in students" class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+        <div v-for="(student) in students" class="animate__animated animate__fadeIn column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
             <article class="media">
                 <div class="media-content">
                     <p>
@@ -131,17 +133,17 @@ var gallery = {
     template: 
     `
     <div class="columns is-centered is-multiline is-vcentered is-mobile">
-        <div v-for="(item) in gallery" class='column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
+        <div v-for="(item) in gallery" class='animate__animated animate__fadeIn column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
             <article class="media">
                 <div class="media-content">
-                    <a :href="item.path" target="_blank">
+                    <a v-if="item.type == 'picture'" :href="item.path" target="_blank">
                         <figure class="image">
-                            <img v-if="item.type == 'picture'" :src="item.path">
-                            <video v-else preload="metadata" controls>
-                                <source :src="item.path"></script>
-                            </video>
+                            <img :src="item.path">
                         </figure>
                     </a>
+                    <video v-else preload="metadata" controls>
+                        <source :src="item.path"></script>
+                    </video>
                     <p>{{ item.description }}</p>
                     <nav class="level is-mobile">
                         <div class="level-left">
@@ -177,13 +179,25 @@ var main = new Vue({
         students: students_js, // Students data
         gallery: gallery_js, // Gallery data
         ybinfo: ybinfo_js, // General yearbook info
+        splashscreen: true,
         ready: false, // Hide splashscreen when everything loads
         showNav: false, // Navbar burger (only mobile/tablet)
         lang: lang // Var in lang.js, language currently used
     },
     methods: {
+        enterYearbook: function() {
+            let banner = document.getElementById("banner")
+            banner.classList.replace("is-fullheight", "is-medium")
+            document.getElementById("enterButton").remove()
+            this.ready = true
+            // Load tab if specified by user
+            if (window.location.hash.substring(1)) {
+                changetab()
+            }
+            confetti.start(1500)
+        },
         changelang: changelang, // Function in lang.js
-        easteregg: function (egg) {
+        easteregg: function(egg) {
             switch (egg) {
                 case "timeago":
                     this.longtimeago = true
@@ -194,12 +208,23 @@ var main = new Vue({
             }
         }
     },
-    mounted: function() {
-        // Show yearbook if everything is already loaded
-        this.$nextTick(function () {
-            document.title = `Yearbook ${this.ybinfo.year}`
-            this.ready = true
-            confetti.start(1000)
-        })
+    created() {
+        if (!this.ybinfo.banner) {
+            document.getElementById("banner").classList.replace("has-background", "is-primary")
+        }
+        document.title = `Yearbook ${this.ybinfo.year}`
+    },
+    mounted() {
+        document.onreadystatechange = () => {
+            if (document.readyState == "complete") {
+                document.getElementById("loading_process").value = 100
+                let splashscreen = document.getElementById("splashscreen")
+                splashscreen.classList.add("animate__animated", "animate__bounceOut")
+                splashscreen.addEventListener('animationend', () => {
+                    this.splashscreen = false
+                });
+            }
+          }
+          
     }
 })

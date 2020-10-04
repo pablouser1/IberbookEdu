@@ -17,7 +17,7 @@ Todos los datos del usuario se extraen a partir de la información de los servid
 * Genera un ZIP preparado para extraer y colocar en cualquier parte.
 * Acepta agregar tanto profesores como alumnos.
   * Pueden añadir una foto y un vídeo
-  * Además pueden agregar opcionalmente un enlace y un texto de 280 caracteres máximo.
+  * Además pueden agregar opcionalmente un enlace y un texto de 100 caracteres máximo.
   * También los tutores legales pueden subir la foto y el vídeo de sus hijos
 * Galería general, puedes subir fotos del grupo aquí.
 * Gestión de cuentas:

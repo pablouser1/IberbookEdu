@@ -212,7 +212,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
     <section id="main">
-        <section v-if="$root.stage === 'splashscreen'" class="hero is-success is-fullheight">
+        <section v-if="stage === 'splashscreen'" class="hero is-success is-fullheight">
             <div class="hero-body">
                 <div class="container">
                     <h1 class="title animate__animated animate__fadeInDown">
@@ -230,9 +230,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
             <div class="container">
                 <noscript>Este programa necesita Javascript</noscript>
-                <database v-if="$root.stage === 'database'"></database>
-                <owner v-if="$root.stage === 'owner'"></owner>
-                <server v-bind:dirs="dirs" v-if="$root.stage === 'server'"></server>
+                <database v-if="stage === 'database'"></database>
+                <owner v-if="stage === 'owner'"></owner>
+                <server v-bind:dirs="dirs" v-if="stage === 'server'"></server>
             </div>
         </form>
     </section>

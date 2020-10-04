@@ -70,7 +70,7 @@ class Api {
         {
             return array(
                 "code" => "CURL",
-                "error" => curl_error($ch)
+                "error" => "Ha habido un error al conectarse con los servidores remotos"
             );
         }
         $json_data = mb_substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));  
@@ -148,41 +148,22 @@ class Api {
                 break;
             // -- Profesor -- //
             case 'teachers':
-                // Set user info
                 $idteacher = $this->getidteacher();
-                // Set array with only allowed schools
-                $stmt = $GLOBALS["conn"]->prepare("SELECT name, id FROM schools WHERE id=?");
-                // Check each school available
-                foreach($info["RESULTADO"][0]["CENTROS"] as $id => $centro){
-                    $stmt->bind_param("i", $centro["id"]);
-                    $stmt->execute();
-                    $stmt->store_result();
-                    $stmt->bind_result($allowed_name, $allowed_id);
-                    if($stmt->num_rows == 1) {
-                        if(!empty($centro["X_CENTRO"])){
-                            $data = ["X_CENTRO" => $centro["X_CENTRO"], "C_PERFIL" => "P"];
-                            $this->changeschoolteachers($data);
-                        }
-                        $groups = $this->getgroupsteachers();
-                        while ($stmt->fetch()) {
-                            // Set basic school info
-                            $finalschools[$id] = [
-                                "name" => $allowed_name,
-                                "id" => $allowed_id,
-                            ];
-                        }
-                        // Set groups info
-                        if(empty($groups)){
-                            $finalschools[$id]["groups"][] = [];
-                        }
-                        else {
-                            foreach ($groups as $group) {
-                                $finalschools[$id]["groups"][] = $group;
-                            }
-                        }
+                // Only one school
+                if (count($info["RESULTADO"][0]["CENTROS"]) === 1 || !isset($info["RESULTADO"][0]["CENTROS"])) {
+                    $schoolid = $info["RESULTADO"][0]["C_CODIGO"];
+                    $finalschools[$schoolid] = $this->getallteacher($info["RESULTADO"][0]);
+                }
+                // Multiple schools
+                else {
+                    foreach($info["RESULTADO"][0]["CENTROS"] as $centro) {
+                        $schoolid = $centro["C_CODIGO"];
+                        $data = ["X_CENTRO" => $centro["X_CENTRO"]];
+                        $this->changeschoolteachers($data);
+                        $finalschools[$schoolid] = $this->getallteacher($centro);
                     }
                 }
-                $stmt->close();
+
                 $userinfo = array(
                     "iduser" => $idteacher,
                     "nameuser" => $info["RESULTADO"][0]["USUARIO"],
@@ -219,6 +200,33 @@ class Api {
         return $response["RESULTADO"][0]["DATOS"][0]["C_NUMIDE"]; // Teacher's id
     }
     
+    function getallteacher($centro) {
+        // Set array with only allowed schools
+        $stmt = $GLOBALS["conn"]->prepare("SELECT id FROM schools WHERE id=?");
+        $stmt->bind_param("i", $centro["C_CODIGO"]);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows == 1) {
+            $groups = $this->getgroupsteachers();
+            while ($stmt->fetch()) {
+                // Set basic school info
+                $schoolinfo = [
+                    "name" => $centro["CENTRO"],
+                    "id" => $centro["C_CODIGO"],
+                ];
+            }
+            // Set groups info
+            if(empty($groups)){
+                $schoolinfo["groups"] = [];
+            }
+            else {
+                $schoolinfo["groups"] = $groups;
+            }
+        }
+        $stmt->close();
+        return $schoolinfo;
+    }
+
     // Change between schools (if needed)
     function changeschoolteachers($data){
         $url = "{$this->base_url}/setCentro";

@@ -45,14 +45,7 @@ if (isset($_GET["id"])) {
     $value = $result->fetch_assoc();
     $stmt->close();
     // Check if user is trying to vote his own group
-    if ( ($value["schoolid"] == $userinfo["idcentro"]) && ($value["schoolyear"] == $userinfo["yearuser"]) ) {
-        $response = [
-            "code" => "E",
-            "description" => "no puedes votar a tu propio grupo"
-        ];
-        sendJSON($response);
-    }
-    elseif (!$value) {
+    if (!$value) {
         // Invalid id
         $response = [
             "code" => "E",
@@ -60,7 +53,16 @@ if (isset($_GET["id"])) {
         ];
         sendJSON($response);
     }
-
+    elseif ( ($value["schoolid"] == $userinfo["idcentro"]) && ($value["schoolyear"] == $userinfo["yearuser"]) ) {
+        $response = [
+            "code" => "E",
+            "description" => "no puedes votar a tu propio grupo"
+        ];
+        sendJSON($response);
+    }
+    // Set ybexists to true if yearbook exists
+    if (!empty($value)) $ybexist = true;
+    
     // Get user yearbook voted id
     $stmt = $conn->prepare("SELECT voted FROM $typeuser WHERE id=?");
     $stmt->bind_param("s", $userinfo["iduser"]);
@@ -69,9 +71,6 @@ if (isset($_GET["id"])) {
     $ybinfo = $result->fetch_assoc();
     $uservote = !empty($ybinfo["voted"]) ? (int)$ybinfo["voted"] : null;
     $stmt->close();
-
-    // Set ybexists to true if yearbook exists
-    if (!empty($value)) $ybexist = true;
 
     // Allow voting if user voted a yearbook that has been deleted
     if (!$ybexist) {

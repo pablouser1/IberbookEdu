@@ -1,9 +1,9 @@
 <?php
-session_start();
-if (!isset($_SESSION["owner"])){
-    header("Location: login.php");
+if (!isset($_SESSION, $_SESSION["owner"])){
+    header("Location: ../login.php");
     exit;
 }
+
 require_once("../helpers/db/db.php");
 if (isset($_POST["id"])){
     if (isset($_POST["addschool"])){

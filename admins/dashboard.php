@@ -132,7 +132,7 @@ if ($stmt->num_rows == 1) {
             <table class="table is-bordered is-striped is-narrow is-hoverable">
                 <thead>
                     <tr>
-                        <th>Nombre y apellidos</th>
+                        <th>Nombre completo</th>
                         <th>Foto</th>
                         <th>Vídeo</th>
                         <th>Enlace</th>
@@ -271,6 +271,11 @@ if ($stmt->num_rows == 1) {
                     </select>
                 </div>
             </div>
+            <label class="label">Banner</label>
+            <div class="control">
+                <input id="banner" type="file" name="banner" accept="image/jpeg, image/png, image/gif">
+            </div>
+            <p class="help">Sólo se aceptan jpg, png y gif de máximo 5MB</p>
         </div>
         <div class="buttons">
             <button id="genyearbook" class="button is-success">
@@ -304,32 +309,14 @@ if ($stmt->num_rows == 1) {
                     ';
                 }
                 ?>
-                <?php
-                if (!isset($_SESSION["owner"])) {
-                    echo '
-                    <li>
-                        <a href="../users/dashboard.php">
-                            <span class="icon is-small">
-                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                            </span>
-                            <span>Cambiar a usuario</span>
-                        </a>
-                    </li>
-                    ';
-                }
-                else {
-                    echo '
-                    <li>
-                        <a href="../owner/dashboard.php">
-                            <span class="icon is-small">
-                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                            </span>
-                            <span>Volver al panel de control de dueño</span>
-                        </a>
-                    </li>
-                    ';
-                }
-                ?>
+                <li>
+                    <a href="../users/dashboard.php">
+                        <span class="icon is-small">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </span>
+                        <span>Cambiar a usuario</span>
+                     </a>
+                </li>
                 <li>
                     <a href="../logout.php">
                         <span class="icon is-small">
@@ -344,4 +331,3 @@ if ($stmt->num_rows == 1) {
     <script src="../assets/scripts/admins/dashboard.js"></script>
 </body>
 </html>
-

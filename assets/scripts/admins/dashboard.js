@@ -9,11 +9,19 @@ theme_select.addEventListener("change", function () {
 
 genyearbook.addEventListener("click", function () {
     // Set loading
+    let banner = document.getElementById("banner").files[0]
+    let data = new FormData()
+    if (theme === "default") {
+        data.append('banner', banner)
+    }
+
     genyearbook.classList.add("is-loading")
     document.body.style.cursor = "progress"; 
     // Send id and action to do
-    fetch(`yearbook/generate.php?theme=${theme}`)
-
+    fetch(`yearbook/generate.php?theme=${theme}`, {
+        method: "POST",
+        body: data
+    })
     // Get json response
     .then(res => {
         return res.json()

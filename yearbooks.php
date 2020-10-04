@@ -63,7 +63,7 @@ $conn->close();
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
     <script>
         const yearbooks_js = <?php echo(json_encode($yearbooks)); ?>;
@@ -144,7 +144,10 @@ $conn->close();
                 <i class="fas fa-trophy"></i>
                 <span>Leaderboards</span>
             </p>
-            <p class="subtitle has-text-centered">Los 5 grupos más votados</p>
+            <p class="subtitle has-text-centered">
+                <i class="fas fa-star"></i>
+                <span>Las 5 orlas más votadas de todos los tiempos</span>
+            </p>
             <leaderboards v-bind:leaderboards="leaderboards"></leaderboards>
         </section>
         <footer class="footer">
@@ -160,4 +163,3 @@ $conn->close();
 </body>
 
 </html>
-

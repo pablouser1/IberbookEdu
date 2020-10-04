@@ -1,10 +1,7 @@
 <?php
-if(!isset($_SESSION)) {
-    session_start();
-}
-
-if (!isset($_SESSION["owner"])){
+if (!isset($_SESSION, $_SESSION["owner"])){
     header("Location: ../login.php");
+    exit;
 }
 require_once("../helpers/db/db.php");
 

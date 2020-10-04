@@ -5,6 +5,7 @@ session_start();
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] !== "admin") {
     header("Location: ../../login.php");
+    exit;
 }
 require_once("../../helpers/db/db.php");
 require_once("../../helpers/config.php");
@@ -14,7 +15,7 @@ require_once("themes.php");
 // Send json
 function sendJSON($response) {
     header('Content-type: application/json');
-    echo (json_encode($response));
+    echo json_encode($response);
     exit;
 }
 
@@ -159,18 +160,19 @@ if($result->num_rows === 1) {
 
 // Copy all user uploaded files
 $source = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/";
-$dest = $baseurl;
-recursivecopy($source, $dest);
+recursivecopy($source, $baseurl);
 
 // Copy all theme-specific assets
 $source = "themes/{$theme}";
-recursivecopy($source, $dest);
+recursivecopy($source, $baseurl);
 
 // Copy all common assets
 $source = "themes/common";
-recursivecopy($source, $dest);
+recursivecopy($source, $baseurl);
 
 copy("../../favicon.ico",  $baseurl.'/favicon.ico');
+
+mkdir($baseurl."/assets", 0755, true);
 
 // -- Yearbook data -- //
 
@@ -188,6 +190,28 @@ $ybinfo = [
     "acyear" => $acyear,
     "ybdate" => $dt->getTimestamp()
 ];
+
+if ($theme == "default") {
+    $ybinfo["banner"] = null;
+    // Copy banner
+    $tmpFilePath = $_FILES['banner']['tmp_name'];
+    if($tmpFilePath != "") {
+        $uploadName = $_FILES['banner']['name'];
+        $ext = pathinfo($uploadName, PATHINFO_EXTENSION);
+        if (!in_array($ext, ["jpg", "jpeg", "png", "gif"])) {
+            $response = [
+                "code" => "E",
+                "description" => "El banner tiene una extensión no soportada"
+            ];
+            sendJSON($response);
+        }
+        else {
+            $ybinfo["banner"] = "banner.$ext";
+            move_uploaded_file($tmpFilePath, "$baseurl/assets/banner.$ext");
+        }
+    }
+}
+
 $ybinfo_js = json_encode($ybinfo, JSON_PRETTY_PRINT);
 
 // Data to be written in js file

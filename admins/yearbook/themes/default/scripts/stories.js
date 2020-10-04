@@ -10,7 +10,7 @@ const story_settings = {
     backNative: false,
     previousTap: true,
     localStorage: true,
-    reactive: false
+    reactive: true
 }
 
 // Return array with story info
@@ -25,7 +25,7 @@ function setupStories(type) {
             group = teachers_js
             break;
         default:
-            console.log(`Error loading stories ${type}, this group does not exist`)
+            console.error(`Error loading stories ${type}, this group does not exist`)
             break;
     }
     group.forEach(person => {

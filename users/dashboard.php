@@ -26,12 +26,12 @@ if ($stmt->num_rows == 1) {
 $stmt->close();
 // Check if user uploaded pic and vid before
 if (isset($userinfo["subject"])){
-    $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), subject
-    FROM 'teachers' where schoolid=? and schoolyear=?");
+    $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i'), 'subject'
+    FROM teachers WHERE schoolid=? AND schoolyear=?");
 }
 else{
     $stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, DATE_FORMAT(uploaded, '%d/%m/%Y %H:%i')
-    FROM students where schoolid=? and schoolyear=?");
+    FROM students WHERE schoolid=? AND schoolyear=?");
 }
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();

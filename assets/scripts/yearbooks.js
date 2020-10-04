@@ -210,13 +210,13 @@ Vue.component('leaderboards', {
                 <div class="card">
                     <header class="card-header">
                         <p class="card-header-title">
-                            {{ yearbook.schoolyear }} ({{ yearbook.acyear }})
+                            Puesto Nº {{ index + 1 }} - {{ yearbook.voted }} voto(s)
                         </p>
                     </header>
                     <div class="card-content">
                         <div class="content">
+                            <p>{{ yearbook.schoolyear }} ({{ yearbook.acyear }})</p>
                             <p>{{ yearbook.schoolname }}</p>
-                            <p>{{ yearbook.voted }} voto(s)</p>
                         </div>
                     </div>
                     <footer class="card-footer">

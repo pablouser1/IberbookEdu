@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex">
     <title>IberbookEdu</title>
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico">
@@ -20,46 +21,51 @@
     <link rel="stylesheet" href="styles/vendor/animate.min.css"/>
     <link rel="stylesheet" href="styles/vendor/zuck.min.css"/>
     <link rel="stylesheet" href="styles/vendor/snapgram.min.css"/>
+    <link rel="stylesheet" href="styles/yearbook.css"/>
 </head>
 
-<body class="has-navbar-fixed-top">
+<body>
     <!-- NoScript Warning -->
     <noscript>This program needs Javascript</noscript>
     <div id="main">
         <!-- Splashscreen -->
-        <section v-if="!ready" class="hero is-fullheight">
-            <div id="loading_body" class="hero-body">
-                <div class="container">
-                    <p class="title">
+        <section id="splashscreen" v-if="splashscreen" class="hero is-fullheight is-primary">
+            <div class="hero-body">
+                <div class="container has-text-black">
+                    <h1 class="title">
                         Loading...
-                    </p>
-                    <p class="subtitle">
-                        <progress class="progress is-large is-primary" max="100"></progress>
-                    </p>
+                    </h1>
+                    <progress id="loading_process" class="progress is-success"></progress>
                 </div>
             </div>
         </section>
         <!-- Banner -->
-        <section v-if="ready" class="hero is-primary">
+        <section id="banner" v-show="!splashscreen" class="hero is-fullheight has-background animate__animated animate__bounceIn">
+            <img v-if="ybinfo.banner !== null" class="hero-background" :src="'assets/' + ybinfo.banner"/>
             <div class="hero-body">
-                <div class="container animate__animated animate__lightSpeedInLeft">
-                    <p class="title has-text-centered">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
-                    </p>
-                    <h2 class="subtitle has-text-centered">{{ ybinfo.acyear }}</h2>
-                    <h2 v-if="longtimeago" class="subtitle has-text-centered">{{ lang.misc.longtime }}</h2>
+                <div class="columns is-mobile is-centered">
+                    <div class="column is-narrow">
+                        <div class="box has-text-centered animate__animated animate__lightSpeedInLeft">
+                            <p class="title has-text-black">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
+                            </p>
+                            <h2 class="subtitle has-text-black">{{ ybinfo.acyear }}</h2>
+                            <h2 v-if="longtimeago" class="subtitle has-text-black">{{ lang.misc.longtime }}</h2>
+                            <button id="enterButton" v-on:click="enterYearbook" type="button" class="button is-primary">Entrar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
         <!-- Navigation tabs -->
-        <nav id="navbar" v-if="ready" class="navbar is-primary is-bold is-fixed-top" role="navigation" aria-label="main navigation">
+        <nav id="navbar" v-if="ready" class="navbar is-success" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
                 <a :href="ybinfo.schoolurl" target="_blank" class="navbar-item">
                     <span class="icon">
                         <i class="fas fa-school"></i>
                     </span>
-                    <span>{{ ybinfo.schoolname }}</span>
+                    <span v-cloak>{{ ybinfo.schoolname }}</span>
                 </a>
                 <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button" aria-label="menu" aria-expanded="false">
                     <span aria-hidden="true"></span>
@@ -79,13 +85,13 @@
                         <span class="icon">
                             <i class="fas fa-photo-video"></i>
                         </span>
-                        <span>{{ lang.tabs.gallery }}</span>
+                        <span v-cloak>{{ lang.tabs.gallery }}</span>
                     </a>
                     <a v-on:click="showNav = false" href="#about" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-info-circle"></i>
                         </span>
-                        <span>{{ lang.tabs.about }}</span>
+                        <span v-cloak>{{ lang.tabs.about }}</span>
                     </a>
                 </div>
             </div>
@@ -138,6 +144,7 @@
                 <ul id="languages">
                     <li><a v-on:click="changelang('en')">🇬🇧 English</a></li>
                     <li><a v-on:click="changelang('es')">🇪🇸 Español</a></li>
+                    <li><a v-on:click="changelang('fr')">🇫🇷 Français</a></li>
                 </ul>
             </nav>
             <p v-html="lang.footer.madewith" class="has-text-centered"></p>
