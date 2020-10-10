@@ -23,6 +23,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
             "namecentro" => $child["namecentro"]
         );
         $_SESSION["userinfo"] = $childinfo;
+        // Create profile
+        require_once("createprofile.php");
         header("Location: ../index.php");
         exit;
     }

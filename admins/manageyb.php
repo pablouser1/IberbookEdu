@@ -23,6 +23,7 @@ require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
+$db = new DB;
 // Year without spaces
 $yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 
@@ -32,10 +33,10 @@ if (isset($_GET["action"])) {
     switch ($_GET["action"]) {
         case "delete":
             // Delete yearbook
-            $stmt = $conn->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=? and acyear=?");
+            $stmt = $db->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=? and acyear=?");
             $stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $acyear);
             if ($stmt->execute() !== true) {
-                die("Error updating record: " . $conn->error);
+                die("Error eliminando yearbook");
             }
             $stmt->close();
             recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"]."/$acyear/".$yearuser);
@@ -44,4 +45,5 @@ if (isset($_GET["action"])) {
 }
 
 header("Location: dashboard.php");
+exit;
 ?>

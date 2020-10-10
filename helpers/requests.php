@@ -3,7 +3,7 @@
 
 class req {
     private $cookies;
-
+    private static $useragent = 'IberbookEdu Testing';
     function setcookies($cookies) {
         $this->cookies = $cookies;
     }
@@ -14,6 +14,7 @@ class req {
         $initial_options = array(
             CURLOPT_URL => $url,
             CURLOPT_HEADER => true,
+            CURLOPT_USERAGENT => req::$useragent,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_COOKIE => $this->cookies,
             CURLOPT_CONNECTTIMEOUT => 5
@@ -38,6 +39,7 @@ class req {
         $initial_options = array(
             CURLOPT_URL => $url,
             CURLOPT_HEADER => true,
+            CURLOPT_USERAGENT => req::$useragent,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($data),
             CURLOPT_RETURNTRANSFER => true,

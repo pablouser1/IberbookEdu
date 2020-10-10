@@ -14,6 +14,7 @@ $login_error = array();
 require_once("helpers/db/db.php");
 require_once("helpers/api.php");
 $api = new Api;
+$db = new DB;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!$_POST["username"]){
         $login_error[] = "No has escrito ningún nombre de usuario.";
@@ -43,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Check if school is allowed, only for students. Teachers and parents are checked in users/teachers.php and users/tutorlegal.php
                 if ($userinfo["typeuser"] == "ALU"){
                     $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
-                    $result = $conn->query($sql);
+                    $result = $db->query($sql);
                     if ($result !== false && $result->num_rows == 0) {
                         $login_error[] = "Su centro no está permitido";
                     }
@@ -55,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if(!$login_error){
                     // Check if user is admin
                     $sql = "SELECT `username`, `permissions` FROM `staff` WHERE username ='$username' and permissions='admin'";
-                    $result = $conn->query($sql);
+                    $result = $db->query($sql);
                     if ($result->num_rows == 1) {
                         // User is admin
                         $_SESSION["loggedin"] = "admin";
@@ -67,16 +68,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     switch ($userinfo["typeuser"]){
                         case "ALU":
                             $_SESSION["userinfo"] = $userinfo;
+                            // Create profile
+                            require_once("helpers/createprofile.php");
                             header("Location: index.php");
+                            exit;
                         break;
                         case "TUT_LEGAL":
                             $_SESSION["tutorinfo"] = $userinfo;
                             header("Location: profiles/tutorlegal.php");
+                            exit;
                         break;
                         case "P":
                             $_SESSION["teacherinfo"] = $userinfo;
                             $api->settype("students");
                             header("Location: profiles/teachers.php");
+                            exit;
                         break;
                     }
                     exit;
@@ -91,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         else {
             // Prepare a select statement
             $sql = "SELECT username, password FROM staff WHERE username = ? and permissions='owner'";
-            if($stmt = mysqli_prepare($conn, $sql)){
+            if($stmt = $db->prepare($sql)){
                 // Bind variables to the prepared statement as parameters
                 mysqli_stmt_bind_param($stmt, "s", $param_username);
             

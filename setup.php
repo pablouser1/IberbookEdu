@@ -74,12 +74,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
-        photo varchar(255) not null,
-        video varchar(255) not null,
+        photo varchar(255),
+        video varchar(255),
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        voted varchar(12),
+        voted int,
+        reason varchar(255),
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {
@@ -88,17 +89,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Teachers
     $sql = "CREATE TABLE teachers(
-        id varchar(9) not null UNIQUE,
+        id varchar(9) not null,
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
-        photo varchar(255) not null,
-        video varchar(255) not null,
+        photo varchar(255),
+        video varchar(255),
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        subject varchar(24) not null,
-        voted varchar(12),
+        `subject` varchar(24) not null,
+        voted int,
+        reason varchar(255),
         primary key(id)
         )";
     if ($conn->query($sql) !== TRUE) {

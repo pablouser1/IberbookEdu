@@ -1,7 +1,7 @@
 <?php
 session_start();
 $enabled = true;
-if(!isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
+if(!isset($_SESSION["loggedin"])){
     header("Location: ../login.php");
     exit;
 }
@@ -14,6 +14,14 @@ require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 
 $userinfo = $_SESSION["userinfo"];
+$db = new DB;
+
+function executestmt($stmt) {
+    if ($stmt->execute() !== true) {
+        die("Error inserting user data: " . $db->error);
+    }
+    $stmt->close();
+}
 
 switch ($userinfo["typeuser"]) {
     case "ALU":
@@ -27,18 +35,33 @@ switch ($userinfo["typeuser"]) {
 }
 
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
-$max_characters = 280; // "Quote" max characters
+$max_characters = 100; // "Quote" max characters
 $pic_error = $vid_error = $general_error = "";
 
-// Check if user uploaded pic and vid before
-$stmt = $conn->prepare("SELECT id FROM $typeuser where schoolid=? and schoolyear=?");
+// Get what user didn't upload yet
+$remain = [];
+$stmt = $db->prepare("SELECT photo, video, link, quote FROM $typeuser WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
 if ($result->num_rows == 1){
-    die("No tienes permisos para acceder a esta página ya que ya has subido tus datos.");
+    while ($row = mysqli_fetch_assoc($result)) {
+        foreach ($row as $field => $value) {
+            if (!$value) {
+                array_push($remain, $field);
+            }
+        }
+    }
+}
+else {
+    $remain = ["photo", "video", "link", "quote"];
 }
 $stmt->close();
+
+if (empty($remain)) {
+    die("Ya has subido todos los datos");
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Prepare
     // Allowed formats
@@ -46,12 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_vid = array('mp4', 'webm');
     // Upload directory
     $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$typeuser/";
-    if(isset($_POST["quote"]) && strlen($_POST["quote"]) > $max_characters){
-        $general_error = "Has excedido la máxima cantidad de caracteres";   
-    }
-    // Continue with the files upload if the quote didn't excede the max amount
-    else{
-        // Pic upload
+
+    // Pic upload
+    if (in_array("photo", $remain)) {
         if(isset($_FILES['pic'])){
             $tmpFilePath = $_FILES['pic']['tmp_name'];
             if($tmpFilePath != ""){
@@ -67,13 +87,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     $picname = basename($picPath);
                     move_uploaded_file($tmpFilePath, $picPath);
+                    $stmt = $db->prepare("UPDATE $typeuser SET photo = ? WHERE id=?");
+                    $stmt->bind_param("ss", $_FILES["pic"]["name"], $userinfo["iduser"]);
+                    executestmt($stmt);
                 }
             }
         }
         else {
             $pic_error = "Foto: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
         }
-        // Vid upload
+    }
+
+    // Vid upload
+    if (in_array("video", $remain)) {
         if(isset($_FILES['vid'])){
             $tmpFilePath = $_FILES['vid']['tmp_name'];
             if($tmpFilePath != ""){
@@ -89,6 +115,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     $vidname = basename($vidPath);
                     move_uploaded_file($tmpFilePath, $vidPath);
+                    $stmt = $db->prepare("UPDATE $typeuser SET video = ? WHERE id=?");
+                    $stmt->bind_param("ss", $_FILES["vid"]["name"], $userinfo["iduser"]);
+                    executestmt($stmt);
                 }
             }
         }
@@ -96,26 +125,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $vid_error = "Video: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
         }
     }
-    // Inject to DB
-    if (empty($vid_error) && empty($pic_error) && empty($general_error)){
-        $qoute = ($_POST["quote"]) ? nl2br(htmlspecialchars($_POST["quote"])) : null;
-        // Create row with user data, nl2br is used to follow line breaks.
-        if ($userinfo["typeuser"] == "P"){
-            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, photo, video, link, quote, subject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssissssss",
-            $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute, $userinfo["subject"]);
-        }
-        else{
-            $stmt = $conn->prepare("INSERT INTO $typeuser (id, fullname, schoolid, schoolyear, photo, video, link, quote) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssisssss", $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $picname, $vidname, $_POST["link"], $qoute);
-        }
-        if ($stmt->execute() !== true) {
-            die("Error inserting user data: " . $conn->error);
-        }
-        $stmt->close();
-        header("Location: finish.html");
-        exit;
+
+    if (in_array("link", $remain)) {
+        $link = $_POST["link"];
+        $stmt = $db->prepare("UPDATE $typeuser SET link = ? WHERE id=?");
+        $stmt->bind_param("ss", $link, $userinfo["iduser"]);
+        executestmt($stmt);
     }
+
+    if (in_array("quote", $remain)) {
+        if (strlen($_POST["quote"]) > $max_characters) {
+            $general_error = "Has excedido la máxima cantidad de caracteres";
+        }
+        else {
+            $quote = nl2br(htmlspecialchars($_POST["quote"]));
+            $stmt = $db->prepare("UPDATE $typeuser SET quote = ? WHERE id=?");
+            $stmt->bind_param("ss", $quote, $userinfo["iduser"]);
+            executestmt($stmt);
+        }
+    }
+    // Reset reason to NULL
+    $stmt = $db->prepare("UPDATE $typeuser SET reason = NULL WHERE id=?");
+    $stmt->bind_param("s", $userinfo["iduser"]);
+    executestmt($stmt);
+
+    header("Location: finish.html");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -128,6 +163,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+        <script>
+            const remain = <?php echo(json_encode($remain));?>;
+        </script>
     </head>
 
     <body>
@@ -147,12 +185,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
         </section>
-        <?php include("../helpers/navbar/navbar.php"); ?>
         <section id="upload" class="section">
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
                 <div class="container has-text-centered">
-                    <div class="field">
-                        <p class="title">Subir</p>
+                    <p class="title">Subir</p>
+                    <div id="photo" class="field animate__animated animate__fadeIn is-hidden">
                         <div id="pic-file" class="file has-name is-centered">
                             <label class="file-label">
                                 <input class="file-input" type="file" name="pic" accept="image/gif,image/png,image/jpeg" multiple="multiple">
@@ -170,7 +207,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </label>
                         </div>
                     </div>
-                    <div class="field">
+                    <div id="video" class="field animate__animated animate__fadeIn is-hidden">
                         <div id="vid-file" class="file has-name is-centered">
                             <label class="file-label">
                                 <input class="file-input" type="file" name="vid" accept="video/mp4,video/webm" multiple="multiple">
@@ -188,13 +225,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </label>
                         </div>
                     </div>
-                    <div class="field">
+                    <div id="link" class="field animate__animated animate__fadeIn is-hidden">
                         <label class="label">(Opcional) Enlace</label>
                         <div class="control">
                             <input name="link" class="input" type="text" placeholder="https://github.com/pablouser1/IberbookEdu">
                         </div>
                     </div>
-                    <div class="field">
+                    <div id="quote" class="field animate__animated animate__fadeIn is-hidden">
                         <label class="label">(Opcional) Cita - Máximo 100 caracteres</label>
                         <div class="control">
                             <textarea id="quote" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="100"></textarea>
@@ -244,7 +281,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </form>
         </section>
-        <script src="../helpers/navbar/navbar.js"></script>
         <script src="../assets/scripts/users/upload.js"></script>
     </body>
 </html>

@@ -1,3 +1,7 @@
+remain.forEach(item => {
+  document.getElementById(item).classList.remove("is-hidden")
+})
+
 const picInput = document.querySelector('#pic-file input[type=file]');
 picInput.onchange = () => {
   if (picInput.files.length > 0) {

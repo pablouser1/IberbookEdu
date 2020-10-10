@@ -38,8 +38,9 @@ Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes com
 
 # TODO
 
-* Agregar soporte para Formación Profesional
+* Agregar soporte para Formación Profesional (CED API)
 * API local
+* Fix, los profesores solo pueden estar una vez
 
 # Credits
 

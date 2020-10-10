@@ -8,6 +8,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     header("Location: ../login.php");
     exit;
 }
+$userinfo = $_SESSION["userinfo"];
+$db = new DB;
 
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 
@@ -26,7 +28,6 @@ function delete_files($target) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $userinfo = $_SESSION["userinfo"];
     $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/";
     $gallery_dir = 'gallery/';
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
@@ -34,10 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // The user wants to overwrite data
     if(isset($_POST["overwrite"])){
-        $stmt = $conn->prepare("DELETE FROM gallery WHERE schoolid=? AND schoolyear=?");
+        $stmt = $db->prepare("DELETE FROM gallery WHERE schoolid=? AND schoolyear=?");
         $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
         if ($stmt->execute() !== TRUE) {
-            die("Error deleting gallery data: " . $conn->error);
+            die("Error eliminando foto");
         }
         delete_files($uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/gallery/");
     }
@@ -85,13 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Insert to DB
     // Create row with user data
     if (isset($videos) || isset($pictures)) {
-        $stmt = $conn->prepare("insert ignore into gallery(name, schoolid, schoolyear, description, type) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $db->prepare("insert ignore into gallery(name, schoolid, schoolyear, description, type) VALUES (?, ?, ?, ?, ?)");
 
         if (isset($pictures)) {
             foreach ($pictures as $pic) {
                 $stmt->bind_param("sisss", $pic["path"], $userinfo["idcentro"], $userinfo["yearuser"], $pic["description"], $pic["type"]);
                 if ($stmt->execute() !== TRUE) {
-                    die("Error inserting pic data: " . $conn->error);
+                    die("Error subiendo foto");
                 }
             }
         }
@@ -100,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             foreach ($videos as $video) {
                 $stmt->bind_param("sisss", $video["path"], $userinfo["idcentro"], $userinfo["yearuser"], $video["description"], $video["type"]);
                 if ($stmt->execute() !== TRUE) {
-                    die("Error inserting vid data: " . $conn->error);
+                    die("Error subiendo vídeo");
                 }
             }
         }

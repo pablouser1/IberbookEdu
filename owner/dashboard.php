@@ -177,8 +177,9 @@ require_once("getschools.php");
                     <p>Limpia la carpeta de subida</p>
                     <p>
                         <span class="has-background-danger"><strong>ADVERTENCIA</strong></span>,
-                        esta función elimina todos los datos subidos por los usuarios en la carpeta de subidas.
-                        <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span><br>
+                        esta función elimina todos los datos subidos por los usuarios.
+                        Esta acción no borra las orlas ya generadas.
+                        <span class="has-background-danger"><u>ESTA ACCIÓN ES IRREVERSIBLE</u></span>
                     </p>
                     <div class="field">
                         <label class="label">Código del centro</label>

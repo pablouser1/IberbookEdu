@@ -65,6 +65,7 @@ else {
 
 // User info
 $userinfo = $_SESSION["userinfo"];
+$db = new DB;
 // Used later for directories without spaces
 $yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 
@@ -81,7 +82,7 @@ if(!is_dir($baseurl)) {
 }
 
 // Teachers
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
+$stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -104,7 +105,7 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 // Students
-$stmt = $conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
+$stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -133,7 +134,7 @@ if ( (count($students) || count($teachers)) == 0 ) {
 }
 
 // Gallery
-$stmt = $conn->prepare("SELECT name, description, type FROM gallery WHERE schoolid=? AND schoolyear=?");
+$stmt = $db->prepare("SELECT name, description, type FROM gallery WHERE schoolid=? AND schoolyear=?");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -150,7 +151,7 @@ $stmt->close();
 
 // Get school info
 $schoolurl = null;
-$stmt = $conn->prepare("SELECT url FROM schools WHERE id=?");
+$stmt = $db->prepare("SELECT url FROM schools WHERE id=?");
 $stmt->bind_param("i", $userinfo["idcentro"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -282,7 +283,7 @@ $zip_name = "yearbook_".$date_file.'.zip';
 HZip::zipDir($baseurl, $baseurl."/".$zip_name);
 
 // Writes data to DB
-$stmt = $conn->prepare("INSERT INTO yearbooks(schoolid, schoolname, schoolyear, zipname, acyear) VALUES(?, ?, ?, ?, ?)");
+$stmt = $db->prepare("INSERT INTO yearbooks(schoolid, schoolname, schoolyear, zipname, acyear) VALUES(?, ?, ?, ?, ?)");
 $stmt->bind_param("issss", $userinfo["idcentro"], $userinfo["namecentro"], $userinfo["yearuser"], $zip_name, $acyear);
 if ($stmt->execute() !== true) {
     $response = [

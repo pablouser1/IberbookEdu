@@ -30,6 +30,7 @@ if (isset($_GET["select_curso"], $_GET["schoolid"])){
 
   // If everything is OK, continue
   if(count($valid) === 2){
+    $group = "2º BCT C";
     $userinfo = array(
       "iduser" => $teacherinfo["iduser"],
       "nameuser" => $teacherinfo["nameuser"],
@@ -41,6 +42,8 @@ if (isset($_GET["select_curso"], $_GET["schoolid"])){
       "namecentro" => $schoolname
     );
     $_SESSION["userinfo"] = $userinfo;
+    // Create profile
+    require_once("../helpers/createprofile.php");
     header("Location: ../index.php");
     exit;
   }

@@ -6,7 +6,7 @@ if (!isset($_SESSION["owner"])){
 }
 require_once("../helpers/db.php");
 require_once("../helpers/config.php");
-
+$db = new DB;
 function recursiveRemoveDirectory($directory)
 {
     foreach(glob("{$directory}/*") as $file)
@@ -22,17 +22,17 @@ function recursiveRemoveDirectory($directory)
 
 function cleardb($tables) {
     foreach ($tables as $table) {
-        $stmt = $conn->prepare("DELETE FROM $dir WHERE schoolid=?");
+        $stmt = $db->prepare("DELETE FROM $dir WHERE schoolid=?");
         $stmt->bind_param("i", $_POST["id"]);
         if ($stmt->execute() !== true) {
-            die("Error deleting data: " . $conn->error);
+            die("Error al intentar eliminar la base de datos");
         }
         $stmt->close();
     }
 }
 if (isset($_POST["id"], $_POST["clear"])){
     // Check first if id exists
-    $stmt = $conn->prepare("SELECT id FROM schools WHERE id=?");
+    $stmt = $db->prepare("SELECT id FROM schools WHERE id=?");
     $stmt->bind_param("i", $_POST["id"]);
     $stmt->execute();
     $stmt->store_result();

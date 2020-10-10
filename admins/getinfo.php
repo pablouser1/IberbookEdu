@@ -3,15 +3,15 @@
 require_once("../helpers/db/db.php");
 class DBInfo {
     private $userinfo = array();
-    private $conn;
+    private $db;
     function __construct($data) {
         $this->userinfo = $data;
-        $this->conn = $GLOBALS["conn"];
+        $this->db = new DB;
     }
 
-    function teachers() {
+    public function teachers() {
         // Teachers
-        $stmt = $this->conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
+        $stmt = $this->db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
         $stmt->bind_param("is", $this->userinfo["idcentro"], $this->userinfo["yearuser"]);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -31,9 +31,9 @@ class DBInfo {
         return $teachers;
     }
 
-    function students() {
+    public function students() {
         // Students
-        $stmt = $this->conn->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students where schoolid=? and schoolyear=? ORDER BY fullname");
+        $stmt = $this->db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students where schoolid=? and schoolyear=? ORDER BY fullname");
         $stmt->bind_param("is", $this->userinfo["idcentro"], $this->userinfo["yearuser"]);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -52,9 +52,9 @@ class DBInfo {
         return $students;
     }
 
-    function gallery() {
+    public function gallery() {
         // Gallery
-        $stmt = $this->conn->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
+        $stmt = $this->db->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
         $stmt->bind_param("is", $this->userinfo["idcentro"], $this->userinfo["yearuser"]);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -68,6 +68,26 @@ class DBInfo {
         }
         $stmt->close();
         return $gallery;
+    }
+
+    public function yearbook() {
+        $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+        $yearbook = [];
+        // Check if admin generated yearbook before
+        $stmt = $this->db->prepare("SELECT DATE_FORMAT(generated, '%d/%m/%Y %H:%i') FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
+        $stmt->bind_param("iss", $this->userinfo["idcentro"], $this->userinfo["yearuser"], $acyear);
+        $stmt->execute();
+        $stmt->store_result();
+        $stmt->bind_result($generated);
+        if ($stmt->num_rows == 1) {
+            if(($result = $stmt->fetch()) == true){
+                $yearbook = array(
+                    "available" => true,
+                    "date" => $generated
+                );
+            }
+        }
+        return $yearbook;
     }
 }
 ?>

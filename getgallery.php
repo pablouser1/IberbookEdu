@@ -8,8 +8,8 @@ if (!isset($_SESSION["loggedin"])){
     exit;
 }
 $userinfo = $_SESSION["userinfo"];
-
-$stmt = $conn->prepare("SELECT name, id FROM gallery where id=? and schoolid=? and schoolyear=?");
+$db = new DB;
+$stmt = $db->prepare("SELECT name, id FROM gallery where id=? and schoolid=? and schoolyear=?");
 $stmt->bind_param("sis", $_GET["id"], $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $stmt->store_result();

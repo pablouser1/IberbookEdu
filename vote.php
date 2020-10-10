@@ -23,10 +23,10 @@ if (!isset($_SESSION["loggedin"])){
     ];
     sendJSON($response);
 }
-
-$userinfo = $_SESSION["userinfo"];
 require_once("helpers/db/db.php");
 
+$userinfo = $_SESSION["userinfo"];
+$db = new DB;
 // Add votes
 if (isset($_GET["id"])) {
     $ybexist = false;
@@ -38,7 +38,7 @@ if (isset($_GET["id"])) {
         $typeuser = "students";
     }
     // Get yearbook info
-    $stmt = $conn->prepare("SELECT schoolid, schoolyear FROM yearbooks WHERE id=?");
+    $stmt = $db->prepare("SELECT schoolid, schoolyear FROM yearbooks WHERE id=?");
     $stmt->bind_param("i", $_GET["id"]);
     if ($stmt->execute() !== true) DBError();
     $result = $stmt->get_result();
@@ -64,7 +64,7 @@ if (isset($_GET["id"])) {
     if (!empty($value)) $ybexist = true;
     
     // Get user yearbook voted id
-    $stmt = $conn->prepare("SELECT voted FROM $typeuser WHERE id=?");
+    $stmt = $db->prepare("SELECT voted FROM $typeuser WHERE id=?");
     $stmt->bind_param("s", $userinfo["iduser"]);
     if ($stmt->execute() !== true) DBError();
     $result = $stmt->get_result();
@@ -74,10 +74,10 @@ if (isset($_GET["id"])) {
 
     // Allow voting if user voted a yearbook that has been deleted
     if (!$ybexist) {
-        $stmt = $conn->prepare("UPDATE $typeuser SET voted =? WHERE id=?");
+        $stmt = $db->prepare("UPDATE $typeuser SET voted =? WHERE id=?");
     }
     else {
-        $stmt = $conn->prepare("UPDATE $typeuser SET voted =? WHERE id=? AND voted IS NULL");
+        $stmt = $db->prepare("UPDATE $typeuser SET voted =? WHERE id=? AND voted IS NULL");
     }
     
     $stmt->bind_param("is", $_GET["id"], $userinfo["iduser"]);
@@ -92,7 +92,7 @@ if (isset($_GET["id"])) {
     $stmt->close();
     
     // Update yearbook data with one more vote
-    $stmt = $conn->prepare("UPDATE yearbooks SET voted = voted + 1 WHERE id=?");
+    $stmt = $db->prepare("UPDATE yearbooks SET voted = voted + 1 WHERE id=?");
     $stmt->bind_param("i", $_GET["id"]);
     if ($stmt->execute() !== true) DBError();
     $stmt->close();

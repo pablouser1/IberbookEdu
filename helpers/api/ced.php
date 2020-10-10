@@ -1,10 +1,10 @@
 <?php
 require_once(__DIR__. "/../config.php");
 require_once(__DIR__. "/../requests.php");
-
 class Api {
     // -- Initial vars -- //
     private $req;
+    private $db;
     private $base_url;
     public $type;
     private $cookies;
@@ -14,6 +14,8 @@ class Api {
         // Class from requests.php
         $req = new req();
         $this->req = $req;
+        $db = new DB();
+        $this->db = $db;
     }
     // https://stackoverflow.com/a/10514539, eliminates duplicates in array
     function super_unique($array,$key)
@@ -46,14 +48,15 @@ class Api {
     // Login user
     function login($username, $password, $type){
         // Initial config
+        $useragent = "IberbookEdu Testing";
         $this->settype($type);
-
         $data = array('p' => '{"version":"11.10.0"}', 'USUARIO' => $username, 'CLAVE' => $password);
         // Options
         $url = "{$this->base_url}/login";
         $initial_options = array(
             CURLOPT_URL => $url,
             CURLOPT_HEADER => true,
+            CURLOPT_USERAGENT => $useragent,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($data),
             CURLOPT_RETURNTRANSFER => true,
@@ -79,7 +82,7 @@ class Api {
         if ($result["ESTADO"]["CODIGO"] != "C"){
             return array(
                 "code" => $result["ESTADO"]["CODIGO"],
-                "description" => $result["ESTADO"]["DESCRIPCION"]
+                "error" => $result["ESTADO"]["DESCRIPCION"]
             );
         }
         // Get cookies
@@ -92,7 +95,7 @@ class Api {
 
         return [
             "code" => $result["ESTADO"]["CODIGO"],
-            "description" => null
+            "error" => null
         ];
     }
 
@@ -133,7 +136,7 @@ class Api {
                     $datacentro = array("X_CENTRO" => $child["MATRICULAS"][0]["X_CENTRO"]);
                     $infocentro = $this->getcentrostudent($datacentro);
                     $sql = "SELECT `id` FROM `schools` WHERE id=$infocentro[idcentro]";
-                    $result = $GLOBALS["conn"]->query($sql);
+                    $result = $this->db->query($sql);
                     // If student is allowed, include him in array
                     if ($result !== false && $result->num_rows == 1 && preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $child["MATRICULAS"][0]["UNIDAD"])) {
                         // Merge child info with school info
@@ -150,7 +153,7 @@ class Api {
             case 'teachers':
                 $idteacher = $this->getidteacher();
                 // Only one school
-                if (count($info["RESULTADO"][0]["CENTROS"]) === 1 || !isset($info["RESULTADO"][0]["CENTROS"])) {
+                if (!isset($info["RESULTADO"][0]["CENTROS"])) {
                     $schoolid = $info["RESULTADO"][0]["C_CODIGO"];
                     $finalschools[$schoolid] = $this->getallteacher($info["RESULTADO"][0]);
                 }
@@ -158,7 +161,8 @@ class Api {
                 else {
                     foreach($info["RESULTADO"][0]["CENTROS"] as $centro) {
                         $schoolid = $centro["C_CODIGO"];
-                        $data = ["X_CENTRO" => $centro["X_CENTRO"]];
+                        $data = ["X_CENTRO" => $centro["X_CENTRO"], "C_PERFIL" => "P"];
+                        // Get school info
                         $this->changeschoolteachers($data);
                         $finalschools[$schoolid] = $this->getallteacher($centro);
                     }
@@ -202,7 +206,7 @@ class Api {
     
     function getallteacher($centro) {
         // Set array with only allowed schools
-        $stmt = $GLOBALS["conn"]->prepare("SELECT id FROM schools WHERE id=?");
+        $stmt = $this->db->prepare("SELECT id FROM schools WHERE id=?");
         $stmt->bind_param("i", $centro["C_CODIGO"]);
         $stmt->execute();
         $stmt->store_result();

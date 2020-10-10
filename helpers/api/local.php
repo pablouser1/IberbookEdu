@@ -3,19 +3,19 @@
 require_once(__DIR__. "/../config.php");
 require_once(__DIR__. "/../db/db.php");
 class Api {
-    private $conn;
+    private $db;
     private $type;
     private $userid;
 
     function __construct() {
         // Class from requests.php
-        $this->conn = $GLOBALS["conn"];
+        $this->db = new DB;
     }
 
     function login($username, $password, $type) {
         // Prepare a select statement
         $sql = "SELECT id, password FROM users WHERE username = ?";
-        if($stmt = mysqli_prepare($this->conn, $sql)){
+        if($stmt = $this->db->prepare($sql)){
             // Bind variables to the prepared statement as parameters
             mysqli_stmt_bind_param($stmt, "s", $param_username);
             // Set parameters
@@ -61,7 +61,7 @@ class Api {
     }
 
     function getinfo() {
-        $stmt = $this->conn->prepare("SELECT `id`, `fullname`, `type`, `schoolid`, `group` FROM users WHERE id=?");
+        $stmt = $this->db->prepare("SELECT `id`, `fullname`, `type`, `schoolid`, `group` FROM users WHERE id=?");
         $stmt->bind_param("i", $this->userid);
         $stmt->execute();
         $result = $stmt->get_result();

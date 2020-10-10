@@ -9,6 +9,7 @@ if (!isset($_SESSION["loggedin"])){
 }
 
 $userinfo = $_SESSION["userinfo"];
+$db = new DB;
 switch($_GET["type"]) {
     case "ALU":
         $type = "students";
@@ -29,7 +30,7 @@ switch ($_GET["media"]) {
         die("Ese tipo de archivo no existe");
 }
 
-$stmt = $conn->prepare("SELECT $media, id FROM $type where id=?");
+$stmt = $db->prepare("SELECT $media, id FROM $type where id=?");
 $stmt->bind_param("s", $_GET["id"]);
 $stmt->execute();
 $stmt->store_result();

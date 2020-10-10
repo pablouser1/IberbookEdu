@@ -4,9 +4,9 @@ if (!isset($_SESSION, $_SESSION["owner"])){
     exit;
 }
 require_once("../helpers/db/db.php");
-
+$db = new DB;
 // Get all schools
-$stmt = $conn->prepare("SELECT id, url FROM schools");
+$stmt = $db->prepare("SELECT id, url FROM schools");
 $stmt->execute();
 $result = $stmt->get_result();
 $schools = [];

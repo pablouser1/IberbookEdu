@@ -2,11 +2,11 @@
 session_start();
 require_once("helpers/db/db.php");
 require_once("helpers/config.php");
-
+$db = new DB;
 $yearbooks = array();
 $leaderboards = array();
 $sql = "SELECT id, schoolid, schoolname, schoolyear, zipname, acyear, voted FROM yearbooks ORDER BY schoolyear ASC";
-$result = $conn->query($sql);
+$result = $db->query($sql);
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
@@ -21,7 +21,7 @@ if ($result->num_rows > 0) {
         ];
     }
     $sql = "SELECT id, schoolid, schoolname, schoolyear, acyear, voted FROM yearbooks ORDER BY voted DESC LIMIT 5";
-    $result = $conn->query($sql);
+    $result = $db->query($sql);
     while($row = $result->fetch_assoc()) {
         $yearuser = str_replace(' ', '', $row["schoolyear"]);
         $leaderboards[] = [
@@ -42,14 +42,13 @@ if (isset($_SESSION["loggedin"])) {
     else {
         $typeuser = "students";
     }
-    $stmt = $conn->prepare("SELECT voted FROM $typeuser WHERE id=?");
+    $stmt = $db->prepare("SELECT voted FROM $typeuser WHERE id=?");
     $stmt->bind_param("s", $userinfo["iduser"]);
     $stmt->execute();
     $stmt->bind_result($votedid);
     $stmt->fetch();
+    $stmt->close();
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
