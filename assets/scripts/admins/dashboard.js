@@ -9,7 +9,7 @@ Vue.component('teachers', {
             <span>Profesores</span>
         </p>
         <p class="subtitle">Total: {{ teachers.length }}</p>
-        <div v-if="!teachers">
+        <div v-if="Object.keys(teachers).length === 0">
             <p>No hay profesores disponibles</p>
         </div>
         <div v-else class="table-container">
@@ -21,7 +21,7 @@ Vue.component('teachers', {
                         <th>Vídeo</th>
                         <th>Enlace</th>
                         <th>Cita</th>
-                        <th>Fecha de subida</th>
+                        <th>Última modificación</th>
                         <th>Asignatura</th>
                     </tr>
                 </thead>
@@ -59,7 +59,7 @@ Vue.component('students', {
             <span>Alumnos</span>
         </p>
         <p class="subtitle">Total: {{ students.length }}</p>
-        <div v-if="!students">
+        <div v-if="Object.keys(students).length === 0">
             <p>No hay alumnos disponibles</p>
         </div>
         <div v-else class="table-container">
@@ -71,7 +71,7 @@ Vue.component('students', {
                         <th>Vídeo</th>
                         <th>Enlace</th>
                         <th>Cita</th>
-                        <th>Fecha de subida</th>
+                        <th>Última modificación</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -193,7 +193,6 @@ Vue.component('edit', {
             .then((json_res) => {
                 if (json_res.code == "C") {
                     alert("Datos eliminados con éxito")
-                    window.location.reload()
                 }
                 else {
                     alert(json_res.description)
@@ -248,7 +247,8 @@ Vue.component('gallery', {
 Vue.component('yearbook', {
     data() {
         return {
-            generating: false
+            generating: false,
+            params: ""
         }
     },
     props: ["yearbook"],
@@ -259,7 +259,7 @@ Vue.component('yearbook', {
             <h1 class='title'>Yearbook</h1>
             <p class='subtitle'>Generado el {{ yearbook.date }}
             <div class='buttons'>
-                <a href='../yearbooks.php' target='_blank' class='button is-primary'>
+                <a :href="'../yearbooks.php' + params" target='_blank' class='button is-primary'>
                     <span class='icon'>
                         <i class='fas fa-eye'></i>
                     </span>
@@ -297,12 +297,6 @@ Vue.component('yearbook', {
                     </span>
                     <span>Generar Yearbook</span>
                 </button>
-                <a class="button is-info" href="gallery.php">
-                    <span class="icon">
-                        <i class="fas fa-photo-video"></i>
-                    </span>
-                    <span>Modificar galería</span>
-                </a>
             </div>
         </div>
     </div>
@@ -312,16 +306,16 @@ Vue.component('yearbook', {
         generateYearbook: function() {
             // Set loading
             this.generating = true
+            document.body.style.cursor = "progress";
+            // Get theme
             let theme_select = document.getElementById("theme_selector")
             let theme = theme_select.options[theme_select.selectedIndex].text;
-            let banner = document.getElementById("banner").files[0]
+            // Set POST data
             let data = new FormData()
             if (theme === "default") {
+                let banner = document.getElementById("banner").files[0]
                 data.append('banner', banner)
             }
-
-            genyearbook.classList.add("is-loading")
-            document.body.style.cursor = "progress"; 
             // Send id and action to do
             fetch(`yearbook/generate.php?theme=${theme}`, {
                 method: "POST",
@@ -342,6 +336,12 @@ Vue.component('yearbook', {
             })
         }
     },
+    mounted() {
+        if (this.yearbook.available) {
+            // Set GET params, so when the user clicks, gets redirected to the group's yearbook
+            this.params = `?schoolid=${this.yearbook.schoolid}&acyear=${this.yearbook.acyear}&group=${this.yearbook.schoolyear}`
+        }
+    }
 })
 
 // Root instance

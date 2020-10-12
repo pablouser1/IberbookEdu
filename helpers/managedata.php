@@ -33,7 +33,12 @@ if ($_SESSION["loggedin"] !== "admin") {
 }
 else {
     if ($_POST["type"] == ("students" || "teachers")) {
-        $reason = htmlspecialchars($_POST["reason"]);
+        if (isset($_POST["reason"])) {
+            $reason = htmlspecialchars($_POST["reason"]);
+        }
+        else {
+            $reason = null;
+        }
     }
     else {
         $response = [
@@ -69,8 +74,9 @@ if (isset($_POST["items"])) {
             $stmt->close();
         }
         // Base de datos
-        $stmt = $db->prepare("UPDATE $typeuser SET ? = NULL WHERE id=?");
-        $stmt->bind_param("ss", $item, $userid);
+        // POSIBLE SQL INJECTION
+        $stmt = $db->prepare("UPDATE $typeuser SET $item = NULL WHERE id=?");
+        $stmt->bind_param("s", $userid);
         if ($stmt->execute() !== true) {
             $response = [
                 "code" => "E",

@@ -7,13 +7,10 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
     exit;
 }
 
-require_once("../helpers/db/db.php");
-require_once("../helpers/config.php");
-require_once("yearbook/themes.php");
-
 $userinfo = $_SESSION["userinfo"];
 
-require_once("getinfo.php");
+require_once("../helpers/getinfo.php");
+require_once("yearbook/themes.php");
 
 $DBInfo = new DBInfo($userinfo);
 // Get teachers
@@ -75,6 +72,7 @@ $yearbook["themes"] = $themes;
         </ul>
     </div>
     <section id="main" class="section">
+        <noscript>Esta página necesita Javascript para funcionar</noscript>
         <!-- Teachers -->
         <teachers v-bind:teachers="teachers"></teachers>
         <!-- Students -->
@@ -83,42 +81,6 @@ $yearbook["themes"] = $themes;
         <gallery v-bind:gallery="gallery"></gallery>
         <!-- Yearbook -->
         <yearbook v-bind:yearbook="yearbook"></yearbook>
-    </section>
-    <section class="section <?php if(isset($yearbook)) echo("is-hidden");?>">
-        <p class="title">Administrar yearbook</p>
-        <div class="field">
-            <label class="label">Plantilla</label>
-            <div class="control">
-                <div class="select">
-                    <select id="theme_selector">
-                        <?php
-                        foreach ($themes as $theme) {
-                            echo("<option>$theme</option>");
-                        }
-                        ?>
-                    </select>
-                </div>
-            </div>
-            <label class="label">Banner</label>
-            <div class="control">
-                <input id="banner" type="file" name="banner" accept="image/jpeg, image/png, image/gif">
-            </div>
-            <p class="help">Sólo se aceptan jpg, png y gif de máximo 5MB</p>
-        </div>
-        <div class="buttons">
-            <button id="genyearbook" class="button is-success">
-                <span class="icon">
-                    <i class="fas fa-check"></i>
-                </span>
-                <span>Generar Yearbook</span>
-            </button>
-            <a class="button is-info" href="gallery.php">
-                <span class="icon">
-                    <i class="fas fa-photo-video"></i>
-                </span>
-                <span>Modificar galería</span>
-            </a>
-        </div>
     </section>
     <footer class="footer">
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">

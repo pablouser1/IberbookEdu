@@ -30,7 +30,6 @@ if (isset($_GET["select_curso"], $_GET["schoolid"])){
 
   // If everything is OK, continue
   if(count($valid) === 2){
-    $group = "2º BCT C";
     $userinfo = array(
       "iduser" => $teacherinfo["iduser"],
       "nameuser" => $teacherinfo["nameuser"],
@@ -41,14 +40,17 @@ if (isset($_GET["select_curso"], $_GET["schoolid"])){
       "idcentro" => $_GET["schoolid"],
       "namecentro" => $schoolname
     );
-    $_SESSION["userinfo"] = $userinfo;
-    // Create profile
+
     require_once("../helpers/createprofile.php");
+    // Create profile
+    $profile = createprofile($userinfo, "teachers");
+    $userinfo["id"] = $profile;
+    $_SESSION["userinfo"] = $userinfo;
     header("Location: ../index.php");
     exit;
   }
   else {
-    $error[] = "Ha habido un error al procesar tu solicitud";
+    $errors[] = "Ha habido un error al procesar tu solicitud";
   }
 }
 ?>
@@ -129,12 +131,12 @@ if (isset($_GET["select_curso"], $_GET["schoolid"])){
         ?>
       </div>
       <progress id="progress" class="progress is-primary is-hidden" max="100"></progress>
-      <div class="container <?php if(!isset($error)) echo("is-hidden");?>">
+      <div class="container <?php if(!isset($errors)) echo("is-hidden");?>">
         <div class="notification is-danger">
           <?php
-          if(isset($error)){
-            foreach ($error as $error_i) {
-              echo($error_i);
+          if(isset($errors)){
+            foreach ($errors as $error) {
+              echo($error);
             }
           }
           ?>

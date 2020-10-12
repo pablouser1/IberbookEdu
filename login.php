@@ -67,9 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     switch ($userinfo["typeuser"]){
                         case "ALU":
-                            $_SESSION["userinfo"] = $userinfo;
                             // Create profile
                             require_once("helpers/createprofile.php");
+                            // Get id from DB
+                            $profile = createprofile($userinfo, "students");
+                            $userinfo["id"] = $profile;
+                            // Set session
+                            $_SESSION["userinfo"] = $userinfo;
                             header("Location: index.php");
                             exit;
                         break;
@@ -80,7 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         break;
                         case "P":
                             $_SESSION["teacherinfo"] = $userinfo;
-                            $api->settype("students");
                             header("Location: profiles/teachers.php");
                             exit;
                         break;

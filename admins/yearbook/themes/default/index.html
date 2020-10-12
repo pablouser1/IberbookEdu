@@ -40,12 +40,12 @@
             </div>
         </section>
         <!-- Banner -->
-        <section id="banner" v-show="!splashscreen" class="hero is-fullheight has-background animate__animated animate__bounceIn">
+        <section id="banner" v-show="!splashscreen" class="hero is-fullheight has-background animate__animated animate__fadeIn animate__fast">
             <img v-if="ybinfo.banner !== null" class="hero-background" :src="'assets/' + ybinfo.banner"/>
             <div class="hero-body">
                 <div class="columns is-mobile is-centered">
                     <div class="column is-narrow">
-                        <div class="box has-text-centered animate__animated animate__lightSpeedInLeft">
+                        <div class="box has-text-centered animate__animated animate__zoomIn">
                             <p class="title has-text-black">
                                 <i class="fas fa-graduation-cap"></i>
                                 <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>

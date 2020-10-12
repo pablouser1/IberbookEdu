@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 CURLOPT_SSL_VERIFYPEER => true
             );';
         break;
-        case "logal":
+        case "local":
             $login = "local";
         break;
         default:
@@ -70,7 +70,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Creating tables
     // Students
     $sql = "CREATE TABLE students(
-        id int(8) not null UNIQUE,
+        id INT NOT NULL AUTO_INCREMENT,
+        userid varchar(9) not null,
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
@@ -78,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         video varchar(255),
         link varchar(255),
         quote varchar(280),
-        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         voted int,
         reason varchar(255),
         primary key(id)
@@ -89,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Teachers
     $sql = "CREATE TABLE teachers(
-        id varchar(9) not null,
+        id INT NOT NULL AUTO_INCREMENT,
+        userid varchar(9) not null,
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
@@ -97,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         video varchar(255),
         link varchar(255),
         quote varchar(280),
-        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         `subject` varchar(24) not null,
         voted int,
         reason varchar(255),

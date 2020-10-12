@@ -1,3 +1,4 @@
+// Show only items that haven't been uploaded yet
 remain.forEach(item => {
   document.getElementById(item).classList.remove("is-hidden")
 })
@@ -17,7 +18,7 @@ vidInput.onchange = () => {
     fileName.textContent = vidInput.files[0].name;
   }
 }
-const quote =  document.getElementById("quote")
+const quote =  document.getElementById("quote_text")
 const max_characters = 100;
 document.getElementById("quote").addEventListener("input", () => {
   let remain_characters = max_characters - quote.value.length;

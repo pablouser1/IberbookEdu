@@ -1,50 +1,48 @@
 # IberbookEdu
 
-Genera orlas utilizando datos de las plataformas escolares:
+Generate yearbooks easily using info from local database or the following educational platforms:
 
-PASEN/SÉNECA (Andalucía)
+* PASEN/SÉNECA (Andalucía, Spain)
 
-ROBLE (Madrid) (Sin verificar su funcionamiento)
+* ROBLE (Madrid, Spain) (Sin verificar su funcionamiento)
 
 Este programa funciona para 2º de Bachillerato, 4º ESO y 6º Primaria (FP planeado)
 
-Todos los datos del usuario se extraen a partir de la información de los servidores de PASEN/SENECA o ROBLE.
-
 # Features
 
-* Orla Multilenguaje (solo español e inglés por el momento).
-* Funciona tanto en escritorio como en teléfonos.
-* Genera un ZIP preparado para extraer y colocar en cualquier parte.
-* Acepta agregar tanto profesores como alumnos.
-  * Pueden añadir una foto y un vídeo
-  * Además pueden agregar opcionalmente un enlace y un texto de 100 caracteres máximo.
-  * También los tutores legales pueden subir la foto y el vídeo de sus hijos
-* Galería general, puedes subir fotos del grupo aquí.
-* Gestión de cuentas:
-  * Usuario: Puede subir y administrar sus datos
-  * Administrador: Puede administrar los datos de su curso
-  * Dueño: Puede agregar/eliminar administradores y dueños, además de cambiar los centros admitidos
-* Sistema público para ver orlas ya generadas
-* Sistema de votación de orlas
+* Multilanguage yearbook (english, spanish, french).
+* Works both in mobile phones and desktop.
+* Generates a ZIP ready to be downloaded by the users.
+* Accepts both teachers and students
+  * They can add a photo and a video
+  * Optionally, they can also add a link and a quote.
+* General gallery
+* Account administration:
+  * Users: They can upload and administrate their own data.
+  * Administrators: They can administrate their group's data.
+  * Owner: Can change some options of the instance, like the schools allowed.
+* Public yearbooks, ready to be seen by anyone
+* Voting system
 
 # Installation
 
-Necesitas los siguientes programas para poder hacer funcionar IberBookEdu:
-* PHP5.5 (PHP7 recomendado)
-* Extensiones php-mysqli, php-zip, php-curl
-* Servidor de bases de datos MySQL / MariaDB
+You will need the following programs to make IberBookEdu work:
+* PHP5.5 (PHP7 recommended)
+* Extensions: php-mysqli, php-zip, php-curl
+* Database server MySQL / MariaDB
 
-Cuando hayas instalado todo y hayas copiado el proyecto a tu servidor puedes comenzar con la instalación inicial encontrada en el archivo setup.php
+Once you finished installing everything and you had already copied the project to your server you can start the installation starting the script named "setup.php"
 
 # TODO
 
 * Agregar soporte para Formación Profesional (CED API)
-* API local
-* Fix, los profesores solo pueden estar una vez
+* Local API
+* Fix, better upload error handling
+* Maintenance mode
 
 # Credits
 
-Este proyecto no sería posible sin la ayuda de los siguientes proyectos:
+This project wouldn't be possible without the help of the following projects:
 
 * Bulma (https://bulma.io) | [LICENSE](https://github.com/jgthms/bulma/blob/master/LICENSE)
 * Vue.js (https://vuejs.org) | [LICENSE](https://github.com/vuejs/vuejs.org/blob/master/LICENSE)

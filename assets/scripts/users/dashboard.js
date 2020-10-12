@@ -1,5 +1,10 @@
 // Yearbook generated
 Vue.component('yearbook', {
+    data() {
+        return {
+            params: ""
+        }
+    },
     props: ["yearbook"],
     template:
     `
@@ -9,7 +14,7 @@ Vue.component('yearbook', {
                 <div class='container'>
                     <h1 class='title'>Tu yearbook está listo</h1>
                     <p class='subtitle'>
-                        <a href='../yearbooks.php' class='button is-success'>
+                        <a :href="'../yearbooks.php' + params" class='button is-success'>
                             <span class='icon'>
                                 <i class='fas fa-eye'></i>
                             </span>
@@ -21,7 +26,11 @@ Vue.component('yearbook', {
         </section>
         <hr>
     </div>
-    `
+    `,
+    mounted() {
+        // Set GET params, so when the user clicks, gets redirected to the group's yearbook
+        this.params = `?schoolid=${this.yearbook.schoolid}&acyear=${this.yearbook.acyear}&group=${this.yearbook.schoolyear}`
+    }
 })
 
 // Dashboard
@@ -66,7 +75,7 @@ Vue.component('dashboard', {
                         <th>Vídeo</th>
                         <th>Enlace</th>
                         <th>Cita</th>
-                        <th>Fecha de subida</th>
+                        <th>Última modificación</th>
                         <th v-if="user.type == 'P'">Asignatura</th>
                     </tr>
                 </thead>
@@ -171,7 +180,7 @@ Vue.component('dashboard', {
         else {
             this.type = "students"
         }
-    },
+    }
 })
 
 Vue.component('upload', {

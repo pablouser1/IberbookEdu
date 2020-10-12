@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__. "/../config.php");
-require_once(__DIR__. "/../requests.php");
+require_once(__DIR__. "/requests.php");
 class Api {
     // -- Initial vars -- //
     private $req;
@@ -12,10 +12,8 @@ class Api {
     // -- Base functions -- //
     function __construct() {
         // Class from requests.php
-        $req = new req();
-        $this->req = $req;
-        $db = new DB();
-        $this->db = $db;
+        $this->req = new req();
+        $this->db = new DB();
     }
     // https://stackoverflow.com/a/10514539, eliminates duplicates in array
     function super_unique($array,$key)
@@ -89,7 +87,7 @@ class Api {
         $cookies = "";
         preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $response, $matches);
         foreach($matches[1] as $item) {
-            $cookies .= "$item;";
+            $cookies .= "{$item};";
         }
         $this->req->setcookies($cookies);
 
@@ -155,16 +153,26 @@ class Api {
                 // Only one school
                 if (!isset($info["RESULTADO"][0]["CENTROS"])) {
                     $schoolid = $info["RESULTADO"][0]["C_CODIGO"];
-                    $finalschools[$schoolid] = $this->getallteacher($info["RESULTADO"][0]);
+                    $school = $this->getallteacher($info["RESULTADO"][0]);
+                    if ($school) {
+                        $finalschools[$schoolid] = $school;
+                    }
+                    else {
+                        $finalschools = [];
+                    }
                 }
                 // Multiple schools
                 else {
+                    $finalschools = [];
                     foreach($info["RESULTADO"][0]["CENTROS"] as $centro) {
                         $schoolid = $centro["C_CODIGO"];
                         $data = ["X_CENTRO" => $centro["X_CENTRO"], "C_PERFIL" => "P"];
                         // Get school info
                         $this->changeschoolteachers($data);
-                        $finalschools[$schoolid] = $this->getallteacher($centro);
+                        $school = $this->getallteacher($centro);
+                        if ($school) {
+                            $finalschools[$schoolid] = $school;
+                        }
                     }
                 }
 
@@ -219,15 +227,15 @@ class Api {
                     "id" => $centro["C_CODIGO"],
                 ];
             }
+            $stmt->close();
             // Set groups info
             if(empty($groups)){
-                $schoolinfo["groups"] = [];
+                return null;
             }
             else {
                 $schoolinfo["groups"] = $groups;
             }
         }
-        $stmt->close();
         return $schoolinfo;
     }
 

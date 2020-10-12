@@ -1,13 +1,8 @@
 <?php
 session_start();
-$enabled = true;
 if(!isset($_SESSION["loggedin"])){
     header("Location: ../login.php");
     exit;
-}
-
-if (!$enabled) {
-    die("El sistema de subida no está activo");
 }
 
 require_once("../helpers/db/db.php");
@@ -36,12 +31,11 @@ switch ($userinfo["typeuser"]) {
 
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 $max_characters = 100; // "Quote" max characters
-$pic_error = $vid_error = $general_error = "";
 
 // Get what user didn't upload yet
 $remain = [];
-$stmt = $db->prepare("SELECT photo, video, link, quote FROM $typeuser WHERE schoolid=? AND schoolyear=?");
-$stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
+$stmt = $db->prepare("SELECT photo, video, link, quote FROM $typeuser WHERE id=?");
+$stmt->bind_param("i", $userinfo["id"]);
 $stmt->execute();
 $result = $stmt->get_result();
 if ($result->num_rows == 1){
@@ -69,32 +63,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_vid = array('mp4', 'webm');
     // Upload directory
     $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$typeuser/";
-
     // Pic upload
     if (in_array("photo", $remain)) {
         if(isset($_FILES['pic'])){
             $tmpFilePath = $_FILES['pic']['tmp_name'];
             if($tmpFilePath != ""){
-                $picPath = $baseurl.$userinfo["iduser"]."/".$_FILES['pic']['name'];
+                $picPath = $baseurl.$userinfo["id"]."/".$_FILES['pic']['name'];
                 $ext = pathinfo($picPath, PATHINFO_EXTENSION);
                 // If the extension is not in the array create error message
                 if (!in_array($ext, $allowed_pic)) {
-                    $pic_error = "$ext no es un formato admitido.<br>";
+                    $errors[] = "$ext no es un formato admitido.<br>";
                 }
                 else{
-                    if (!is_dir($baseurl.$userinfo["iduser"])){
-                        mkdir($baseurl.$userinfo["iduser"], 0700, true);
+                    if (!is_dir($baseurl.$userinfo["id"])){
+                        mkdir($baseurl.$userinfo["id"], 0700, true);
                     }
                     $picname = basename($picPath);
                     move_uploaded_file($tmpFilePath, $picPath);
                     $stmt = $db->prepare("UPDATE $typeuser SET photo = ? WHERE id=?");
-                    $stmt->bind_param("ss", $_FILES["pic"]["name"], $userinfo["iduser"]);
+                    $stmt->bind_param("ss", $_FILES["pic"]["name"], $userinfo["id"]);
                     executestmt($stmt);
                 }
             }
         }
         else {
-            $pic_error = "Foto: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
+            $errors[] = "Foto: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
         }
     }
 
@@ -103,34 +96,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(isset($_FILES['vid'])){
             $tmpFilePath = $_FILES['vid']['tmp_name'];
             if($tmpFilePath != ""){
-                $vidPath = $baseurl.$userinfo["iduser"]."/".$_FILES['vid']['name'];
+                $vidPath = $baseurl.$userinfo["id"]."/".$_FILES['vid']['name'];
                 $ext = pathinfo($vidPath, PATHINFO_EXTENSION);
                 // If the extension is not in the array create error message
                 if (!in_array($ext, $allowed_vid)) {
-                    $vid_error = "$ext no es un formato admitido.<br>";
+                    $errors[] = "$ext no es un formato admitido.<br>";
                 }
                 else{
-                    if (!is_dir($baseurl.$userinfo["iduser"])){
-                        mkdir($baseurl.$userinfo["iduser"], 0700, true);
+                    if (!is_dir($baseurl.$userinfo["id"])){
+                        mkdir($baseurl.$userinfo["id"], 0700, true);
                     }
                     $vidname = basename($vidPath);
                     move_uploaded_file($tmpFilePath, $vidPath);
                     $stmt = $db->prepare("UPDATE $typeuser SET video = ? WHERE id=?");
-                    $stmt->bind_param("ss", $_FILES["vid"]["name"], $userinfo["iduser"]);
+                    $stmt->bind_param("ss", $_FILES["vid"]["name"], $userinfo["id"]);
                     executestmt($stmt);
                 }
             }
         }
         else {
-            $vid_error = "Video: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
+            $errors[] = "Video: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
         }
     }
 
     if (in_array("link", $remain)) {
         $link = $_POST["link"];
-        $stmt = $db->prepare("UPDATE $typeuser SET link = ? WHERE id=?");
-        $stmt->bind_param("ss", $link, $userinfo["iduser"]);
-        executestmt($stmt);
+        if (!filter_var($link, FILTER_VALIDATE_URL)) {
+            $errors[] = "Enlace no válido";
+        }
+        else {
+            $stmt = $db->prepare("UPDATE $typeuser SET link = ? WHERE id=?");
+            $stmt->bind_param("ss", $link, $userinfo["id"]);
+            executestmt($stmt);
+        }
     }
 
     if (in_array("quote", $remain)) {
@@ -140,17 +138,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         else {
             $quote = nl2br(htmlspecialchars($_POST["quote"]));
             $stmt = $db->prepare("UPDATE $typeuser SET quote = ? WHERE id=?");
-            $stmt->bind_param("ss", $quote, $userinfo["iduser"]);
+            $stmt->bind_param("ss", $quote, $userinfo["id"]);
             executestmt($stmt);
         }
     }
     // Reset reason to NULL
     $stmt = $db->prepare("UPDATE $typeuser SET reason = NULL WHERE id=?");
-    $stmt->bind_param("s", $userinfo["iduser"]);
+    $stmt->bind_param("s", $userinfo["id"]);
     executestmt($stmt);
-
-    header("Location: finish.html");
-    exit;
+    if (!isset($general_error, $pic_error, $vid_error)) {
+        header("Location: finish.html");
+        exit;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -234,7 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div id="quote" class="field animate__animated animate__fadeIn is-hidden">
                         <label class="label">(Opcional) Cita - Máximo 100 caracteres</label>
                         <div class="control">
-                            <textarea id="quote" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="100"></textarea>
+                            <textarea id="quote_text" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="100"></textarea>
                         </div>
                         <p>
                             <span id="remain_characters">100</span>
@@ -261,17 +260,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <progress id="upload_progress" class="progress is-primary is-hidden" max="100"></progress>
                     <hr>
-                    <?php
-                    if ($pic_error || $vid_error || $general_error !== ""){
-                        echo "
-                        <div class='notification is-danger'>
-                            $general_error
-                            $pic_error
-                            $vid_error
-                        </div>
-                        ";
-                    }
-                    ?>
+                    <div class='notification is-danger <?php if(!isset($errors)) echo "is-hidden"; ?>'>
+                        <?php
+                        foreach ($errors as $error) {
+                            echo($error);
+                        }
+                        ?>
+                    </div>
                     <div class="notification is-info">
                         <b>Formatos admitidos:</b><br>
                         Fotos: gif, png, jpg, jpeg.<br>

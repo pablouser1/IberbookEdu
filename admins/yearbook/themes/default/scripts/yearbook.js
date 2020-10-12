@@ -219,10 +219,10 @@ var main = new Vue({
             if (document.readyState == "complete") {
                 document.getElementById("loading_process").value = 100
                 let splashscreen = document.getElementById("splashscreen")
-                splashscreen.classList.add("animate__animated", "animate__bounceOut")
-                splashscreen.addEventListener('animationend', () => {
+                splashscreen.classList.add("animate__animated", "animate__fadeOut", "animate__fast")
+                splashscreen.addEventListener("animationend", () => {
                     this.splashscreen = false
-                });
+                })
             }
           }
           

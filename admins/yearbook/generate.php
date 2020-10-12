@@ -73,7 +73,7 @@ $yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
 
 // Get current date (used later)
-$dt = new DateTime("now", new DateTimeZone('Europe/Madrid'));
+$dt = new DateTime("now");
 // Yearbook complete path
 $baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$yearuser;
 // Create yearbook dir
@@ -88,6 +88,13 @@ $stmt->execute();
 $result = $stmt->get_result();
 $teachers_dir = 'teachers/';
 while ($row = $result->fetch_assoc()) {
+    if (!isset($row["photo"], $row["video"])) {
+        $response = [
+            "code" => "E",
+            "description" => "El profesor {$row[fullname]} no tiene foto/vídeo, interrumpiendo proceso"
+        ];
+        sendJSON($response);
+    }
     $id = $row["id"];
     $teachers[] = [
         "userid" => $id,
@@ -111,6 +118,13 @@ $stmt->execute();
 $result = $stmt->get_result();
 $students_dir = 'students/';
 while ($row = $result->fetch_assoc()) {
+    if (!isset($row["photo"], $row["video"])) {
+        $response = [
+            "code" => "E",
+            "description" => "El alumno {$row[fullname]} no tiene foto/vídeo, interrumpiendo proceso"
+        ];
+        sendJSON($response);
+    }
     $id = $row["id"];
     $students[] = [
         "userid" => $id,

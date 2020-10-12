@@ -13,7 +13,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
     }
     else {
         $child = $tutorinfo["children"][$_POST['childlogin']];
-        $childinfo = array(
+        $userinfo = [
             "iduser" => $child["MATRICULAS"][0]["X_MATRICULA"],
             "nameuser" => $child["NOMBRE"],
             "typeuser" => "ALU",
@@ -21,10 +21,12 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['childlogin'])){
             "photouser" => $child["FOTO"],
             "idcentro" => $child["idcentro"],
             "namecentro" => $child["namecentro"]
-        );
-        $_SESSION["userinfo"] = $childinfo;
+        ];
         // Create profile
-        require_once("createprofile.php");
+        require_once("../helpers/createprofile.php");
+        $profile = createprofile($userinfo, "students");
+        $userinfo["id"] = $profile;
+        $_SESSION["userinfo"] = $userinfo;
         header("Location: ../index.php");
         exit;
     }

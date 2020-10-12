@@ -41,7 +41,7 @@ if ($stmt->num_rows == 1) {
     if ($_SESSION["loggedin"] == "admin"){
         $downloadable = 1;
     }
-    elseif($_SESSION["loggedin"] == "user" && $mediaid == $userinfo["iduser"]){
+    elseif($_SESSION["loggedin"] == "user" && $mediaid == $userinfo["id"]){
         $downloadable = 1;
     }
     else{
