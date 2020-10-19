@@ -36,14 +36,8 @@ if ($result->num_rows > 0) {
 }
 if (isset($_SESSION["loggedin"])) {
     $userinfo = $_SESSION["userinfo"];
-    if ($userinfo["typeuser"] == "P"){
-        $typeuser = "teachers";
-    }
-    else {
-        $typeuser = "students";
-    }
-    $stmt = $db->prepare("SELECT voted FROM $typeuser WHERE id=?");
-    $stmt->bind_param("s", $userinfo["iduser"]);
+    $stmt = $db->prepare("SELECT voted FROM users WHERE id=?");
+    $stmt->bind_param("i", $userinfo["iduser"]);
     $stmt->execute();
     $stmt->bind_result($votedid);
     $stmt->fetch();
@@ -61,9 +55,9 @@ if (isset($_SESSION["loggedin"])) {
     <!-- Dev -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script>
         const yearbooks_js = <?php echo(json_encode($yearbooks)); ?>;
         const leaderboards_js = <?php echo(json_encode($leaderboards)); ?>;

@@ -19,6 +19,13 @@ function recursiveRemoveDirectory($directory)
     rmdir($directory);
 }
 
+// Send json
+function sendJSON($response) {
+    header('Content-type: application/json');
+    echo json_encode($response);
+    exit;
+}
+
 require_once("../helpers/db/db.php");
 require_once("../helpers/config.php");
 
@@ -36,14 +43,34 @@ if (isset($_GET["action"])) {
             $stmt = $db->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=? and acyear=?");
             $stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $acyear);
             if ($stmt->execute() !== true) {
-                die("Error eliminando yearbook");
+                $response = [
+                    "code" => "E",
+                    "description" => "Error al eliminar yearbook"
+                ];
+                sendJSON($response);
             }
             $stmt->close();
             recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"]."/$acyear/".$yearuser);
         break;
+        default:
+        $response = [
+            "code" => "E",
+            "description" => "Opción no válida"
+        ];
+        sendJSON($response);
     }
 }
+else {
+    $response = [
+        "code" => "E",
+        "description" => "No has mandado ninguna acción"
+    ];
+    sendJSON($response);
+}
 
-header("Location: dashboard.php");
-exit;
+$response = [
+    "code" => "C",
+    "description" => "El yearbook se ha eliminado con éxito"
+];
+sendJSON($response);
 ?>

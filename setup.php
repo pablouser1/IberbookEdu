@@ -64,14 +64,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ?>';
     // Add global config file
     file_put_contents("helpers/config.php", $global_config_file);
-    // Now that we have the config available, import helpers
-    require_once("helpers/db.php");
-
+    // Now that we have the config available, import db helper
+    require_once("helpers/db/db.php");
+    $db = new DB;
     // Creating tables
-    // Students
-    $sql = "CREATE TABLE students(
+    // Users
+    $sql = "CREATE TABLE users(
         id INT NOT NULL AUTO_INCREMENT,
-        userid varchar(9) not null,
+        userid varchar(9),
+        `type` varchar(12),
         fullname varchar(255) not null,
         schoolid varchar(12) not null,
         schoolyear varchar(12) not null,
@@ -80,33 +81,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `subject` varchar(24),
         voted int,
         reason varchar(255),
         primary key(id)
         )";
-    if ($conn->query($sql) !== TRUE) {
-        die("Error creating students' table: " . $conn->error);
-    }
-
-    // Teachers
-    $sql = "CREATE TABLE teachers(
-        id INT NOT NULL AUTO_INCREMENT,
-        userid varchar(9) not null,
-        fullname varchar(255) not null,
-        schoolid varchar(12) not null,
-        schoolyear varchar(12) not null,
-        photo varchar(255),
-        video varchar(255),
-        link varchar(255),
-        quote varchar(280),
-        uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        `subject` varchar(24) not null,
-        voted int,
-        reason varchar(255),
-        primary key(id)
-        )";
-    if ($conn->query($sql) !== TRUE) {
-        die("Error creating teachers' table: " . $conn->error);
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating users");
     }
 
     // Gallery
@@ -119,8 +100,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         type varchar(8) not null,
         primary key(id)
         )";
-    if ($conn->query($sql) !== TRUE) {
-        die("Error creating gallery's table: " . $conn->error);
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating gallery");
     }
 
     // Yearbook
@@ -134,8 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `voted` int DEFAULT '0',
         primary key(id)
         )";
-    if ($conn->query($sql) !== TRUE) {
-        die("Error creating yearbooks' table: " . $conn->error);
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating yearbooks");
     }
 
     // Staff (admins and owner)
@@ -146,8 +127,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `permissions` varchar(14) NOT NULL,
         primary key(id)
         )";
-    if ($conn->query($sql) !== TRUE) {
-        die("Error creating admins' table: " . $conn->error);
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating staff");
     }
 
     // Schools
@@ -157,38 +138,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `url` varchar(255),
         primary key(id)
         )";
-    if ($conn->query($sql) !== TRUE) {
-        die("Error creating admins' table: " . $conn->error);
-    }
-    
-    if($global_config[0] == "local"){
-        $sql = "CREATE TABLE `users` (
-            `id` int NOT NULL AUTO_INCREMENT,
-            `username` varchar(14) NOT NULL UNIQUE,
-            `password` varchar(80) NOT NULL,
-            `fullname` varchar(255) NOT NULL,
-            `type` varchar(10) NOT NULL,
-            `school` varchar(128) NOT NULL,
-            `group` varchar(24) NOT NULL,
-            primary key(id)
-        )";
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating schools");
     }
     // Writes data to DB
 
     // School info
     // First we need to get the school's name
-    $stmt = $conn->prepare("INSERT INTO schools (id, url) VALUES (?, ?);");
+    $stmt = $db->prepare("INSERT INTO schools (id, url) VALUES (?, ?);");
     $stmt->bind_param("is", $schoolinfo[0], $schoolinfo[1]);
     if ($stmt->execute() !== true) {
-        die("Error writing school: " . $conn->error);
+        die("Error writing school");
     }
     
     // Staff info
     $owner_password = password_hash($owner[1], PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
+    $stmt = $db->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
     $stmt->bind_param("ss", $owner[0], $owner_password);
     if ($stmt->execute() !== true) {
-        die("Error writing owners' info: " . $conn->error);
+        die("Error writing owner");
     }
     mkdir($global_config[1], 0755);
     // Elimina setup

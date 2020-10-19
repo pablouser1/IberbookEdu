@@ -31,12 +31,7 @@ $db = new DB;
 if (isset($_GET["id"])) {
     $ybexist = false;
 
-    if ($userinfo["typeuser"] == "P"){
-        $typeuser = "teachers";
-    }
-    else {
-        $typeuser = "students";
-    }
+    $typeuser = $userinfo["typeuser"];
     // Get yearbook info
     $stmt = $db->prepare("SELECT schoolid, schoolyear FROM yearbooks WHERE id=?");
     $stmt->bind_param("i", $_GET["id"]);

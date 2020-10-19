@@ -115,7 +115,7 @@ class Api {
                 $userinfo = [
                     "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
                     "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
+                    "typeuser" => "students",
                     "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
                     "photouser" => $photo,
                     "idcentro" => $infocentro["idcentro"],
@@ -143,7 +143,7 @@ class Api {
                 }
                 $userinfo = [
                     "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
+                    "typeuser" => "tutor",
                     "children" => $children
                 ];
                 break;
@@ -179,7 +179,7 @@ class Api {
                 $userinfo = array(
                     "iduser" => $idteacher,
                     "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => $info["RESULTADO"][0]["C_PERFIL"],
+                    "typeuser" => "teachers",
                     "schools" => $finalschools
                 );
             break;
@@ -213,6 +213,7 @@ class Api {
     }
     
     function getallteacher($centro) {
+        $schoolinfo = [];
         // Set array with only allowed schools
         $stmt = $this->db->prepare("SELECT id FROM schools WHERE id=?");
         $stmt->bind_param("i", $centro["C_CODIGO"]);

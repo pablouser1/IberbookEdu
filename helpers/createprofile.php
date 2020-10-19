@@ -16,15 +16,15 @@ function createprofile($userinfo, $type) {
         return $exists;
     }
     else {
-        // Create user
-        if ($type == "teachers") {
-            $stmt = $db->prepare("INSERT INTO `teachers` (`userid`, `fullname`, `schoolid`, `schoolyear`, `subject`) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssiss", $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $userinfo["subject"]);
+        if (!isset($userinfo["subject"])) {
+            $subject = null;
         }
         else {
-            $stmt = $db->prepare("INSERT INTO `students` (`userid`, `fullname`, `schoolid`, `schoolyear`) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("isis", $userinfo["iduser"], $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"]);
+            $subject = $userinfo["subject"];
         }
+        // Create user
+        $stmt = $db->prepare("INSERT INTO `users` (`userid`, `type`, `fullname`, `schoolid`, `schoolyear`, `subject`) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssiss", $userinfo["iduser"], $type, $userinfo["nameuser"], $userinfo["idcentro"], $userinfo["yearuser"], $subject);
         if ($stmt->execute() !== true) {
             die("Error al crear usuario");
         }
@@ -41,18 +41,9 @@ function createprofile($userinfo, $type) {
 function check($userinfo, $type) {
     // Get global vars
     global $db;
-    switch ($type) {
-        case "teachers":
-            $stmt = $db->prepare("SELECT id FROM $type WHERE userid=? AND schoolyear=? AND schoolid=?");
-        break;
-        case "students":
-            $stmt = $db->prepare("SELECT id FROM $type WHERE userid=? AND schoolyear=? AND schoolid=?");
-        break;
-        default:
-        die("Ese tipo de usuario no existe");
-    }
+    $stmt = $db->prepare("SELECT id FROM users WHERE `type`=? AND userid=? AND schoolyear=? AND schoolid=?");
     // Check if exists
-    $stmt->bind_param("ssi", $userinfo["iduser"], $userinfo["yearuser"], $userinfo["idcentro"]);
+    $stmt->bind_param("sssi", $userinfo["typeuser"], $userinfo["iduser"], $userinfo["yearuser"], $userinfo["idcentro"]);
     $stmt->execute();
     $stmt->store_result();
     // Get profile id

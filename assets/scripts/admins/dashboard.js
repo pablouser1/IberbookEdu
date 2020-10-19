@@ -29,10 +29,10 @@ Vue.component('teachers', {
                     <tr v-for="teacher in teachers">
                         <td>{{ teacher.name }}</td>
                         <td>
-                            <a :href="'../getmedia.php?id=' + teacher.id + '&media=photo&type=P'" target='_blank'>{{ teacher.photo }}</a>
+                            <a :href="'../getmedia.php?id=' + teacher.id + '&media=photo&type=teachers'" target='_blank'>{{ teacher.photo }}</a>
                         </td>
                         <td>
-                            <a :href="'../getmedia.php?id=' + teacher.id + '&media=video&type=P'" target='_blank'>{{ teacher.video }}</a>
+                            <a :href="'../getmedia.php?id=' + teacher.id + '&media=video&type=teachers'" target='_blank'>{{ teacher.video }}</a>
                         </td>
                         <td><a :href="teacher.link" target='_blank'>Abrir enlace</a></td>
                         <td v-html="teacher.quote"></td>
@@ -78,10 +78,10 @@ Vue.component('students', {
                     <tr v-for="student in students">
                         <td>{{ student.name }}</td>
                         <td>
-                            <a :href="'../getmedia.php?id=' + student.id + '&media=photo&type=ALU'" target='_blank'>{{ student.photo }}</a>
+                            <a :href="'../getmedia.php?id=' + student.id + '&media=photo&type=students'" target='_blank'>{{ student.photo }}</a>
                         </td>
                         <td>
-                            <a :href="'../getmedia.php?id=' + student.id + '&media=video&type=ALU'" target='_blank'>{{ student.video }}</a>
+                            <a :href="'../getmedia.php?id=' + student.id + '&media=video&type=students'" target='_blank'>{{ student.video }}</a>
                         </td>
                         <td><a :href="student.link" target='_blank'>Abrir enlace</a></td>
                         <td v-html="student.quote"></td>
@@ -193,6 +193,7 @@ Vue.component('edit', {
             .then((json_res) => {
                 if (json_res.code == "C") {
                     alert("Datos eliminados con éxito")
+                    location.reload()
                 }
                 else {
                     alert(json_res.description)
@@ -265,12 +266,12 @@ Vue.component('yearbook', {
                     </span>
                     <span>Ver yearbook</span>
                 </a>
-                <a href='manageyb.php?action=delete' class='button is-danger'>
+                <button v-on:click="deleteYearbook" class='button is-danger'>
                     <span class='icon'>
                         <i class='fas fa-trash'></i>
                     </span>
                     <span>Eliminar yearbook</span>
-                </a>
+                </button>
             </div>
         </div>
         <div v-else>
@@ -332,6 +333,20 @@ Vue.component('yearbook', {
                 if (json_res["code"] == "C") {
                     // If everyting went ok, reload page
                     location.reload();
+                }
+            })
+        },
+        deleteYearbook: function() {
+            fetch(`manageyb.php?action=delete`)
+            // Get json response
+            .then(res => {
+                return res.json()
+            })
+            .then(json_res => {
+                alert(json_res["description"])
+                if (json_res["code"] == "C") {
+                    // If everyting went ok, reload page
+                    this.yearbook.available = false
                 }
             })
         }

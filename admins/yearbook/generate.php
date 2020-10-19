@@ -82,7 +82,7 @@ if(!is_dir($baseurl)) {
 }
 
 // Teachers
-$stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM teachers WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
+$stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM users WHERE `type`='teachers' AND schoolid=? AND schoolyear=? ORDER BY fullname");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -112,7 +112,7 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 // Students
-$stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM students WHERE schoolid=? AND schoolyear=? ORDER BY fullname");
+$stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded FROM users WHERE `type`='students' AND schoolid=? AND schoolyear=? ORDER BY fullname");
 $stmt->bind_param("is", $userinfo["idcentro"], $userinfo["yearuser"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -231,6 +231,8 @@ $ybinfo_js = json_encode($ybinfo, JSON_PRETTY_PRINT);
 
 // Data to be written in js file
 $data = "
+// Config auto-generated using IberbookEdu, DO NOT MODIFY MANUALLY
+
 // Teachers
 const teachers_js = {$teachers_js};
 // Students

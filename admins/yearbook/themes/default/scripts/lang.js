@@ -3,21 +3,23 @@
 // Common
 const translate_common = {
     external: `
-    Bulma (https://bulma.io)
-    <br>
-    Vue.js (https://vuejs.org)
-    <br>
-    Animate.css (https://animate.style)
-    <br>
-    zuck.js (https://github.com/ramon82/zuck.js)
-    <br>
-    confetti.js (https://github.com/mathusummut/confetti.js)
+    <ul>
+        <li>Bulma (<a href="https://bulma.io">web</a>)</li>
+        <li>Vue.js (<a href="https://vuejs.org">web</a>)</li>
+        <li>Animate.css (<a href="https://animate.style">web</a>)</li>
+        <li>Zuck.js (<a href="https://github.com/ramon82/zuck.js">web</a>)</li>
+        <li>Confetti.js (<a href="https://github.com/mathusummut/confetti.js">web</a>)</li>
+        <li>Spinkit (<a href="https://github.com/tobiasahlin/SpinKit">web</a>)</li>
+    </ul>
     `
 }
 
 const translations = {
     // English
     en: {
+        splashscreen: {
+            loading: "Loading..."
+        },
         banner: {
             title: "Graduation"
         },
@@ -46,6 +48,9 @@ const translations = {
     },
     // Spanish
     es: {
+        splashscreen: {
+            loading: "Cargando..."
+        },
         banner: {
             title: "Graduación"
         },
@@ -74,6 +79,9 @@ const translations = {
     },
     // French
     fr: {
+        splashscreen: {
+            loading: "Chargement..."
+        },
         banner: {
             title: "Graduation"
         },

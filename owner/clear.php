@@ -22,7 +22,7 @@ function recursiveRemoveDirectory($directory)
 
 function cleardb($tables) {
     foreach ($tables as $table) {
-        $stmt = $db->prepare("DELETE FROM $dir WHERE schoolid=?");
+        $stmt = $db->prepare("DELETE FROM $table WHERE schoolid=?");
         $stmt->bind_param("i", $_POST["id"]);
         if ($stmt->execute() !== true) {
             die("Error al intentar eliminar la base de datos");
@@ -30,6 +30,7 @@ function cleardb($tables) {
         $stmt->close();
     }
 }
+
 if (isset($_POST["id"], $_POST["clear"])){
     // Check first if id exists
     $stmt = $db->prepare("SELECT id FROM schools WHERE id=?");
@@ -41,9 +42,9 @@ if (isset($_POST["id"], $_POST["clear"])){
     }
     $stmt->close();
 
-    $tables = ["students", "teachers", "gallery"];
+    $tables = ["users", "gallery"];
     // Clear tables from database
-    cleardb($tables);
+    cleardb();
     // Delete uploads folder
     recursiveRemoveDirectory($uploadpath.$_POST["id"]);
         
@@ -51,4 +52,3 @@ if (isset($_POST["id"], $_POST["clear"])){
     exit;
 }
 ?>
-

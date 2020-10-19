@@ -1,5 +1,6 @@
 <?php
-if (!isset($_SESSION, $_SESSION["owner"])){
+session_start();
+if (!isset($_SESSION["owner"])){
     header("Location: ../login.php");
     exit;
 }
@@ -15,9 +16,9 @@ if (isset($_POST["sendstaff"], $_POST["action"])) {
             elseif ($_POST["action"] == "remove") {
                 $stmt = $db->prepare("DELETE FROM `staff` WHERE username=? AND password=?");
             }
-            foreach ($_POST["username"] as $id => $usernname) {
+            foreach ($_POST["username"] as $id => $username) {
                 $owner_password = password_hash($_POST["password"][$id], PASSWORD_DEFAULT);
-                $stmt->bind_param("ss", $usernname, $owner_password);
+                $stmt->bind_param("ss", $username, $owner_password);
                 if ($stmt->execute() !== true) {
                     die("Error al agregar/eliminar dueño");
                 }
@@ -32,8 +33,8 @@ if (isset($_POST["sendstaff"], $_POST["action"])) {
                 $stmt = $db->prepare("DELETE FROM `staff` WHERE username=?");
             }
 
-            foreach ($_POST["username"] as $usernname) {
-                $stmt->bind_param("s", $usernname);
+            foreach ($_POST["username"] as $username) {
+                $stmt->bind_param("s", $username);
                 if ($stmt->execute() !== true) {
                     die("Error al agregar/eliminar administrador");
                 }

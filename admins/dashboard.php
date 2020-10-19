@@ -14,10 +14,10 @@ require_once("yearbook/themes.php");
 
 $DBInfo = new DBInfo($userinfo);
 // Get teachers
-$teachers = $DBInfo->teachers();
+$teachers = $DBInfo->users('teachers');
 
 // Get students
-$students = $DBInfo->students();
+$students = $DBInfo->users('students');
 
 // Get gallery
 $gallery = $DBInfo->gallery();
@@ -37,14 +37,15 @@ $yearbook["themes"] = $themes;
     <!-- Dev -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script>
-    const teachers_js = <?php echo(json_encode($teachers)); ?>;
-    const students_js = <?php echo(json_encode($students)); ?>;
-    const gallery_js = <?php echo(json_encode($gallery)); ?>;
-    const yearbook_js = <?php echo(json_encode($yearbook)); ?>;
+        // Initial variables
+        const teachers_js = <?php echo(json_encode($teachers)); ?>;
+        const students_js = <?php echo(json_encode($students)); ?>;
+        const gallery_js = <?php echo(json_encode($gallery)); ?>;
+        const yearbook_js = <?php echo(json_encode($yearbook)); ?>;
     </script>
 </head>
 <body>

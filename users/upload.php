@@ -18,23 +18,14 @@ function executestmt($stmt) {
     $stmt->close();
 }
 
-switch ($userinfo["typeuser"]) {
-    case "ALU":
-        $typeuser = "students";
-    break;
-    case "P":
-        $typeuser = "teachers";
-    break;
-    default:
-        die("Ese usuario no es válido");
-}
+$typeuser = $userinfo["typeuser"];
 
 $max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
 $max_characters = 100; // "Quote" max characters
 
 // Get what user didn't upload yet
 $remain = [];
-$stmt = $db->prepare("SELECT photo, video, link, quote FROM $typeuser WHERE id=?");
+$stmt = $db->prepare("SELECT photo, video, link, quote FROM users WHERE id=?");
 $stmt->bind_param("i", $userinfo["id"]);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -80,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     $picname = basename($picPath);
                     move_uploaded_file($tmpFilePath, $picPath);
-                    $stmt = $db->prepare("UPDATE $typeuser SET photo = ? WHERE id=?");
+                    $stmt = $db->prepare("UPDATE users SET photo = ? WHERE id=?");
                     $stmt->bind_param("ss", $_FILES["pic"]["name"], $userinfo["id"]);
                     executestmt($stmt);
                 }
@@ -108,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     $vidname = basename($vidPath);
                     move_uploaded_file($tmpFilePath, $vidPath);
-                    $stmt = $db->prepare("UPDATE $typeuser SET video = ? WHERE id=?");
+                    $stmt = $db->prepare("UPDATE users SET video = ? WHERE id=?");
                     $stmt->bind_param("ss", $_FILES["vid"]["name"], $userinfo["id"]);
                     executestmt($stmt);
                 }
@@ -125,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors[] = "Enlace no válido";
         }
         else {
-            $stmt = $db->prepare("UPDATE $typeuser SET link = ? WHERE id=?");
+            $stmt = $db->prepare("UPDATE users SET link = ? WHERE id=?");
             $stmt->bind_param("ss", $link, $userinfo["id"]);
             executestmt($stmt);
         }
@@ -137,16 +128,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         else {
             $quote = nl2br(htmlspecialchars($_POST["quote"]));
-            $stmt = $db->prepare("UPDATE $typeuser SET quote = ? WHERE id=?");
+            $stmt = $db->prepare("UPDATE users SET quote = ? WHERE id=?");
             $stmt->bind_param("ss", $quote, $userinfo["id"]);
             executestmt($stmt);
         }
     }
-    // Reset reason to NULL
-    $stmt = $db->prepare("UPDATE $typeuser SET reason = NULL WHERE id=?");
-    $stmt->bind_param("s", $userinfo["id"]);
-    executestmt($stmt);
-    if (!isset($general_error, $pic_error, $vid_error)) {
+    if (!isset($errors)) {
+        // Reset reason to NULL
+        $stmt = $db->prepare("UPDATE users SET reason = NULL WHERE id=?");
+        $stmt->bind_param("s", $userinfo["id"]);
+        executestmt($stmt);
         header("Location: finish.html");
         exit;
     }
@@ -262,8 +253,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <hr>
                     <div class='notification is-danger <?php if(!isset($errors)) echo "is-hidden"; ?>'>
                         <?php
-                        foreach ($errors as $error) {
-                            echo($error);
+                        if (isset($errors)) {
+                            foreach ($errors as $error) {
+                                echo($error);
+                            }
                         }
                         ?>
                     </div>

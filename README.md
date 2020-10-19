@@ -49,7 +49,7 @@ This project wouldn't be possible without the help of the following projects:
 * Animate.css (https://animate.style) | [LICENSE](https://github.com/animate-css/animate.css/blob/master/LICENSE)
 * zuck.js (https://github.com/ramon82/zuck.js) | [LICENSE](https://github.com/ramon82/zuck.js/blob/master/LICENSE)
 * Confetti.js (https://github.com/mathusummut/confetti.js) | [LICENSE](https://github.com/mathusummut/confetti.js/blob/master/LICENSE)
-
+* Spinkit (https://github.com/tobiasahlin/SpinKit) | [LICENSE](https://github.com/tobiasahlin/SpinKit/blob/master/LICENSE)
 Assets:
 
 * Portrait Placeholder : Greasemann / CC BY-SA (https://creativecommons.org/licenses/by-sa/4.0)

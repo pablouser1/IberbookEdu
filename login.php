@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Get user info
                 $userinfo = $api->getinfo();
                 // Check if school is allowed, only for students. Teachers and parents are checked in users/teachers.php and users/tutorlegal.php
-                if ($userinfo["typeuser"] == "ALU"){
+                if ($userinfo["typeuser"] == "students"){
                     $sql = "SELECT `id` FROM `schools` WHERE id=$userinfo[idcentro]";
                     $result = $db->query($sql);
                     if ($result !== false && $result->num_rows == 0) {
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $_SESSION["loggedin"] = "user";
                     }
                     switch ($userinfo["typeuser"]){
-                        case "ALU":
+                        case "students":
                             // Create profile
                             require_once("helpers/createprofile.php");
                             // Get id from DB
@@ -77,12 +77,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             header("Location: index.php");
                             exit;
                         break;
-                        case "TUT_LEGAL":
+                        case "tutor":
                             $_SESSION["tutorinfo"] = $userinfo;
                             header("Location: profiles/tutorlegal.php");
                             exit;
                         break;
-                        case "P":
+                        case "teachers":
                             $_SESSION["teacherinfo"] = $userinfo;
                             header("Location: profiles/teachers.php");
                             exit;

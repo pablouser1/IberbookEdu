@@ -11,11 +11,9 @@ if (!isset($_SESSION["loggedin"])){
 $userinfo = $_SESSION["userinfo"];
 $db = new DB;
 switch($_GET["type"]) {
-    case "ALU":
-        $type = "students";
-    break;
-    case "P":
-        $type = "teachers";
+    case "teachers":
+    case "students":
+        $type = $_GET["type"];
     break;
     default:
         die("Ese tipo de usuario no existe");
@@ -30,8 +28,8 @@ switch ($_GET["media"]) {
         die("Ese tipo de archivo no existe");
 }
 
-$stmt = $db->prepare("SELECT $media, id FROM $type where id=?");
-$stmt->bind_param("s", $_GET["id"]);
+$stmt = $db->prepare("SELECT $media, id FROM users WHERE id=?");
+$stmt->bind_param("i", $_GET["id"]);
 $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($medianame, $mediaid);
@@ -53,7 +51,7 @@ else{
 }
 
 if ($downloadable == 1){
-    $filepath = $uploadpath.$userinfo["idcentro"]."/$userinfo[yearuser]"."/$type/$mediaid/$medianame";
+    $filepath = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/{$type}/{$mediaid}/{$medianame}";
     if(file_exists($filepath)){
         // https://www.sitepoint.com/community/t/loading-html5-video-with-php-chunks-or-not/350957
         $fp = @fopen($filepath, 'rb');

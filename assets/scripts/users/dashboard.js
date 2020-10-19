@@ -121,7 +121,7 @@ Vue.component('dashboard', {
                     </button>
                 </div>
                 <div class="control">
-                    <button v-on:click="deleteItems(user.id, type)" class="button is-danger">
+                    <button v-on:click="deleteItems(user.id, user.type)" class="button is-danger">
                         <span class="icon">
                             <i class="fas fa-trash"></i>
                         </span>
@@ -164,21 +164,17 @@ Vue.component('dashboard', {
             })
             .then(json_res => {
                 if (json_res.code == "C") {
+                    this.edit = false
                     alert("Datos eliminados con éxito")
-                    window.location.reload()
+                    values.forEach(item => {
+                        // Reset deleted items
+                        this.user[item] = null
+                    })
                 }
                 else {
                     alert(json_res.description)
                 }
             })
-        }
-    },
-    mounted() {
-        if (this.user.type == "P") {
-            this.type = "teachers"
-        }
-        else {
-            this.type = "students"
         }
     }
 })

@@ -11,12 +11,7 @@ $userinfo = $_SESSION["userinfo"];
 require_once("../helpers/getinfo.php");
 $DBInfo = new DBInfo($userinfo);
 
-if ($userinfo["typeuser"] == "P") {
-    $user_values = $DBInfo->teacher();
-}
-else {
-    $user_values = $DBInfo->student();
-}
+$user_values = $DBInfo->user();
 
 $gallery = $DBInfo->gallery();
 
@@ -31,12 +26,13 @@ $yearbook = $DBInfo->yearbook();
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Dashboard Usuarios - IberbookEdu</title>
         <!-- Dev -->
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+        <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <script>
+            // Initial variables
             const user_js = <?php echo(json_encode($user_values));?>;
             const gallery_js = <?php echo(json_encode($gallery));?>;
             const yearbook_js = <?php echo(json_encode($yearbook));?>;
@@ -112,7 +108,7 @@ $yearbook = $DBInfo->yearbook();
                             </a>
                         </li>
                     <?php endif;?>
-                    <!-- Cerrar sesión -->
+                    <!-- Logout -->
                     <li>
                         <a href="../logout.php">
                             <span class="icon is-small">

@@ -9,6 +9,8 @@
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico">
     <!-- Scripts -->
+
+    <!-- Yearbook data -->
     <script src="scripts/data.js"></script>
     <!-- Dev Vue -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
@@ -29,13 +31,16 @@
     <noscript>This program needs Javascript</noscript>
     <div id="main">
         <!-- Splashscreen -->
-        <section id="splashscreen" v-if="splashscreen" class="hero is-fullheight is-primary">
+        <section id="splashscreen" v-if="splashscreen" class="hero is-fullheight">
             <div class="hero-body">
-                <div class="container has-text-black">
-                    <h1 class="title">
-                        Loading...
-                    </h1>
-                    <progress id="loading_process" class="progress is-success"></progress>
+                <div class="container has-text-centered">
+                    <div class="sk-folding-cube">
+                        <div class="sk-cube1 sk-cube"></div>
+                        <div class="sk-cube2 sk-cube"></div>
+                        <div class="sk-cube4 sk-cube"></div>
+                        <div class="sk-cube3 sk-cube"></div>
+                    </div>
+                    <h1 class="title" v-text="lang.splashscreen.loading"></h1>
                 </div>
             </div>
         </section>
@@ -65,7 +70,7 @@
                     <span class="icon">
                         <i class="fas fa-school"></i>
                     </span>
-                    <span v-cloak>{{ ybinfo.schoolname }}</span>
+                    <span>{{ ybinfo.schoolname }}</span>
                 </a>
                 <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button" aria-label="menu" aria-expanded="false">
                     <span aria-hidden="true"></span>
@@ -85,13 +90,13 @@
                         <span class="icon">
                             <i class="fas fa-photo-video"></i>
                         </span>
-                        <span v-cloak>{{ lang.tabs.gallery }}</span>
+                        <span v-text="lang.tabs.gallery"></span>
                     </a>
                     <a v-on:click="showNav = false" href="#about" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-info-circle"></i>
                         </span>
-                        <span v-cloak>{{ lang.tabs.about }}</span>
+                        <span v-text="lang.tabs.about"></span>
                     </a>
                 </div>
             </div>
