@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     if (!is_dir($baseurl.$gallery_dir)){
-        mkdir($baseurl.$gallery_dir, 0700, true);
+        mkdir($baseurl.$gallery_dir, 0755, true);
     }
     if(count($_FILES['pic']['name']) > 0){
         for($i=0; $i<count($_FILES['pic']['name']); $i++) {
@@ -121,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Galería</title>
+    <title>Galería - IberbookEdu</title>
     <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>

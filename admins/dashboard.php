@@ -75,9 +75,11 @@ $yearbook["themes"] = $themes;
     <section id="main" class="section">
         <noscript>Esta página necesita Javascript para funcionar</noscript>
         <!-- Teachers -->
-        <teachers v-bind:teachers="teachers"></teachers>
+        <users v-bind:users="teachers" v-bind:type="'teachers'"></users>
+        <hr>
         <!-- Students -->
-        <students v-bind:students="students"></students>
+        <users v-bind:users="students" v-bind:type="'students'"></users>
+        <hr>
         <!-- Gallery -->
         <gallery v-bind:gallery="gallery"></gallery>
         <!-- Yearbook -->

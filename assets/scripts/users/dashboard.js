@@ -76,7 +76,7 @@ Vue.component('dashboard', {
                         <th>Enlace</th>
                         <th>Cita</th>
                         <th>Última modificación</th>
-                        <th v-if="user.type == 'P'">Asignatura</th>
+                        <th v-if="user.type == 'teachers'">Asignatura</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,10 +89,12 @@ Vue.component('dashboard', {
                         <td>
                             <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + user.type" target="_blank">{{ user.video }}</a>
                         </td>
-                        <td>{{ user.link }}</td>
+                        <td>
+                            <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
+                        </td>
                         <td v-html="user.quote"></td>
                         <td>{{ user.uploaded }}</td>
-                        <td v-if="user.type == 'P'">{{ user.subject }}</td>
+                        <td v-if="user.type == 'teachers'">{{ user.subject }}</td>
                     </tr>
                 </tbody>
             </table>

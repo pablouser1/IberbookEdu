@@ -71,7 +71,8 @@ Vue.component('yearbook', {
     data: function () {
         return {
           voted: null,
-          url: null
+          url: null,
+          whatsappURL: ""
         }
     },
     methods: {
@@ -102,11 +103,23 @@ Vue.component('yearbook', {
             })
         }
     },
-    mounted() {
-        this.voted = voted_js
+    created() {
         // Get website url
         let getUrl = window.location;
         this.url = getUrl.protocol + "//" + getUrl.host;
+        this.voted = voted_js;
+    },
+    updated() {
+        let starturl;
+        if(/Android|iPhone|iPod|BlackBerry|Opera Mini/i.test(navigator.userAgent)){
+            // Phone user
+            starturl = "whatsapp://send?text="
+        }
+        else {
+            // Desktop user, use Whatsapp Web
+            starturl = "https://web.whatsapp.com/send?text="
+        }
+        this.whatsappURL = starturl + "Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20berbookEdu%20en%3A%20" + this.url + this.yearbook.link
     },
     template:
     `
@@ -169,8 +182,8 @@ Vue.component('yearbook', {
                     </span>
                     <span>Facebook</span>
                 </a>
-                <a
-                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creando%20con%20IberbookEdu&url=' + encodeURI(url + yearbook.link) + '&hashtags=IberbookEdu'"
+                <a target='_blank'
+                :href="'https://twitter.com/intent/tweet?text=Echa%20un%20vistazo%20a%20mi%20anuario%20en&url=' + url + yearbook.link + '&hashtags=IberbookEdu'"
                 class="button is-info">
                     <span class="icon">
                         <i class="fab fa-twitter"></i>
@@ -178,8 +191,7 @@ Vue.component('yearbook', {
                     <span>Twitter</span>
                 </a>
                 <a
-                :href="'whatsapp://send?text=Echa%20un%20vistazo%20a%20mi%20anuario%20creado%20con%20berbookEdu%20en%3A%20' + url + yearbook.link"
-                data-action="share/whatsapp/share"
+                :href="whatsappURL" target='_blank'
                 class="button is-success">
                     <span class="icon">
                         <i class="fab fa-whatsapp"></i>

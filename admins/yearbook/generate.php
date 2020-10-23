@@ -185,8 +185,8 @@ recursivecopy($source, $baseurl);
 $source = "themes/common";
 recursivecopy($source, $baseurl);
 
-copy("../../favicon.ico",  $baseurl.'/favicon.ico');
-
+copy("../../favicon.ico",  "{$baseurl}/favicon.ico");
+copy("../../externalprojects.html", "{$baseurl}/externalprojects.html");
 mkdir($baseurl."/assets", 0755, true);
 
 // -- Yearbook data -- //

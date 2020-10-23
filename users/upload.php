@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
                 else{
                     if (!is_dir($baseurl.$userinfo["id"])){
-                        mkdir($baseurl.$userinfo["id"], 0700, true);
+                        mkdir($baseurl.$userinfo["id"], 0755, true);
                     }
                     $picname = basename($picPath);
                     move_uploaded_file($tmpFilePath, $picPath);
@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
                 else{
                     if (!is_dir($baseurl.$userinfo["id"])){
-                        mkdir($baseurl.$userinfo["id"], 0700, true);
+                        mkdir($baseurl.$userinfo["id"], 0755, true);
                     }
                     $vidname = basename($vidPath);
                     move_uploaded_file($tmpFilePath, $vidPath);

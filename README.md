@@ -39,6 +39,7 @@ Once you finished installing everything and you had already copied the project t
 * Local API
 * Fix, better upload error handling
 * Maintenance mode
+* Yearbook Twitter URL doesn't work
 
 # Credits
 

@@ -19,7 +19,8 @@ class DBInfo {
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            $users[] = [
+            $id = $row["id"];
+            $users[$id] = [
                 "id" => $row["id"],
                 "name" => $row["fullname"],
                 "type" => $row["type"],

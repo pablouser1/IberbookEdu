@@ -1,66 +1,20 @@
-// Teachers
-Vue.component('teachers', {
-    props: ["teachers"],
+// Users
+Vue.component('users', {
+    props: ["users", "type"],
     template:
     `
     <div class="container">
-        <p class="title">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <span>Profesores</span>
-        </p>
-        <p class="subtitle">Total: {{ teachers.length }}</p>
-        <div v-if="Object.keys(teachers).length === 0">
-            <p>No hay profesores disponibles</p>
-        </div>
-        <div v-else class="table-container">
-            <table class="table is-bordered is-striped is-narrow is-hoverable">
-                <thead>
-                    <tr>
-                        <th>Nombre completo</th>
-                        <th>Foto</th>
-                        <th>Vídeo</th>
-                        <th>Enlace</th>
-                        <th>Cita</th>
-                        <th>Última modificación</th>
-                        <th>Asignatura</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="teacher in teachers">
-                        <td>{{ teacher.name }}</td>
-                        <td>
-                            <a :href="'../getmedia.php?id=' + teacher.id + '&media=photo&type=teachers'" target='_blank'>{{ teacher.photo }}</a>
-                        </td>
-                        <td>
-                            <a :href="'../getmedia.php?id=' + teacher.id + '&media=video&type=teachers'" target='_blank'>{{ teacher.video }}</a>
-                        </td>
-                        <td><a :href="teacher.link" target='_blank'>Abrir enlace</a></td>
-                        <td v-html="teacher.quote"></td>
-                        <td>{{ teacher.uploaded }}</td>
-                        <td>{{ teacher.subject }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <edit v-bind:users="teachers" v-bind:type="'teachers'"></edit>
-        <hr>
-    </div>
-    `
-})
-
-// Students
-Vue.component('students', {
-    props: ["students"],
-    template:
-    `
-    <div class="container">
-        <p class="title">
+        <p v-if="type === 'students'" class="title">
             <i class="fas fa-user-graduate"></i>
             <span>Alumnos</span>
         </p>
-        <p class="subtitle">Total: {{ students.length }}</p>
-        <div v-if="Object.keys(students).length === 0">
-            <p>No hay alumnos disponibles</p>
+        <p v-else class="title">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <span>Profesores</span>
+        </p>
+        <p class="subtitle">Total: {{ users.length }}</p>
+        <div v-if="Object.keys(users).length === 0">
+            <p>No hay personas disponibles</p>
         </div>
         <div v-else class="table-container">
             <table class="table is-bordered is-striped is-narrow is-hoverable">
@@ -72,26 +26,29 @@ Vue.component('students', {
                         <th>Enlace</th>
                         <th>Cita</th>
                         <th>Última modificación</th>
+                        <th v-if="type === 'teachers'">Asignatura</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="student in students">
-                        <td>{{ student.name }}</td>
+                    <tr v-for="user in users">
+                        <td>{{ user.name }}</td>
                         <td>
-                            <a :href="'../getmedia.php?id=' + student.id + '&media=photo&type=students'" target='_blank'>{{ student.photo }}</a>
+                            <a :href="'../getmedia.php?id=' + user.id + '&media=photo&type=' + type" target='_blank'>{{ user.photo }}</a>
                         </td>
                         <td>
-                            <a :href="'../getmedia.php?id=' + student.id + '&media=video&type=students'" target='_blank'>{{ student.video }}</a>
+                            <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + type" target='_blank'>{{ user.video }}</a>
                         </td>
-                        <td><a :href="student.link" target='_blank'>Abrir enlace</a></td>
-                        <td v-html="student.quote"></td>
-                        <td>{{ student.uploaded }}</td>
+                        <td>
+                            <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
+                        </td>
+                        <td v-html="user.quote"></td>
+                        <td>{{ user.uploaded }}</td>
+                        <td v-if="type === 'teachers'">{{ user.subject }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <edit v-bind:users="students" v-bind:type="'students'"></edit>
-        <hr>
+        <edit v-bind:users="users" v-bind:type="type"></edit>
     </div>
     `
 })
@@ -345,7 +302,7 @@ Vue.component('yearbook', {
             .then(json_res => {
                 alert(json_res["description"])
                 if (json_res["code"] == "C") {
-                    // If everyting went ok, reload page
+                    // If everyting went ok, reset
                     this.yearbook.available = false
                 }
             })
