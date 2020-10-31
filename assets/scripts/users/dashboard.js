@@ -1,15 +1,16 @@
 // Yearbook generated
-Vue.component('yearbook', {
+Vue.component('mainmenu', {
     data() {
         return {
             params: ""
         }
     },
-    props: ["yearbook"],
+    props: ["user", "yearbook"],
     template:
     `
     <div>
-        <section class='hero is-medium is-success is-bold'>
+        <!-- Yearbook ready -->
+        <section v-if="yearbook.available" class='hero is-medium is-success is-bold'>
             <div class='hero-body'>
                 <div class='container'>
                     <h1 class='title'>Tu yearbook está listo</h1>
@@ -24,81 +25,46 @@ Vue.component('yearbook', {
                 </div>
             </div>
         </section>
-        <hr>
+        <!-- More info -->
+        <div v-else>
+            <div class="columns is-vcentered">
+                <div v-if="user.reason" class="box column is-narrow">
+                    <p>Uno o más elementos han sido eliminados por tu administrador, motivo:</p>
+                    <p>{{ user.reason }}</p>
+                </div>
+                <div v-if="!user.photo || !user.video" class="box column is-narrow">
+                    <p class="title">ADVERTENCIA</p>
+                    <p>Para poder salir en la orla tienes que <strong>subir una foto o un vídeo</strong> como mínimo</p>
+                    <a href="upload.php" class="button is-success">Subir datos</a>   
+                </div>
+                <div v-else-if="!user.link || !user.quote" class="box column is-narrow">
+                    <p class="title">Completa tu perfil</p>
+                    <p>Todavía puedes subir tu enlace o tu cita</p>
+                    <a href="upload.php" class="button is-success">Subir datos</a>    
+                </div>
+                <div v-else class="box column is-narrow">
+                    Todo listo
+                </div>
+            </div>
+        </div>
     </div>
     `,
     mounted() {
         // Set GET params, so when the user clicks, gets redirected to the group's yearbook
-        this.params = `?schoolid=${this.yearbook.schoolid}&acyear=${this.yearbook.acyear}&group=${this.yearbook.schoolyear}`
+        this.params = `?id=${this.yearbook.id}`
     }
 })
 
-// Dashboard
-Vue.component('dashboard', {
-    props: ["user"],
+Vue.component('edit', {
     data() {
         return {
-            edit: false,
-            type: ""
+            edit: false
         }
     },
+    props: ["user"],
     template:
     `
-    <div class="container">
-        <div v-if="!user.photo || !user.video">
-            <p class="title">ADVERTENCIA</p>
-            <p>Para poder salir en la orla tienes que <strong>subir una foto o un vídeo</strong> como mínimo</p>
-            <a href="upload.php" class="button is-success">Subir datos</a>     
-            <hr>   
-        </div>
-        <div v-else-if="!user.link || !user.quote">
-            <p class="title">Completa tu perfil</p>
-            <p>Todavía puedes subir tu enlace o tu cita</p>
-            <a href="upload.php" class="button is-success">Subir datos</a>     
-            <hr>  
-        </div>
-        <div v-if="user.reason" class="notification is-danger">
-            <p>Uno o más elementos han sido eliminados por tu administrador, motivo:</p>
-            <p>{{ user.reason }}</p>
-        </div>
-        <p class="title">
-            <i class="fas fa-user"></i>
-            <span>Tus datos</span>
-        </p>
-        <div class="table-container">
-            <table class="table is-bordered is-striped is-narrow is-hoverable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre completo</th>
-                        <th>Foto</th>
-                        <th>Vídeo</th>
-                        <th>Enlace</th>
-                        <th>Cita</th>
-                        <th>Última modificación</th>
-                        <th v-if="user.type == 'teachers'">Asignatura</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.fullname }}</td>
-                        <td>
-                            <a :href="'../getmedia.php?id=' + user.id + '&media=photo&type=' + user.type" target="_blank">{{ user.photo }}</a>
-                        </td>
-                        <td>
-                            <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + user.type" target="_blank">{{ user.video }}</a>
-                        </td>
-                        <td>
-                            <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
-                        </td>
-                        <td v-html="user.quote"></td>
-                        <td>{{ user.uploaded }}</td>
-                        <td v-if="user.type == 'teachers'">{{ user.subject }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div>
         <div v-show="edit">
             <div class="field">
                 <label class="label">Elige los datos</label>
@@ -138,7 +104,6 @@ Vue.component('dashboard', {
             </span>
             <span>Editar</span>
         </button>
-        <hr>
     </div>
     `,
     methods: {
@@ -181,19 +146,52 @@ Vue.component('dashboard', {
     }
 })
 
-Vue.component('upload', {
+
+// Dashboard
+Vue.component('user', {
+    props: ["user"],
     template:
     `
-    <div class="content has-text-centered">
-        <h1 class="title">👋 ¡Hola! Bienvenido</h1>
-        <p>Parece ser que no tienes datos subidos, puedes comenzar pulsando el botón:</p>
-        <a class="button is-info" href="upload.php">
-            <span class="icon">
-                <i class="fas fa-upload"></i>
-            </span>
-            <span>Agregar datos</span>
-        </a>
-        <hr>
+    <div>
+        <p class="title">
+            <i class="fas fa-user"></i>
+            <span>Tus datos</span>
+        </p>
+        <div class="table-container">
+            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre completo</th>
+                        <th>Foto</th>
+                        <th>Vídeo</th>
+                        <th>Enlace</th>
+                        <th>Cita</th>
+                        <th>Última modificación</th>
+                        <th v-if="user.type == 'teachers'">Asignatura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.fullname }}</td>
+                        <td>
+                            <a :href="'../getmedia.php?id=' + user.id + '&media=photo&type=' + user.type" target="_blank">{{ user.photo }}</a>
+                        </td>
+                        <td>
+                            <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + user.type" target="_blank">{{ user.video }}</a>
+                        </td>
+                        <td>
+                            <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
+                        </td>
+                        <td v-html="user.quote"></td>
+                        <td>{{ user.uploaded }}</td>
+                        <td v-if="user.type === 'teachers'">{{ user.subject }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <edit v-bind:user="user"></edit>
     </div>
     `
 })
@@ -202,7 +200,7 @@ Vue.component('gallery', {
     props: ["gallery"],
     template:
     `
-    <div class="container">
+    <div>
         <p class="title">
             <i class="fas fa-photo-video"></i>
             <span>Galería de tu grupo</span>
@@ -235,8 +233,19 @@ Vue.component('gallery', {
 var dashboard_vue = new Vue({
     el: '#main',
     data: {
+        showNav: false,
+        tab: "mainmenu",
         user: user_js,
         gallery: gallery_js,
         yearbook: yearbook_js
+    },
+    methods: {
+        changeTab: function(tab) {
+            this.showNav = false
+            this.tab = tab
+            document.getElementById("items").scrollIntoView({
+                behavior: 'smooth'
+            })
+        }
     }
 })

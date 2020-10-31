@@ -88,14 +88,15 @@ class DBInfo {
         $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
         $yearbook = [];
         // Check if admin generated yearbook before
-        $stmt = $this->db->prepare("SELECT generated FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
+        $stmt = $this->db->prepare("SELECT id, generated FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
         $stmt->bind_param("iss", $this->userinfo["idcentro"], $this->userinfo["yearuser"], $acyear);
         $stmt->execute();
         $stmt->store_result();
-        $stmt->bind_result($generated);
+        $stmt->bind_result($id, $generated);
         if ($stmt->num_rows == 1) {
             if(($result = $stmt->fetch()) == true){
                 $yearbook = [
+                    "id" => $id,
                     "available" => true,
                     "date" => $generated,
                     "schoolid" => $this->userinfo["idcentro"],
@@ -105,6 +106,24 @@ class DBInfo {
             }
         }
         return $yearbook;
+    }
+
+    public function recents() {
+        $users = [];
+        $stmt = $this->db->prepare("SELECT id, fullname, uploaded FROM users WHERE schoolid=? AND schoolyear=? ORDER BY DATE(uploaded) DESC LIMIT 5");
+        $stmt->bind_param("ss", $this->userinfo["idcentro"], $this->userinfo["yearuser"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $users[] = [
+                "id" => $row["id"],
+                "name" => $row["fullname"],
+                "type" => $row["type"],
+                "uploaded" => $row["uploaded"]
+            ];
+        }
+        $stmt->close();
+        return $users;
     }
 }
 ?>

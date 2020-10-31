@@ -109,9 +109,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `id` int NOT NULL AUTO_INCREMENT,
         `schoolid` varchar(32) NOT NULL,
         `schoolyear` varchar(32) NOT NULL,
-        `zipname` varchar(32) NOT NULL,
         `generated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `acyear` varchar(16) NOT NULL,
+        `banner` varchar(30),
         `voted` int DEFAULT '0',
         primary key(id)
         )";

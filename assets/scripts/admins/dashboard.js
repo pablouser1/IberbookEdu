@@ -1,54 +1,76 @@
-// Users
-Vue.component('users', {
-    props: ["users", "type"],
+Vue.component('mainmenu', {
+    props: ["info"],
     template:
     `
-    <div class="container">
-        <p v-if="type === 'students'" class="title">
-            <i class="fas fa-user-graduate"></i>
-            <span>Alumnos</span>
-        </p>
-        <p v-else class="title">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <span>Profesores</span>
-        </p>
-        <p class="subtitle">Total: {{ users.length }}</p>
-        <div v-if="Object.keys(users).length === 0">
-            <p>No hay personas disponibles</p>
+    <div>
+        <section class="info-tiles">
+            <div class="tile is-ancestor has-text-centered">
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title">{{ info.teachers + info.students }}</p>
+                        <p class="subtitle">Usuarios totales</p>
+                    </article>
+                </div>
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title">{{ info.teachers }}</p>
+                        <p class="subtitle">Profesores</p>
+                    </article>
+                </div>
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title">{{ info.students }}</p>
+                        <p class="subtitle">Alumnos</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <div class="columns is-centered">
+            <div class="column is-6">
+                <div class="card events-card">
+                    <header class="card-header">
+                        <p class="card-header-title">Últimas modificaciones</p>
+                    </header>
+                    <div class="card-table">
+                        <div class="content">
+                            <table class="table is-fullwidth is-striped">
+                                <thead>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Fecha</th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="user in info.recent">
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.uploaded }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            Búsqueda de usuarios
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <div class="control has-icons-left">
+                                <input class="input" type="text">
+                                <span class="icon is-medium is-left">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div v-else class="table-container">
-            <table class="table is-bordered is-striped is-narrow is-hoverable">
-                <thead>
-                    <tr>
-                        <th>Nombre completo</th>
-                        <th>Foto</th>
-                        <th>Vídeo</th>
-                        <th>Enlace</th>
-                        <th>Cita</th>
-                        <th>Última modificación</th>
-                        <th v-if="type === 'teachers'">Asignatura</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="user in users">
-                        <td>{{ user.name }}</td>
-                        <td>
-                            <a :href="'../getmedia.php?id=' + user.id + '&media=photo&type=' + type" target='_blank'>{{ user.photo }}</a>
-                        </td>
-                        <td>
-                            <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + type" target='_blank'>{{ user.video }}</a>
-                        </td>
-                        <td>
-                            <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
-                        </td>
-                        <td v-html="user.quote"></td>
-                        <td>{{ user.uploaded }}</td>
-                        <td v-if="type === 'teachers'">{{ user.subject }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <edit v-bind:users="users" v-bind:type="type"></edit>
     </div>
     `
 })
@@ -125,7 +147,7 @@ Vue.component('edit', {
     methods: {
         // Delete selected item(s) from user
         deleteItems: function(type) {
-            let user = document.getElementById("select_user").options[select_user.selectedIndex].value
+            let user = document.getElementById("select_user").value
             let items = []
             let select = document.getElementById("select_items")
             for (var i = 0; i < select.options.length; i++) {
@@ -157,7 +179,60 @@ Vue.component('edit', {
                 }
             })
         }
-    },
+    }
+})
+
+// Users
+Vue.component('users', {
+    props: ["users", "type"],
+    template:
+    `
+    <div class="box">
+        <p v-if="type === 'students'" class="title">
+            <i class="fas fa-user-graduate"></i>
+            <span>Alumnos</span>
+        </p>
+        <p v-else class="title">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <span>Profesores</span>
+        </p>
+        <div class="table-container">
+            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre completo</th>
+                        <th>Foto</th>
+                        <th>Vídeo</th>
+                        <th>Enlace</th>
+                        <th>Cita</th>
+                        <th>Última modificación</th>
+                        <th v-if="type === 'teachers'">Asignatura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="user in users">
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>
+                            <a :href="'../getmedia.php?id=' + user.id + '&media=photo&type=' + type" target='_blank'>{{ user.photo }}</a>
+                        </td>
+                        <td>
+                            <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + type" target='_blank'>{{ user.video }}</a>
+                        </td>
+                        <td>
+                            <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
+                        </td>
+                        <td v-html="user.quote"></td>
+                        <td>{{ user.uploaded }}</td>
+                        <td v-if="type === 'teachers'">{{ user.subject }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <edit v-bind:users="users" v-bind:type="type"></edit>
+    </div>
+    `
 })
 
 // Gallery
@@ -165,13 +240,13 @@ Vue.component('gallery', {
     props: ["gallery"],
     template:
     `
-    <div class="container">
+    <div class="box">
         <p class="title">
             <i class="fas fa-photo-video"></i>
             <span>Galería de tu grupo</span>
         </p>
         <div class="table-container">
-            <table class="table is-bordered is-striped is-narrow is-hoverable">
+            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
                 <thead>
                     <tr>
                         <th>Archivo</th>
@@ -196,7 +271,6 @@ Vue.component('gallery', {
             </span>
             <span>Modificar galería</span>
         </a>
-        <hr>
     </div>
     `
 })
@@ -311,7 +385,7 @@ Vue.component('yearbook', {
     mounted() {
         if (this.yearbook.available) {
             // Set GET params, so when the user clicks, gets redirected to the group's yearbook
-            this.params = `?schoolid=${this.yearbook.schoolid}&acyear=${this.yearbook.acyear}&group=${this.yearbook.schoolyear}`
+            this.params = `?id=${this.yearbook.id}`
         }
     }
 })
@@ -320,9 +394,28 @@ Vue.component('yearbook', {
 var dashboard_vue = new Vue({
     el: '#main',
     data: {
+        showNav: false,
+        tab: "mainmenu",
+        info: null, // Main menu info
         teachers: teachers_js,
         students: students_js,
         gallery: gallery_js,
         yearbook: yearbook_js
+    },
+    created() {
+        this.info = {
+            "teachers": Object.keys(this.teachers).length,
+            "students": Object.keys(this.students).length,
+            "recent": recent_js
+        }
+    },
+    methods: {
+        changeTab: function(tab) {
+            this.showNav = false
+            this.tab = tab
+            document.getElementById("items").scrollIntoView({
+                behavior: 'smooth'
+            })
+        }
     }
 })

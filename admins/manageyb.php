@@ -1,5 +1,4 @@
 <?php
-// TODO, delete user votes when yearbook get deleted
 session_start();
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== "admin"){
@@ -37,6 +36,13 @@ $yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 if (isset($_GET["action"])) {
     // Get academic year (2020-2021 for example)
     $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+    // Get yearbook id
+    $stmt = $db->prepare("SELECT id FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
+    $stmt->bind_param("iss", $userinfo["idcentro"], $userinfo["yearuser"], $acyear);
+    $stmt->execute();
+    $stmt->bind_result($ybid);
+    $stmt->fetch();
+    $stmt->close();
     switch ($_GET["action"]) {
         case "delete":
             // Delete yearbook
@@ -50,7 +56,7 @@ if (isset($_GET["action"])) {
                 sendJSON($response);
             }
             $stmt->close();
-            recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"]."/$acyear/".$yearuser);
+            recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"].$ybpath.$ybid);
         break;
         default:
         $response = [

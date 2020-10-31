@@ -111,16 +111,14 @@ const translations = {
   }
 
 // Multilanguage setup
-var lang;
+
+// Default english
+var lang = translations.en;
 const allowed_languages = ["en", "es", "fr"]
 var userLang = (navigator.language || navigator.userLanguage).substring(0,2)
 
 // Set the language to english if the user's language isn't in the allowed_languages
-if (!allowed_languages.includes(userLang)){
-    console.warn("Falling back to English")
-    lang = translations.en;
-}
-else {
+if (allowed_languages.includes(userLang)){
     lang = translations[userLang];
 }
 

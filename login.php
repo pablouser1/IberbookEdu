@@ -1,13 +1,14 @@
 <?php
 session_start();
-if (isset($_SESSION["loggedin"], $_SESSION["userinfo"])){
-    $userinfo = $_SESSION["userinfo"];
-    header("Location: users/dashboard.php");
-    exit;
-}
-elseif (isset($_SESSION["owner"])) {
-    $ownerinfo = $_SESSION["ownerinfo"];
-    header("Location: owner/dashboard.php");
+if (isset($_SESSION["loggedin"])){
+    if ($_SESSION["loggedin"] === "owner") {
+        header("Location: owner/dashboard.php");
+        exit;
+    }
+    else {
+        header("Location: users/dashboard.php");
+        exit;
+    }
 }
 
 $login_error = array();
@@ -154,38 +155,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - IberbookEdu</title>
-    <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="assets/styles/login.css"/>
 </head>
 
 <body>
-    <section class="hero is-success is-fullheight">
-        <div class="hero-body">
-            <div class="container has-text-centered">
-                <div class="column is-4 is-offset-4">
-                    <h3 class="title has-text-black">IberbookEdu - Login</h3>
-                    <hr class="login-hr">
-                    <p class="subtitle has-text-black">Por favor, inicia sesión con tus credenciales.</p>
-                    <div class="box">
+    <section class="container">
+        <div class="columns is-multiline">
+            <div class="column is-8 is-offset-2 login">
+                <div class="columns">
+                    <div class="column left">
+                        <h1 class="title is-1">IberbookEdu</h1>
+                        <h2 class="subtitle colored is-4">Inicia sesión con tus credenciales</h2>
+                        <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
+                            <span>
+                                <p>Hubo un error al procesar tu solicitud:</p>
+                                <?php
+                                if($login_error) {
+                                    foreach($login_error as $error) {
+                                        echo "<p>$error</p>";
+                                    }
+                                }
+                                ?>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="column right has-text-centered">
+                        <!-- FORM -->
                         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                             <div class="field">
-                                <label class="label">Usuario</label>
-                                <div class="control has-icons-left">
-                                    <span class="icon is-small is-left">
-                                        <i class="fas fa-user"></i>
-                                    </span>
-                                    <input name="username" type="text" placeholder="usuario" class="input" required>
+                                <label class="label">Nombre de usuario</label>
+                                <div class="control">
+                                    <input name="username" class="input is-medium" type="text" placeholder="usuario">
                                 </div>
                             </div>
+
                             <div class="field">
                                 <label class="label">Contraseña</label>
-                                <div class="control has-icons-left">
-                                    <span class="icon is-small is-left">
-                                        <i class="fa fa-lock"></i>
-                                    </span>
-                                    <input name="password" type="password" placeholder="**********" class="input" required>
+                                <div class="control">
+                                    <input name="password" class="input is-medium" type="password" placeholder="**********">
                                 </div>
                             </div>
+
                             <div class="field">
                                 <label for="" class="label">Soy...</label>
                                 <div class="select">
@@ -197,32 +209,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </select>
                                 </div>
                             </div>
-                            <button type="submit" class="button is-block is-info is-fullwidth">Iniciar sesión</button>
+                            <button class="button is-block is-primary is-fullwidth is-medium">Iniciar sesión</button>
                         </form>
-                        <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
-                            <ul>
-                                <li>
-                                    <a href="index.php">Volver al inicio</a>
-                                </li>
-                                <li>
-                                    <a href="about.html">Acerca de</a>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
-                <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
-                    <span>
-                        <p>Hubo un error al procesar tu solicitud:</p>
-                        <?php
-                        if($login_error) {
-                            foreach($login_error as $error) {
-                                echo "<p>$error</p>";
-                            }
-                        }
-                        ?>
-                    </span>
-                </div>
+            </div>
+            <div class="column is-8 is-offset-2">
+                <nav class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            Hecho con ❤️ en Github
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <a class="level-item" href="about.html">Acerca de</a>
+                    </div>
+                </nav>
             </div>
         </div>
     </section>

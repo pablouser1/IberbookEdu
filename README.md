@@ -39,18 +39,22 @@ Once you finished installing everything and you had already copied the project t
 * Local API
 * Fix, better upload error handling
 * Maintenance mode
-* Yearbook Twitter URL doesn't work
+* Search mode yearbooks.php (WIP)
+* Redisign yearbooks.php (WIP)
+* Infinite scrolling yearbooks.php
 
 # Credits
 
 This project wouldn't be possible without the help of the following projects:
 
 * Bulma (https://bulma.io) | [LICENSE](https://github.com/jgthms/bulma/blob/master/LICENSE)
+* Bulma Template (https://github.com/BulmaTemplates/bulma-templates) | [LICENSE](https://github.com/BulmaTemplates/bulma-templates/blob/master/LICENSE)
 * Vue.js (https://vuejs.org) | [LICENSE](https://github.com/vuejs/vuejs.org/blob/master/LICENSE)
 * Animate.css (https://animate.style) | [LICENSE](https://github.com/animate-css/animate.css/blob/master/LICENSE)
 * zuck.js (https://github.com/ramon82/zuck.js) | [LICENSE](https://github.com/ramon82/zuck.js/blob/master/LICENSE)
 * Confetti.js (https://github.com/mathusummut/confetti.js) | [LICENSE](https://github.com/mathusummut/confetti.js/blob/master/LICENSE)
 * Spinkit (https://github.com/tobiasahlin/SpinKit) | [LICENSE](https://github.com/tobiasahlin/SpinKit/blob/master/LICENSE)
+
 Assets:
 
 * Portrait Placeholder : Greasemann / CC BY-SA (https://creativecommons.org/licenses/by-sa/4.0)

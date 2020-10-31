@@ -27,8 +27,8 @@ var teachers = {
     },
     template: 
     `
-    <div class="columns is-centered is-multiline is-vcentered is-mobile">
-        <div v-for="(teacher) in teachers" class="animate__animated animate__fadeIn column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+    <div class="columns is-centered is-multiline is-vcentered is-mobile animate__animated animate__fadeIn">
+        <div v-for="(teacher) in teachers" class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
             <article class="media">
                 <div class="media-content">
                     <p>
@@ -41,21 +41,8 @@ var teachers = {
                         <q v-html="teacher.quote"></q>
                         <br>
                         <i><small>{{teacher.date}}</small></i>
-                        <span class="tag">{{teacher.subject}}</span>
                     </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                            </a>
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                            </a>
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                            </a>
-                        </div>
-                    </nav>
+                    <span class="tag">{{teacher.subject}}</span>
                 </div>
             </article>
         </div>
@@ -80,8 +67,8 @@ var students = {
     },
     template: 
     `
-    <div class="columns is-centered is-multiline is-vcentered is-mobile">
-        <div v-for="(student) in students" class="animate__animated animate__fadeIn column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+    <div class="columns is-centered is-multiline is-vcentered is-mobile animate__animated animate__fadeIn">
+        <div v-for="(student) in students" class="column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
             <article class="media">
                 <div class="media-content">
                     <p>
@@ -95,19 +82,6 @@ var students = {
                         <br>
                         <i><small>{{student.date}}</small></i>
                     </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                            </a>
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                            </a>
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                            </a>
-                        </div>
-                    </nav>
                 </div>
             </article>
         </div>
@@ -132,8 +106,8 @@ var gallery = {
     },
     template: 
     `
-    <div class="columns is-centered is-multiline is-vcentered is-mobile">
-        <div v-for="(item) in gallery" class='animate__animated animate__fadeIn column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
+    <div class="columns is-centered is-multiline is-vcentered is-mobile animate__animated animate__fadeIn">
+        <div v-for="(item) in gallery" class='column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
             <article class="media">
                 <div class="media-content">
                     <a v-if="item.type == 'picture'" :href="item.path" target="_blank">
@@ -145,19 +119,6 @@ var gallery = {
                         <source :src="item.path"></script>
                     </video>
                     <p>{{ item.description }}</p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                            </a>
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                            </a>
-                            <a class="level-item">
-                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                            </a>
-                        </div>
-                    </nav>
                 </div>
             </article>
         </div>

@@ -13,7 +13,7 @@ $db = new DB;
 
 function executestmt($stmt) {
     if ($stmt->execute() !== true) {
-        die("Error inserting user data: " . $db->error);
+        die("Error inserting user data");
     }
     $stmt->close();
 }
@@ -39,7 +39,7 @@ if ($result->num_rows == 1){
     }
 }
 else {
-    $remain = ["photo", "video", "link", "quote"];
+    die("Ha habido un error, tu usuario no existe");
 }
 $stmt->close();
 
@@ -53,7 +53,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
     $allowed_vid = array('mp4', 'webm');
     // Upload directory
-    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/$typeuser/";
+    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/{$typeuser}/";
+    // Create dirs
+    if (!is_dir($baseurl.$userinfo["id"])){
+        mkdir($baseurl.$userinfo["id"], 0755, true);
+    }
     // Pic upload
     if (in_array("photo", $remain)) {
         if(isset($_FILES['pic'])){
@@ -63,12 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $ext = pathinfo($picPath, PATHINFO_EXTENSION);
                 // If the extension is not in the array create error message
                 if (!in_array($ext, $allowed_pic)) {
-                    $errors[] = "$ext no es un formato admitido.<br>";
+                    $errors[] = "{$ext} no es un formato admitido.<br>";
                 }
                 else{
-                    if (!is_dir($baseurl.$userinfo["id"])){
-                        mkdir($baseurl.$userinfo["id"], 0755, true);
-                    }
                     $picname = basename($picPath);
                     move_uploaded_file($tmpFilePath, $picPath);
                     $stmt = $db->prepare("UPDATE users SET photo = ? WHERE id=?");
@@ -94,9 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $errors[] = "$ext no es un formato admitido.<br>";
                 }
                 else{
-                    if (!is_dir($baseurl.$userinfo["id"])){
-                        mkdir($baseurl.$userinfo["id"], 0755, true);
-                    }
                     $vidname = basename($vidPath);
                     move_uploaded_file($tmpFilePath, $vidPath);
                     $stmt = $db->prepare("UPDATE users SET video = ? WHERE id=?");

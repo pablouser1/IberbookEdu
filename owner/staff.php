@@ -5,7 +5,9 @@ if (!isset($_SESSION["owner"])){
     exit;
 }
 
-require_once("getstaff.php");
+require_once("getprivinfo.php");
+$info = new DBPrivInfo;
+$staff = $info->staff();
 ?>
 
 <!DOCTYPE html>
@@ -179,9 +181,9 @@ require_once("getstaff.php");
                 foreach($staff as $user){
                     echo "
                     <tr>
-                        <td>$user[0]</td>
-                        <td>$user[1]</td>
-                        <td>$user[2]</td>
+                        <td>$user[id]</td>
+                        <td>$user[username]</td>
+                        <td>$user[permissions]</td>
                     </tr>
                     ";
                 }

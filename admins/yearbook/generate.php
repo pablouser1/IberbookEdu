@@ -66,20 +66,34 @@ else {
 // User info
 $userinfo = $_SESSION["userinfo"];
 $db = new DB;
+$dt = new DateTime("now");
+
 // Used later for directories without spaces
 $yearuser = str_replace(' ', '', $userinfo["yearuser"]);
 
 // Get academic year (2020/2021 for example)
 $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
 
-// Get current date (used later)
-$dt = new DateTime("now");
-// Yearbook complete path
-$baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$userinfo["idcentro"].'/'.$acyear."/".$yearuser;
-// Create yearbook dir
-if(!is_dir($baseurl)) {
-    mkdir($baseurl, 0755, true);
+$banner = null;
+
+if ($_FILES['banner']['name']) {
+    $banner = $_FILES['banner']['name'];
 }
+// Writes data to DB
+$stmt = $db->prepare("INSERT INTO yearbooks(schoolid, schoolname, schoolyear, acyear, banner) VALUES(?, ?, ?, ?, ?)");
+$stmt->bind_param("issss", $userinfo["idcentro"], $userinfo["namecentro"], $userinfo["yearuser"], $acyear, $banner);
+if ($stmt->execute() !== true) {
+    $response = [
+        "code" => "E",
+        "description" => "Error al escribir en la base de datos"
+    ];
+    sendJSON($response);
+}
+
+// Yearbook id
+$ybid = $stmt->insert_id;
+
+$stmt->close();
 
 // Teachers
 $stmt = $db->prepare("SELECT id, fullname, photo, video, link, quote, uploaded, subject FROM users WHERE `type`='teachers' AND schoolid=? AND schoolyear=? ORDER BY fullname");
@@ -154,12 +168,12 @@ $stmt->execute();
 $result = $stmt->get_result();
 $gallery = array();
 $gallery_dir = 'gallery/';
-$i = 0;
 while($row = mysqli_fetch_assoc($result)) {
-    $gallery[$i]["path"] = $gallery_dir.$row["name"];
-    $gallery[$i]["description"] = $row["description"];
-    $gallery[$i]["type"] = $row["type"];
-    $i++;
+    $gallery[] = [
+        "path" => $gallery_dir.$row["name"],
+        "description" => $row["description"],
+        "type" => $row["type"]
+    ];
 }
 $stmt->close();
 
@@ -171,6 +185,13 @@ $stmt->execute();
 $result = $stmt->get_result();
 if($result->num_rows === 1) {
     $schoolurl = $result->fetch_row()[0];
+}
+
+// Yearbook complete path
+$baseurl = $_SERVER["DOCUMENT_ROOT"].$ybpath.$ybid;
+// Create yearbook dir
+if(!is_dir($baseurl)) {
+    mkdir($baseurl, 0755, true);
 }
 
 // Copy all user uploaded files
@@ -293,21 +314,7 @@ class HZip
   }
 }
 
-// Makes zip from folder
-$date_file = $dt->format('d-m-Y');
-$zip_name = "yearbook_".$date_file.'.zip';
-HZip::zipDir($baseurl, $baseurl."/".$zip_name);
-
-// Writes data to DB
-$stmt = $db->prepare("INSERT INTO yearbooks(schoolid, schoolname, schoolyear, zipname, acyear) VALUES(?, ?, ?, ?, ?)");
-$stmt->bind_param("issss", $userinfo["idcentro"], $userinfo["namecentro"], $userinfo["yearuser"], $zip_name, $acyear);
-if ($stmt->execute() !== true) {
-    $response = [
-        "code" => "E",
-        "description" => "Error al escribir en la base de datos"
-    ];
-    sendJSON($response);
-}
+HZip::zipDir($baseurl, $baseurl."/yearbook.zip");
 
 // Everyting went OK
 $response = [
