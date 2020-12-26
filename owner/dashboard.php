@@ -1,7 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION["owner"])){
-    header("Location: ../login.php");
+    http_response_code(401);
+    echo("No tienes permisos");
     exit;
 }
 
@@ -36,46 +37,6 @@ $schools = $info->schools();
 
 <body>
     <div id="main">
-        <!-- Start navbar -->
-        <nav class="navbar is-white">
-            <div class="container">
-                <div class="navbar-brand">
-                    <a class="navbar-item brand-text" href="../index.php">
-                        <span class="icon">
-                            <i class="fas fa-home"></i>
-                        </span>
-                        <span><b>IberbookEdu</b></span>
-                    </a>
-                    <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button" aria-label="menu" aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </a>
-                </div>
-                <div class="navbar-menu" :class="{ 'is-active': showNav }">
-                    <div class="navbar-end">
-                        <div class="navbar-item has-dropdown is-hoverable is-hidden-desktop">
-                            <a class="navbar-link">
-                                <span class="icon">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                                <span>Tabs</span>
-                            </a>
-                            <div class="navbar-dropdown">
-                                <a v-on:click="changeTab('mainmenu')" class="navbar-item">Menú principal</a>
-                                <a v-on:click="changeTab('users')" class="navbar-item">Subidas</a>
-                            </div>
-                        </div>
-                        <a class="navbar-item" href="../logout.php">
-                            <span class="icon">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </span>
-                            <span>Cerrar sesión</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
         <!-- End navbar -->
         <div class="container">
             <section class="hero is-info welcome is-small">
@@ -105,7 +66,7 @@ $schools = $info->schools();
                         <!-- Main Menu --->
                         <mainmenu class="animate__animated animate__fadeIn" v-if="tab === 'mainmenu'" v-bind:staff="staff" v-bind:schools="schools"></mainmenu>
                         <!-- User -->
-                        <users class="animate__animated animate__fadeIn" v-if="tab === 'users'"></users>
+                        <users class="animate__animated animate__fadeIn" v-if="tab === 'users'" v-bind:schools="schools"></users>
                     </section>
                 </div>
             </div>

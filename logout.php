@@ -1,14 +1,30 @@
 <?php
-// Initialize the session
-session_start();
- 
-// Unset all of the session variables
-$_SESSION = array();
- 
-// Destroy the session.
-session_destroy();
- 
-// Redirect to login page
-header("location: index.php");
-exit;
+require_once("functions.php");
+require_once("headers.php");
+require_once("helpers/db.php");
+require_once("auth.php");
+
+$db = new DB;
+$auth = new Auth;
+$userinfo = $auth->isUserLoggedin();
+
+if ($userinfo) {
+    unset($_COOKIE["login"]);
+    setcookie("login", "", [
+        'expires' => time()-86400,
+        'domain' => $_SERVER["HTTP_HOST"],
+        'samesite' => "Strict",
+        'httponly' => true
+    ]);
+    $response = [
+        "code" => "C"
+    ];
+}
+else {
+    $response = [
+        "code" => "E",
+        "error" => "No has iniciado sesión"
+    ];
+}
+sendJSON($response);
 ?>

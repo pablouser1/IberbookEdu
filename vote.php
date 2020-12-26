@@ -1,110 +1,120 @@
 <?php
-session_start();
-// Send JSON to client
-function sendJSON($response) {
-    header('Content-type: application/json');
-    echo (json_encode($response));
-    exit;
+require_once("functions.php");
+require_once("headers.php");
+
+require_once("auth.php");
+require_once("helpers/db.php");
+
+$auth = new Auth;
+
+class Vote {
+    private $conn;
+    private $userinfo;
+    function __construct($userinfo) {
+        $this->db = new DB;
+        $this->userinfo = $userinfo;
+    }
+
+    public function start($id) {
+        $yearbook = $this->getYearbookInfo($id);
+        if ($yearbook) {
+            if ($this->checkifvalid($yearbook)) {
+                $this->checkIfAlreadyVoted($id);
+                $this->addVote($id);
+                $this->setVoteToUser($id);
+                $response = [
+                    "code" => "C"
+                ];
+            }
+            else {
+                $response = [
+                    "code" => "E",
+                    "error" => "No puedes votar a tu propio grupo"
+                ];
+            }
+        }
+        else {
+            $response = [
+                "code" => "E",
+                "error" => "Esa orla no existe"
+            ];
+        }
+        return $response;
+    }
+
+    private function getYearbookInfo($id) {
+        $stmt = $this->db->prepare("SELECT schoolid, schoolyear FROM yearbooks WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 1) {
+            $yearbook = $result->fetch_assoc();
+            $stmt->close();
+            return $yearbook;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Check if user can vote
+    private function checkifvalid($yearbook) {
+        if ($yearbook["schoolid"] == $this->userinfo["schoolid"] && $yearbook["schoolyear"] == $this->userinfo["year"]) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    // Check if user already voted and change vote if that's the case
+    private function checkIfAlreadyVoted($ybid) {
+        $stmt = $this->db->prepare("SELECT votes from users WHERE id=?");
+        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt->execute();
+        $stmt->store_result();
+        // Get profile id
+        $stmt->bind_result($uservote);
+        $stmt->fetch();
+        $stmt->close();
+        if ($uservote !== $ybid) {
+            $this->removeVote($uservote);
+        }
+    }
+
+    // Add 1 vote to yearbook and set voted to yb id
+    private function addVote($ybid) {
+        $stmt = $this->db->prepare("UPDATE yearbooks SET votes = votes + 1 WHERE id=?");
+        $stmt->bind_param("i", $ybid);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    // Remove 1 vote from yearbook
+    private function removeVote($ybid) {
+        $stmt = $this->db->prepare("UPDATE yearbooks SET votes = votes - 1 WHERE id=?");
+        $stmt->bind_param("i", $ybid);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    private function setVoteToUser($ybid) {
+        $stmt = $this->db->prepare("UPDATE users SET votes =? WHERE id=?");
+        $stmt->bind_param("ii", $ybid, $this->userinfo["id"]);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
 
-// Send database error to client
-function DBError() {
-    $response = [
-        "code" => "E",
-        "description" => "por favor, inténtelo de nuevo más tarde"
-    ];
-    sendJSON($response);
+if ($userinfo = $auth->isUserLoggedin()) {
+    $vote = new Vote($userinfo);
+    $response = $vote->start($_POST["id"]);
 }
-
-if (!isset($_SESSION["loggedin"])){
-    $response = [
-        "code" => "E",
-        "description" => "necesitas iniciar sesión para votar"
-    ];
-    sendJSON($response);
-}
-require_once("helpers/db/db.php");
-
-$userinfo = $_SESSION["userinfo"];
-$db = new DB;
-// Add votes
-if (isset($_GET["id"])) {
-    $ybexist = false;
-
-    $typeuser = $userinfo["typeuser"];
-    // Get yearbook info
-    $stmt = $db->prepare("SELECT schoolid, schoolyear FROM yearbooks WHERE id=?");
-    $stmt->bind_param("i", $_GET["id"]);
-    if ($stmt->execute() !== true) DBError();
-    $result = $stmt->get_result();
-    $value = $result->fetch_assoc();
-    $stmt->close();
-    // Check if user is trying to vote his own group
-    if (!$value) {
-        // Invalid id
-        $response = [
-            "code" => "E",
-            "description" => "ese yearbook no existe"
-        ];
-        sendJSON($response);
-    }
-    elseif ( ($value["schoolid"] == $userinfo["idcentro"]) && ($value["schoolyear"] == $userinfo["yearuser"]) ) {
-        $response = [
-            "code" => "E",
-            "description" => "no puedes votar a tu propio grupo"
-        ];
-        sendJSON($response);
-    }
-    // Set ybexists to true if yearbook exists
-    if (!empty($value)) $ybexist = true;
-    
-    // Get user yearbook voted id
-    $stmt = $db->prepare("SELECT voted FROM $typeuser WHERE id=?");
-    $stmt->bind_param("s", $userinfo["iduser"]);
-    if ($stmt->execute() !== true) DBError();
-    $result = $stmt->get_result();
-    $ybinfo = $result->fetch_assoc();
-    $uservote = !empty($ybinfo["voted"]) ? (int)$ybinfo["voted"] : null;
-    $stmt->close();
-
-    // Allow voting if user voted a yearbook that has been deleted
-    if (!$ybexist) {
-        $stmt = $db->prepare("UPDATE $typeuser SET voted =? WHERE id=?");
-    }
-    else {
-        $stmt = $db->prepare("UPDATE $typeuser SET voted =? WHERE id=? AND voted IS NULL");
-    }
-    
-    $stmt->bind_param("is", $_GET["id"], $userinfo["iduser"]);
-    if ($stmt->execute() !== true) DBError();
-    elseif ($stmt->affected_rows == 0) {
-        $response = [
-            "code" => "E",
-            "description" => "ya has votado anteriormente"
-        ];
-        sendJSON($response);
-    }
-    $stmt->close();
-    
-    // Update yearbook data with one more vote
-    $stmt = $db->prepare("UPDATE yearbooks SET voted = voted + 1 WHERE id=?");
-    $stmt->bind_param("i", $_GET["id"]);
-    if ($stmt->execute() !== true) DBError();
-    $stmt->close();
-}
-// If vars are not set send error
 else {
     $response = [
         "code" => "E",
-        "description" => "no has seleccionado ningún yearbook"
+        "error" => "Necesitas inciar sesión para votar"
     ];
-    sendJSON($response);
 }
-
-// Set response in json if everything went ok
-$response = [
-    "code" => "C",
-    "description" => null
-];
 sendJSON($response);
 ?>

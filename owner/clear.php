@@ -1,11 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION["owner"])){
-    header("Location: ../login.php");
+    header("Location: login.php");
     exit;
 }
 require_once("../helpers/db.php");
-require_once("../helpers/config.php");
+require_once("../config/config.php");
 $db = new DB;
 function recursiveRemoveDirectory($directory)
 {

@@ -3,6 +3,7 @@ if (!extension_loaded('mysqli') || !extension_loaded('zip') || !extension_loaded
     die("Este programa necesita los siguientes plugins para funcionar: php-mysqli, php-zip y php-curl");
 }
 
+// Default values
 $dirs = [
     "upload" => dirname(__FILE__)."/uploads/",
     "yearbook" => dirname($_SERVER['PHP_SELF'])."/yearbooks/"
@@ -17,22 +18,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // DB connection info
     $db_file = '
     <?php
-    $db_name = "'.$db_config[0].'";
-    $db_host = "'.$db_config[1].'";
-    $db_port = '.(int)$db_config[2].';
-    $db_username = "'.$db_config[3].'";
-    $db_password = "'.$db_config[4].'";
+    $db_name = "'.$db_config["name"].'";
+    $db_host = "'.$db_config["host"].'";
+    $db_port = '.(int)$db_config["port"].';
+    $db_username = "'.$db_config["username"].'";
+    $db_password = "'.$db_config["password"].'";
     ?>';
     file_put_contents("helpers/db/dbconf.php", $db_file);
 
     // Config info
-    switch ($global_config[0]) { // Login system used
+    switch ($global_config["login"]) { // Login system used
         case "andalucia":
             $login = "ced";
             $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
             $ssloptions = 'array(
                 // The cafile is necessary only in Andalucia
-                CURLOPT_CAINFO => $base_path."helpers/cert/juntadeandalucia-es-chain.pem",
+                CURLOPT_CAINFO => __DIR__."/cert/juntadeandalucia-es-chain.pem",
                 CURLOPT_SSL_VERIFYPEER => true
             );';
         break;
@@ -56,9 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // General
     $login = "'.$login.'"; // Login system used
     $base_url = "'.$base_url.'"; // Remote server url
-    $base_path = "'.dirname(__FILE__).'/"; // Program base dir
-    $uploadpath = "'.$global_config[1].'"; // Uploads dir
-    $ybpath = "'.$global_config[2].'"; // Base dir for user uploads and generated yearbooks
+    $uploadpath = "'.$global_config["uploaddir"].'"; // Uploads dir
+    $token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHARE <--
     // Api
     $ssloptions = '.$ssloptions.'
     ?>';
@@ -73,9 +73,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         id INT NOT NULL AUTO_INCREMENT,
         userid varchar(9),
         `type` varchar(12),
-        fullname varchar(255) not null,
-        schoolid varchar(12) not null,
-        schoolyear varchar(12) not null,
+        fullname varchar(255) NOT NULL,
+        schoolid varchar(12) NOT NULL,
+        schoolyear varchar(12) NOT NULL,
+        email varchar(255),
         photo varchar(255),
         video varchar(255),
         link varchar(255),
@@ -83,7 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         `subject` varchar(24),
         voted int,
-        reason varchar(255),
         primary key(id)
         )";
     if ($db->query($sql) !== TRUE) {
@@ -145,24 +145,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // School info
     // First we need to get the school's name
-    $stmt = $db->prepare("INSERT INTO schools (id, url) VALUES (?, ?);");
-    $stmt->bind_param("is", $schoolinfo[0], $schoolinfo[1]);
+    $stmt = $db->prepare("INSERT INTO schools (id. `name`) VALUES (?, ?);");
+    $stmt->bind_param("is", $schoolinfo["id"], $schoolinfo["name"]);
     if ($stmt->execute() !== true) {
         die("Error writing school");
     }
     
     // Staff info
-    $owner_password = password_hash($owner[1], PASSWORD_DEFAULT);
+    $owner_password = password_hash($owner["password"], PASSWORD_DEFAULT);
     $stmt = $db->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
-    $stmt->bind_param("ss", $owner[0], $owner_password);
+    $stmt->bind_param("ss", $owner["username"], $owner_password);
     if ($stmt->execute() !== true) {
         die("Error writing owner");
     }
-    mkdir($global_config[1], 0755);
+    mkdir($global_config["uploaddir"], 0755);
     // Elimina setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
-    header("Location: index.php");
+    echo("Setup realizado con éxito");
     exit;
 }
 ?>
@@ -202,9 +202,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
             <div class="container">
                 <noscript>Este programa necesita Javascript</noscript>
-                <database v-if="stage === 'database'"></database>
-                <owner v-if="stage === 'owner'"></owner>
-                <server v-bind:dirs="dirs" v-if="stage === 'server'"></server>
+                <database v-show="stage === 'database'"></database>
+                <owner v-show="stage === 'owner'"></owner>
+                <server v-bind:dirs="dirs" v-show="stage === 'server'"></server>
             </div>
         </form>
     </section>

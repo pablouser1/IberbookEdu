@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- General -->
+    <title>IberbookEdu</title>
+    <meta name="description" content="Orla generada con IberbookEdu">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:title" content="Orla - IberbookEdu"/>
+    <meta name="twitter:creator" content="@pablouser1"/>
+    <meta name="twitter:description" content="Ver orla en IberbookEdu"/>
+    <!-- Open Graph -->
+    <meta property="og:title" content="Orla - IberbookEdu"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:description" content="Ver orla en IberbookEdu"/>
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico">
+    <!-- Scripts -->
+
+    <!-- Yearbook data -->
+    <script src="scripts/data.js"></script>
+    <!-- Dev Vue -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script src="scripts/vendor/vue.min.js"></script>
+    <script defer src="scripts/vendor/solid.min.js"></script>
+    <script defer src="scripts/vendor/fontawesome.min.js"></script>
+    <script src="scripts/vendor/confetti.min.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/vendor/bulma.min.css"/>
+    <link rel="stylesheet" href="styles/vendor/animate.min.css"/>
+    <link rel="stylesheet" href="styles/yearbook.css"/>
+</head>
+
+<body>
+    <!-- NoScript Warning -->
+    <noscript>This program needs Javascript</noscript>
+    <div id="main">
+        <!-- Splashscreen -->
+        <section id="splashscreen" v-if="splashscreen" class="hero is-fullheight">
+            <div class="hero-body">
+                <div class="container has-text-centered">
+                    <div class="sk-folding-cube">
+                        <div class="sk-cube1 sk-cube"></div>
+                        <div class="sk-cube2 sk-cube"></div>
+                        <div class="sk-cube4 sk-cube"></div>
+                        <div class="sk-cube3 sk-cube"></div>
+                    </div>
+                    <h1 class="title" v-text="lang.splashscreen.loading"></h1>
+                </div>
+            </div>
+        </section>
+        <!-- Banner -->
+        <section id="banner" v-show="!splashscreen"
+            class="hero is-fullheight has-background animate__animated animate__fadeIn animate__fast">
+            <img v-if="ybinfo.banner !== null" class="hero-background" :src="'assets/' + ybinfo.banner" />
+            <div class="hero-body">
+                <div class="columns is-mobile is-centered">
+                    <div class="column is-narrow">
+                        <div class="box has-text-centered animate__animated animate__zoomIn">
+                            <p class="title has-text-black">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
+                            </p>
+                            <h2 class="subtitle has-text-black">{{ ybinfo.acyear }}</h2>
+                            <h2 v-if="longtimeago" class="subtitle has-text-black">{{ lang.misc.longtime }}</h2>
+                            <button id="enterButton" v-on:click="enterYearbook" type="button"
+                                class="button is-primary">Entrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Navigation tabs -->
+        <nav id="navbar" v-if="ready" class="navbar is-success" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a target="_blank" class="navbar-item">
+                    <span class="icon">
+                        <i class="fas fa-school"></i>
+                    </span>
+                    <span>{{ ybinfo.schoolname }}</span>
+                </a>
+                <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button"
+                    aria-label="menu" aria-expanded="false">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu" :class="{ 'is-active': showNav }">
+                <div class="navbar-start">
+                    <a v-on:click="showNav = false" href="#yearbook" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-book-open"></i>
+                        </span>
+                        <span>Yearbook</span>
+                    </a>
+                    <a v-on:click="showNav = false" href="#gallery" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-photo-video"></i>
+                        </span>
+                        <span v-text="lang.tabs.gallery"></span>
+                    </a>
+                    <a v-on:click="showNav = false" href="#about" class="navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                        <span v-text="lang.tabs.about"></span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <stories v-if="videoWatching" v-bind:user="videoWatching" @close="videoWatching = null"></stories>
+        <!-- Yearbook and Gallery (used by Vue.js) -->
+        <section id="yearbook" v-show="ready" class="section tab">
+            <!-- Teachers -->
+            <h1 class="title has-text-centered">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>{{ lang.yearbook.teachers }}</span>
+            </h1>
+            <p class="subtitle has-text-centered">Total: {{ teachers.length }}</p>
+            <users v-bind:users="teachers"></users>
+            <hr>
+            <!-- Students -->
+            <h1 class="title has-text-centered">
+                <i class="fas fa-user-graduate"></i>
+                <span>{{ lang.yearbook.students }}</span>
+            </h1>
+            <p class="subtitle has-text-centered">Total: {{ students.length }}</p>
+            <users v-bind:users="students"></users>
+        </section>
+        <!-- Gallery -->
+        <section id="gallery" class="section is-hidden tab">
+            <gallery v-bind:gallery="gallery"></gallery>
+        </section>
+        <!-- About section -->
+        <section id="about" class="section is-hidden tab animate__animated animate__slideInLeft">
+            <div class="container">
+                <p v-html="lang.about.attribution"></p>
+                <hr>
+                <p v-html="lang.about.credits"></p>
+                <br>
+                <span>Project Leader: Pablo Ferreiro Romero <a href="https://twitter.com/pablouser1"
+                        target="_blank">@pablouser1</a></span>
+            </div>
+        </section>
+        <!-- Document footer -->
+        <footer v-if="ready" id="footer" class="footer">
+            <nav class="breadcrumb is-centered" aria-label="breadcrumbs">
+                <ul id="languages">
+                    <li><a v-on:click="changelang('en')">🇬🇧 English</a></li>
+                    <li><a v-on:click="changelang('es')">🇪🇸 Español</a></li>
+                    <li><a v-on:click="changelang('fr')">🇫🇷 Français</a></li>
+                </ul>
+            </nav>
+            <p v-html="lang.footer.madewith" class="has-text-centered"></p>
+        </footer>
+    </div>
+    <!-- Stories -->
+    <script src="scripts/stories.js"></script>
+    <!-- Multilang manager -->
+    <script src="scripts/lang.js"></script>
+    <!-- Yearbook manager -->
+    <script src="scripts/yearbook.js"></script>
+    <!-- Misc -->
+    <script src="scripts/misc.js"></script>
+</body>
+
+</html>

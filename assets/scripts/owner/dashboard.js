@@ -65,6 +65,7 @@ Vue.component('mainmenu', {
 })
 
 Vue.component('users', {
+    props: ["schools"],
     data() {
         return {
             schoolid: "",
@@ -80,6 +81,16 @@ Vue.component('users', {
             <label class="label">ID centro</label>
             <div class="control">
                 <input v-model="schoolid" class="input" type="number">
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Predefinido</label>
+            <div class="control">
+                <div class="select">
+                    <select v-model="schoolid">
+                        <option v-for="school in schools" :value="school.id">{{ school.id }}</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="field">

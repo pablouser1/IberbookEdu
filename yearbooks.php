@@ -1,127 +1,169 @@
 <?php
-session_start();
-require_once("helpers/db/db.php");
-require_once("helpers/config.php");
-$db = new DB;
-$yearbooks = array();
-$leaderboards = array();
+require_once("functions.php");
+require_once("headers.php");
 
-$sql = "SELECT id, schoolid, schoolname, schoolyear, acyear, banner, voted FROM yearbooks ORDER BY voted DESC";
-$result = $db->query($sql);
+require_once("auth.php");
+require_once("helpers/db.php");
+require_once("config/config.php");
 
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $yearbooks[] = [
-            "id" => $row["id"],
-            "schoolid" => $row["schoolid"],
-            "schoolname" => $row["schoolname"],
-            "schoolyear" => $row["schoolyear"],
-            "acyear" => $row["acyear"],
-            "zip" => $ybpath.$row["id"]."/yearbook.zip",
-            "link" => $ybpath.$row["id"],
-            "banner" => $ybpath.$row["id"]."/assets/".$row["banner"],
-            "votes" => (int)$row["voted"]
-        ];
+class Yearbooks {
+    private $conn;
+    function __construct() {
+        $this->db = new DB;
+    }
+
+    // Get specific yearbook
+    public function getOne($id) {
+        $stmt = $this->db->prepare("SELECT id, schoolid, schoolname, schoolyear, acyear, banner, votes, `generated` FROM yearbooks WHERE id=? LIMIT 1");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+            $selectedyb = [
+                "id" => (int)$row["id"],
+                "schoolid" => (int)$row["schoolid"],
+                "schoolname" => $row["schoolname"],
+                "schoolyear" => $row["schoolyear"],
+                "acyear" => $row["acyear"],
+                "banner" => $row["id"]."/assets/".$row["banner"],
+                "votes" => (int)$row["votes"],
+                "generated" => $row["generated"]
+            ];
+            return $selectedyb;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Get yearbook from logged in user
+    public function getUserYearbook($userinfo) {
+        $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+        $stmt = $this->db->prepare("SELECT id, schoolid, schoolname, schoolyear, acyear, banner, votes, `generated` FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=? LIMIT 1");
+        $stmt->bind_param("iss", $userinfo["schoolid"], $userinfo["year"], $acyear);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+            $selectedyb = [
+                "id" => (int)$row["id"],
+                "schoolid" => $row["schoolid"],
+                "schoolname" => $row["schoolname"],
+                "schoolyear" => $row["schoolyear"],
+                "acyear" => $row["acyear"],
+                "banner" => $row["id"]."/assets/".$row["banner"],
+                "votes" => (int)$row["votes"],
+                "generated" => $row["generated"]
+            ];
+            return $selectedyb;
+        }
+        else {
+            return false;
+        }
+
+    }
+    // Get multiple yearbooks
+    public function getYearbooks($offset, $sort) {
+        $yearbooks = [];
+        $sql = "SELECT id, schoolid, schoolname, schoolyear, acyear, banner, votes FROM yearbooks ORDER BY $sort DESC LIMIT 10 OFFSET $offset";
+        $result = $this->db->query($sql);
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $yearbooks[] = [
+                    "id" => $row["id"],
+                    "schoolid" => $row["schoolid"],
+                    "schoolname" => $row["schoolname"],
+                    "schoolyear" => $row["schoolyear"],
+                    "acyear" => $row["acyear"],
+                    "banner" => $row["id"]."/assets/".$row["banner"],
+                    "votes" => (int)$row["votes"]
+                ];
+            }
+            return $yearbooks;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function sanitizeInput($offset, $sort) {
+        // Offset
+        if (!is_numeric($_GET["offset"])) {
+            return false;
+        }
+        switch ($sort){
+            case "votes":
+            case "schoolyear":
+            case "schoolname":
+            case "acyear":
+                return true;
+                break;
+            default:
+            return false;
+        }
     }
 }
 
-// Login options
-if (isset($_SESSION["loggedin"])) {
-    $userinfo = $_SESSION["userinfo"];
-    $stmt = $db->prepare("SELECT voted FROM users WHERE id=?");
-    $stmt->bind_param("i", $userinfo["iduser"]);
-    $stmt->execute();
-    $stmt->bind_result($votedid);
-    $stmt->fetch();
-    $stmt->close();
+$auth = new Auth;
+$yearbook = new Yearbooks;
+
+// Loggedin user's yearbook
+if (isset($_GET["mode"])) {
+    if ($userinfo = $auth->isUserLoggedin()) {
+        $useryb = $yearbook->getUserYearbook($userinfo);
+        if ($useryb) {
+            $response = [
+                "code" => "C",
+                "data" => $useryb
+            ];
+        }
+        else {
+            $response = [
+                "code" => "C",
+                "data" => null
+            ];
+        }
+    }
+    else {
+        http_response_code(401);
+        $response = [
+            "code" => "E",
+            "error" => "No has iniciado sesión"
+        ];
+    }
 }
-
+elseif (isset($_GET["id"])) {
+    $individual = $yearbook->getOne($_GET["id"]);
+    $response = [
+        "code" => "C",
+        "data" => $individual
+    ];
+}
+// Multiple yearbooks
+else {
+    $sanitized = $yearbook->sanitizeInput($_GET["offset"], $_GET["sort"]);
+    if ($sanitized) {
+        $yearbooks = $yearbook->getYearbooks($_GET["offset"], $_GET["sort"]);
+        if ($yearbooks) {
+            $response = [
+                "code" => "C",
+                "data" => $yearbooks
+            ];
+        }
+        else {
+            $response = [
+                "code" => "NO-MORE",
+                "error" => "Máximo de orlas alcanzados"
+            ];
+        }
+    }
+    else {
+        $response = [
+            "code" => "E",
+            "error" => "Parámetros inválidos"
+        ];
+    }
+}
+sendJSON($response);
 ?>
-
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Orlas - IberbookEdu</title>
-    <!-- Dev -->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
-    <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <script>
-        const yearbooks_js = <?php echo(json_encode($yearbooks)); ?>;
-        // Yearbook id from database info (user voted yearbook)
-        const voted_js = <?php echo (!isset($votedid)) ? 'null' : (int)$votedid; ?>;
-    </script>
-</head>
-
-<body>
-    <section id="yearbooks" class="hero is-fullheight">
-        <div class="hero-head">
-            <header id="navbar" class="navbar" role="navigation" aria-label="main navigation">
-                <div class="navbar-brand">
-                    <a href="index.php" class="navbar-item">
-                        <span class="icon">
-                            <i class="fas fa-home"></i>
-                        </span>
-                        <span><b>Inicio</b></span>
-                    </a>
-                    <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button" aria-label="menu" aria-expanded="false">
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                    </a>
-                </div>
-                <div class="navbar-menu" :class="{ 'is-active': showNav }">
-                    <div class="navbar-end">
-                        <?php
-                        // If user is logged in
-                        if (isset($_SESSION["loggedin"])) {
-                            echo '
-                            <a class="navbar-item" href="users/dashboard.php">
-                                <span class="icon">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                                <span><b>Panel de control</b></span>
-                            </a>
-                            ';
-                        }
-                        // User is not logged in
-                        else {
-                            echo '
-                            <a class="navbar-item" href="login.php">
-                                <span class="icon">
-                                    <i class="fas fa-user-circle"></i>
-                                </span>
-                                <span><b>Iniciar sesión</b></span>
-                            </a>
-                            ';
-                        }
-                        ?>
-                        <a class="navbar-item" href="about.html">
-                            <span class="icon">
-                                <i class="fas fa-info-circle"></i>
-                            </span>
-                            <span><b>Acerca de</b></span>
-                        </a>
-                    </div>
-                </div>
-            </header>
-            <!-- Search bar -->
-            <search></search>
-        </div>
-        <div class="hero-body">
-            <!-- Public yearbooks -->
-            <yearbooks v-bind:yearbooks="yearbooks"></yearbooks>
-        </div>
-        <div class="hero-foot">
-            <p class="has-text-centered">Hecho con ❤️ en Github</p>
-        </div>
-    </section>
-    <script src="assets/scripts/yearbooks.js"></script>
-</body>
-
-</html>

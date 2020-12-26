@@ -1,272 +1,181 @@
 <?php
-session_start();
-if(!isset($_SESSION["loggedin"])){
-    header("Location: ../login.php");
-    exit;
-}
+// -- Handle user data -- //
+require_once("../headers.php");
+require_once("../functions.php");
+require_once("../auth.php");
+require_once("../helpers/db.php");
+require_once("../config/config.php");
 
-require_once("../helpers/db/db.php");
-require_once("../helpers/config.php");
+class Upload {
+    private $db;
+    private $userinfo;
+    private $baseurl;
 
-$userinfo = $_SESSION["userinfo"];
-$db = new DB;
-
-function executestmt($stmt) {
-    if ($stmt->execute() !== true) {
-        die("Error inserting user data");
+    function __construct($userinfo) {
+        $this->db = new DB;
+        $this->userinfo = $userinfo;
+        $this->baseurl = $GLOBALS["uploadpath"].$this->userinfo["schoolid"]."/".$this->userinfo["year"]."/".$this->userinfo["type"]."/".$this->userinfo["id"]."/";
     }
-    $stmt->close();
-}
 
-$typeuser = $userinfo["typeuser"];
+    public function startUpload($files) {
+        $result = [];
+        // Create necessary dirs first
+        $this->createDirs();
 
-$max_mb = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
-$max_characters = 100; // "Quote" max characters
+        // Get not uploaded elements
+        $remain = $this->getNotUploaded();
 
-// Get what user didn't upload yet
-$remain = [];
-$stmt = $db->prepare("SELECT photo, video, link, quote FROM users WHERE id=?");
-$stmt->bind_param("i", $userinfo["id"]);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result->num_rows == 1){
-    while ($row = mysqli_fetch_assoc($result)) {
-        foreach ($row as $field => $value) {
-            if (!$value) {
-                array_push($remain, $field);
+        // -- Continue with elements not uploaded yet
+
+        // Photo
+        if (isset($files['photo'])) {
+            // Not in remaining array, replacing
+            if (!in_array("photo", $remain)) {
+                $this->deleteMedia("photo");
+            }
+            $result["photo"] = $this->uploadPhoto($files["photo"]);
+        }
+
+        // Video
+        if (isset($files['video'])) {
+            if (!in_array("video", $remain)) {
+                $this->deleteMedia("video");
+            }
+            $result["video"] = $this->uploadVideo($files["video"]);
+        }
+
+        // Quote
+        if (isset($_POST['quote']) && !empty($_POST["quote"])) {
+            $result["quote"] = $this->uploadQuote($_POST["quote"]);
+        }
+
+        // Link
+        if (isset($_POST['link']) && !empty($_POST["link"])) {
+            $result["link"] = $this->uploadLink($_POST["link"]);
+        }
+        return $result;
+    }
+
+    private function uploadPhoto($photo) {
+        $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
+        $tmpFilePath = $photo['tmp_name'];
+        if($tmpFilePath != ""){
+            $picPath = $this->baseurl.$photo['name'];
+            $ext = pathinfo($picPath, PATHINFO_EXTENSION);
+            // If the extension is not in the array create error message
+            if (in_array($ext, $allowed_pic)) {
+                $picname = basename($picPath);
+                move_uploaded_file($tmpFilePath, $picPath);
+                $stmt = $this->db->prepare("UPDATE users SET photo = ? WHERE id=?");
+                $stmt->bind_param("ss", $photo["name"], $this->userinfo["id"]);
+                $stmt->execute();
+                $stmt->close();
+                return $photo["name"];
             }
         }
+        return false;
     }
-}
-else {
-    die("Ha habido un error, tu usuario no existe");
-}
-$stmt->close();
 
-if (empty($remain)) {
-    die("Ya has subido todos los datos");
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Prepare
-    // Allowed formats
-    $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
-    $allowed_vid = array('mp4', 'webm');
-    // Upload directory
-    $baseurl = $uploadpath.$userinfo["idcentro"]."/".$userinfo["yearuser"]."/{$typeuser}/";
-    // Create dirs
-    if (!is_dir($baseurl.$userinfo["id"])){
-        mkdir($baseurl.$userinfo["id"], 0755, true);
-    }
-    // Pic upload
-    if (in_array("photo", $remain)) {
-        if(isset($_FILES['pic'])){
-            $tmpFilePath = $_FILES['pic']['tmp_name'];
-            if($tmpFilePath != ""){
-                $picPath = $baseurl.$userinfo["id"]."/".$_FILES['pic']['name'];
-                $ext = pathinfo($picPath, PATHINFO_EXTENSION);
-                // If the extension is not in the array create error message
-                if (!in_array($ext, $allowed_pic)) {
-                    $errors[] = "{$ext} no es un formato admitido.<br>";
-                }
-                else{
-                    $picname = basename($picPath);
-                    move_uploaded_file($tmpFilePath, $picPath);
-                    $stmt = $db->prepare("UPDATE users SET photo = ? WHERE id=?");
-                    $stmt->bind_param("ss", $_FILES["pic"]["name"], $userinfo["id"]);
-                    executestmt($stmt);
-                }
+    private function uploadVideo($video) {
+        $allowed_vid = array('mp4', 'webm');
+        $tmpFilePath = $video['tmp_name'];
+        if($tmpFilePath != ""){
+            $vidPath = $this->baseurl.$video['name'];
+            $ext = pathinfo($vidPath, PATHINFO_EXTENSION);
+            // If the extension is not in the array create error message
+            if (in_array($ext, $allowed_vid)) {
+                $vidname = basename($vidPath);
+                move_uploaded_file($tmpFilePath, $vidPath);
+                $stmt = $this->db->prepare("UPDATE users SET video = ? WHERE id=?");
+                $stmt->bind_param("ss", $video["name"], $this->userinfo["id"]);
+                $stmt->execute();
+                $stmt->close();
+                return $video["name"];
             }
+        }
+        return false;
+    }
+
+    private function uploadQuote($quote) {
+        // TODO, SET MAXIMUM CHARS
+        if (strlen($quote) > 200) {
+            return false;
         }
         else {
-            $errors[] = "Foto: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
+            $sanitizedQuote = nl2br(htmlspecialchars($quote));
+            $stmt = $this->db->prepare("UPDATE users SET quote = ? WHERE id=?");
+            $stmt->bind_param("ss", $sanitizedQuote, $this->userinfo["id"]);
+            $stmt->execute();
+            $stmt->close();
+            return $sanitizedQuote;
         }
     }
 
-    // Vid upload
-    if (in_array("video", $remain)) {
-        if(isset($_FILES['vid'])){
-            $tmpFilePath = $_FILES['vid']['tmp_name'];
-            if($tmpFilePath != ""){
-                $vidPath = $baseurl.$userinfo["id"]."/".$_FILES['vid']['name'];
-                $ext = pathinfo($vidPath, PATHINFO_EXTENSION);
-                // If the extension is not in the array create error message
-                if (!in_array($ext, $allowed_vid)) {
-                    $errors[] = "$ext no es un formato admitido.<br>";
-                }
-                else{
-                    $vidname = basename($vidPath);
-                    move_uploaded_file($tmpFilePath, $vidPath);
-                    $stmt = $db->prepare("UPDATE users SET video = ? WHERE id=?");
-                    $stmt->bind_param("ss", $_FILES["vid"]["name"], $userinfo["id"]);
-                    executestmt($stmt);
-                }
-            }
-        }
-        else {
-            $errors[] = "Video: Ha habido un error al procesar tu solicitud, quizás excediste el límite permitido<br>";
-        }
-    }
-
-    if (in_array("link", $remain)) {
-        $link = $_POST["link"];
+    private function uploadLink($link) {
         if (!filter_var($link, FILTER_VALIDATE_URL)) {
-            $errors[] = "Enlace no válido";
+            return false;
         }
         else {
-            $stmt = $db->prepare("UPDATE users SET link = ? WHERE id=?");
-            $stmt->bind_param("ss", $link, $userinfo["id"]);
-            executestmt($stmt);
+            $stmt = $this->db->prepare("UPDATE users SET link = ? WHERE id=?");
+            $stmt->bind_param("ss", $link, $this->userinfo["id"]);
+            $stmt->execute();
+            $stmt->close();
+            return $link;
         }
     }
 
-    if (in_array("quote", $remain)) {
-        if (strlen($_POST["quote"]) > $max_characters) {
-            $general_error = "Has excedido la máxima cantidad de caracteres";
-        }
-        else {
-            $quote = nl2br(htmlspecialchars($_POST["quote"]));
-            $stmt = $db->prepare("UPDATE users SET quote = ? WHERE id=?");
-            $stmt->bind_param("ss", $quote, $userinfo["id"]);
-            executestmt($stmt);
+    private function createDirs() {
+        if (!is_dir($this->baseurl)){
+            mkdir($this->baseurl, 0755, true);
         }
     }
-    if (!isset($errors)) {
-        // Reset reason to NULL
-        $stmt = $db->prepare("UPDATE users SET reason = NULL WHERE id=?");
-        $stmt->bind_param("s", $userinfo["id"]);
-        executestmt($stmt);
-        header("Location: finish.html");
-        exit;
+
+    private function deleteMedia($element) {
+        $stmt = $this->db->prepare("SELECT $element from users where id=?");
+        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt->execute();
+        $stmt->bind_result($name);
+        $stmt->fetch();
+
+        $stmt->close();
+        $stmt = $this->db->prepare("UPDATE users SET $element = NULL WHERE id=?");
+        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt->execute();
+        // Delete from file system
+        unlink($this->baseurl.$name);
+    }
+
+    // Get elements not uploaded yet
+    private function getNotUploaded() {
+        $remain = [];
+        $stmt = $this->db->prepare("SELECT photo, video, link, quote FROM users WHERE id=?");
+        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows == 1){
+            while ($row = mysqli_fetch_assoc($result)) {
+                foreach ($row as $field => $value) {
+                    if (!$value) {
+                        array_push($remain, $field);
+                    }
+                }
+            }
+        }
+        return $remain;
+    }
+}
+
+$auth = new Auth;
+$userinfo = $auth->isUserLoggedin();
+if ($userinfo && $_SERVER["REQUEST_METHOD"] === "POST") {
+    $upload = new Upload($userinfo);
+    $uploadResult = $upload->startUpload($_FILES);
+    if ($uploadResult) {
+        $response = [
+            "code" => "C",
+            "data" => $uploadResult
+        ];
+        sendJSON($response);
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-
-    <head>
-        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Subir - IberbookEdu</title>
-        <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
-        <script>
-            const remain = <?php echo(json_encode($remain));?>;
-        </script>
-    </head>
-
-    <body>
-        <section class="hero is-primary is-bold">
-            <div class="hero-body has-text-centered">
-                <figure class="image container is-64x64">
-                    <img src="data:image/png;base64, <?php echo($userinfo["photouser"]);?>" alt="Foto Perfil">
-                </figure>
-                <br>
-                <div class="container">
-                    <h1 class="title">
-                        <?php echo($userinfo["nameuser"]);?>
-                    </h1>
-                    <h2 class="subtitle">
-                        <?php echo($userinfo["yearuser"]);?>
-                    </h2>
-                </div>
-            </div>
-        </section>
-        <section id="upload" class="section">
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
-                <div class="container has-text-centered">
-                    <p class="title">Subir</p>
-                    <div id="photo" class="field animate__animated animate__fadeIn is-hidden">
-                        <div id="pic-file" class="file has-name is-centered">
-                            <label class="file-label">
-                                <input class="file-input" type="file" name="pic" accept="image/gif,image/png,image/jpeg" multiple="multiple">
-                                <span class="file-cta">
-                                    <span class="file-icon">
-                                        <i class="fas fa-upload"></i>
-                                    </span>
-                                    <span class="file-label">
-                                        Elige una foto
-                                    </span>
-                                </span>
-                                <span class="file-name">
-                                    Ningún archivo elegido
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                    <div id="video" class="field animate__animated animate__fadeIn is-hidden">
-                        <div id="vid-file" class="file has-name is-centered">
-                            <label class="file-label">
-                                <input class="file-input" type="file" name="vid" accept="video/mp4,video/webm" multiple="multiple">
-                                <span class="file-cta">
-                                    <span class="file-icon">
-                                        <i class="fas fa-upload"></i>
-                                    </span>
-                                    <span class="file-label">
-                                        Elige un vídeo
-                                    </span>
-                                </span>
-                                <span class="file-name">
-                                    Ningún archivo elegido
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                    <div id="link" class="field animate__animated animate__fadeIn is-hidden">
-                        <label class="label">(Opcional) Enlace</label>
-                        <div class="control">
-                            <input name="link" class="input" type="text" placeholder="https://github.com/pablouser1/IberbookEdu">
-                        </div>
-                    </div>
-                    <div id="quote" class="field animate__animated animate__fadeIn is-hidden">
-                        <label class="label">(Opcional) Cita - Máximo 100 caracteres</label>
-                        <div class="control">
-                            <textarea id="quote_text" name="quote" class="textarea" placeholder="¡Hola!" rows="3" maxlength="100"></textarea>
-                        </div>
-                        <p>
-                            <span id="remain_characters">100</span>
-                            <span> de 100 caracteres restantes</span>
-                        </p>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <div class="buttons is-centered">
-                                <a class="button is-danger" href="dashboard.php">
-                                    <span class="icon">
-                                        <i class="fas fa-ban"></i>
-                                    </span>
-                                    <span>Cancelar</span>
-                                </a>
-                                <button id="media_submit" type="submit" name="media_form" class="button is-primary">
-                                    <span class="icon is-small">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </span>
-                                    <span>Enviar</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <progress id="upload_progress" class="progress is-primary is-hidden" max="100"></progress>
-                    <hr>
-                    <div class='notification is-danger <?php if(!isset($errors)) echo "is-hidden"; ?>'>
-                        <?php
-                        if (isset($errors)) {
-                            foreach ($errors as $error) {
-                                echo($error);
-                            }
-                        }
-                        ?>
-                    </div>
-                    <div class="notification is-info">
-                        <b>Formatos admitidos:</b><br>
-                        Fotos: gif, png, jpg, jpeg.<br>
-                        Vídeos: mp4, webm.<br>
-                        <span class="has-background-danger">Tamaño máximo <?php echo($max_mb);?> MB</span>
-                    </div>
-                </div>
-            </form>
-        </section>
-        <script src="../assets/scripts/users/upload.js"></script>
-    </body>
-</html>

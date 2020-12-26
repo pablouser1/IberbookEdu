@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__. "/../config.php");
+require_once(__DIR__. "/../../config/config.php");
 require_once(__DIR__. "/requests.php");
 class Api {
     // -- Initial vars -- //
@@ -32,7 +32,7 @@ class Api {
         $this->type = $type;
         switch ($type) {
             case "students":
-            case "tutorlegal":
+            case "guardians":
                 $this->base_url = $GLOBALS["base_url"].'pasendroid';
             break;
             case "teachers":
@@ -48,7 +48,7 @@ class Api {
         // Initial config
         $useragent = "IberbookEdu Testing";
         $this->settype($type);
-        $data = array('p' => '{"version":"11.10.0"}', 'USUARIO' => $username, 'CLAVE' => $password);
+        $data = array('p' => '{"version":"11.10.5"}', 'USUARIO' => $username, 'CLAVE' => $password);
         // Options
         $url = "{$this->base_url}/login";
         $initial_options = array(
@@ -96,54 +96,77 @@ class Api {
             "error" => null
         ];
     }
-
+    
     // Get basic data from user
     function getinfo(){
+        $userinfo = false;
         $url = "{$this->base_url}/infoSesion";
         $info = $this->req->get($url);
         // Save common user info to array
         switch($this->type){
             // -- Alumno -- //
             case 'students':
-                // Get Pic
-                $datapic = array('X_MATRICULA' => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"], 'ANCHO' => 64, 'ALTO' => 64);
-                $photo = $this->getpicstudent($datapic);
                 // Get school id and name
                 $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
                 $infocentro = $this->getcentrostudent($datacentro);
-                // Set user info
-                $userinfo = [
-                    "iduser" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
-                    "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => "students",
-                    "yearuser" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"],
-                    "photouser" => $photo,
-                    "idcentro" => $infocentro["idcentro"],
-                    "namecentro" => $infocentro["namecentro"]
+                $schoolid = $infocentro["schoolid"];
+                $group = [
+                    "name" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"]
                 ];
+                if ($this->isAllowed($schoolid, $group["name"])) {
+                    // Set user info
+                    $userinfo = [
+                        "idced" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
+                        "name" => $info["RESULTADO"][0]["USUARIO"],
+                        "type" => "students",
+                        "schoolid" => $schoolid,
+                        "schoolname" => $infocentro["schoolname"],
+                        "year" => $group["name"],
+                        "schools" => [
+                            [
+                                "id" => $schoolid,
+                                "name" => $infocentro["schoolname"],
+                                "groups" => [$group]
+                            ]
+                        ]
+                    ];
+                }
                 break;
             // -- Tutor legal -- //
-            case 'tutorlegal':
+            case 'guardians':
                 // Set user info
                 $children = array();
-                foreach($info["RESULTADO"][0]["HIJOS"] as $child){
-                    // Picture
-                    $datapic = array('X_MATRICULA' => $child["MATRICULAS"][0]["X_MATRICULA"], "ANCHO" => 64, "ALTO" => 64);
-                    $child["FOTO"] = $this->getpicstudent($datapic);
+                foreach($info["RESULTADO"][0]["HIJOS"] as $tempchild){
                     // Check if student is allowed
-                    $datacentro = array("X_CENTRO" => $child["MATRICULAS"][0]["X_CENTRO"]);
+                    $datacentro = array("X_CENTRO" => $tempchild["MATRICULAS"][0]["X_CENTRO"]);
                     $infocentro = $this->getcentrostudent($datacentro);
-                    $sql = "SELECT `id` FROM `schools` WHERE id=$infocentro[idcentro]";
-                    $result = $this->db->query($sql);
                     // If student is allowed, include him in array
-                    if ($result !== false && $result->num_rows == 1 && preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $child["MATRICULAS"][0]["UNIDAD"])) {
+                    $schoolid = $infocentro["schoolid"];
+                    $group =  [
+                        "name" => $tempchild["MATRICULAS"][0]["UNIDAD"]
+                    ];
+                    if ($this->isAllowed($schoolid, $group["name"])) {
                         // Merge child info with school info
-                        $children[] = $child + $infocentro;
+                        $children[] = [
+                            "idced" => $tempchild["MATRICULAS"][0]["X_MATRICULA"],
+                            "name" => $tempchild["NOMBRE"],
+                            "type" => "students",
+                            "schoolid" => $schoolid,
+                            "schoolname" => $infocentro["schoolname"],
+                            "year" => $group["name"],
+                            "schools" => [
+                                [
+                                    "id" => $schoolid,
+                                    "name" => $infocentro["schoolname"],
+                                    "groups" => [$group]
+                                ]
+                            ]
+                        ];
                     }
                 }
                 $userinfo = [
-                    "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => "tutor",
+                    "name" => $info["RESULTADO"][0]["USUARIO"],
+                    "type" => "guardians",
                     "children" => $children
                 ];
                 break;
@@ -155,7 +178,7 @@ class Api {
                     $schoolid = $info["RESULTADO"][0]["C_CODIGO"];
                     $school = $this->getallteacher($info["RESULTADO"][0]);
                     if ($school) {
-                        $finalschools[$schoolid] = $school;
+                        $finalschools[] = $school;
                     }
                     else {
                         $finalschools = [];
@@ -171,20 +194,40 @@ class Api {
                         $this->changeschoolteachers($data);
                         $school = $this->getallteacher($centro);
                         if ($school) {
-                            $finalschools[$schoolid] = $school;
+                            $finalschools[] = $school;
                         }
                     }
                 }
 
                 $userinfo = array(
-                    "iduser" => $idteacher,
-                    "nameuser" => $info["RESULTADO"][0]["USUARIO"],
-                    "typeuser" => "teachers",
+                    "idced" => $idteacher,
+                    "name" => $info["RESULTADO"][0]["USUARIO"],
+                    "type" => "teachers",
+                    "schoolid" => $finalschools[0]["id"],
+                    "schoolname" => $finalschools[0]["name"],
+                    "year" => $finalschools[0]["groups"][0]["name"],
+                    "subject" => $finalschools[0]["groups"][0]["subject"],
                     "schools" => $finalschools
                 );
+                //
+                // DEBUG
+                //
+                //$userinfo["year"] = "2º BCT C";
+                //$userinfo["schools"][0]["groups"][0]["name"] = "2º BCT C";
             break;
         }
         return $userinfo;
+    }
+
+    function isAllowed($schoolid, $group) {
+        $sql = "SELECT `id` FROM `schools` WHERE id=$schoolid";
+        $result = $this->db->query($sql);
+        if ($result && $result->num_rows === 1) {
+            if (preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $group)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // -- Students only -- //
@@ -193,8 +236,8 @@ class Api {
         $url = "{$this->base_url}/datosCentro";
         $response = json_decode(utf8_encode($this->req->post($url, $data)), true);
         return array(
-            "idcentro" => $response["RESULTADO"][0]["DATOS"][0][1],
-            "namecentro" => $response["RESULTADO"][0]["DATOS"][2][1]
+            "schoolid" => $response["RESULTADO"][0]["DATOS"][0][1],
+            "schoolname" => $response["RESULTADO"][0]["DATOS"][2][1]
         );
     }
 
@@ -249,7 +292,7 @@ class Api {
     }
 
     function getgroupsteachers(){
-        $url = $GLOBALS["base_url"]."senecadroid/getGrupos";
+        $url = "{$this->base_url}/getGrupos";
         $response = json_decode(utf8_encode($this->req->post($url, [])), true);
         // Get each course, split all groups and if there are any 4º ESO, 2º BCT, 6 Primaria add it to array
         foreach($response["RESULTADO"] as $id => $grupo){

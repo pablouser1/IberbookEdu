@@ -67,13 +67,12 @@ class Api {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
             $userinfo = [
-                "iduser" => $this->userid,
-                "nameuser" => $row["fullname"],
-                "typeuser" => $row["type"],
-                "yearuser" => $row["group"],
-                "photouser" => base64_encode(file_get_contents(__DIR__. "/../../assets/img/PortraitPlaceholder.png")),
-                "idcentro" => $row["schoolid"],
-                "namecentro" => "Test" // TODO, get school name
+                "id" => $this->userid,
+                "name" => $row["fullname"],
+                "typer" => $row["type"],
+                "year" => $row["group"],
+                "schoolid" => $row["schoolid"],
+                "schoolname" => "Test" // TODO, get school name
             ];
         }
         $stmt->close();
