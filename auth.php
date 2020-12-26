@@ -69,11 +69,12 @@ class Auth {
 
     public function authJWT($key) {
         $secret_key = $GLOBALS["token_secret"];
-        $decoded = JWT::decode($key, $secret_key, array('HS256'));
-        if ($decoded) {
+        try {
+            $decoded = JWT::decode($key, $secret_key, array('HS256'));
             return (array) $decoded->data->userinfo;
+        } catch (\Firebase\JWT\SignatureInvalidException $th) {
+            return null;
         }
-
     }
 
     // Set JWT token
@@ -91,9 +92,8 @@ class Auth {
 
         setcookie("login", $jwt, [
             'expires' => time()+86400,
-            'domain' => $_SERVER["HTTP_HOST"],
-            'samesite' => "Strict",
-            'httponly' => true
+            'httponly' => true,
+            'secure' => true
         ]);
     }
 }

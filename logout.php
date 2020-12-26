@@ -12,9 +12,8 @@ if ($userinfo) {
     unset($_COOKIE["login"]);
     setcookie("login", "", [
         'expires' => time()-86400,
-        'domain' => $_SERVER["HTTP_HOST"],
-        'samesite' => "Strict",
-        'httponly' => true
+        'httponly' => true,
+        'secure' => true
     ]);
     $response = [
         "code" => "C"

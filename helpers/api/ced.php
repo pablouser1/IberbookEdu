@@ -209,11 +209,6 @@ class Api {
                     "subject" => $finalschools[0]["groups"][0]["subject"],
                     "schools" => $finalschools
                 );
-                //
-                // DEBUG
-                //
-                //$userinfo["year"] = "2º BCT C";
-                //$userinfo["schools"][0]["groups"][0]["name"] = "2º BCT C";
             break;
         }
         return $userinfo;
