@@ -7,7 +7,7 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
     $origin = $_SERVER['HTTP_ORIGIN'];
     $allowed_domains = [
         "http://localhost:8080",
-        "http://192.168.1.10:8080"
+        "https://iberbookedu.onrender.com"
     ];
     
     if (in_array($origin, $allowed_domains)) {
