@@ -41,13 +41,13 @@ Vue.component('mainmenu', {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>URL</th>
+                            <th>Name</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="school in schools">
                             <td>{{ school.id }}</td>
-                            <td>{{ school.url }}</td>
+                            <td>{{ school.name }}</td>
                         </tr>
                     </tbody>
                 </table>

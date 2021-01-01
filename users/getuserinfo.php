@@ -8,7 +8,7 @@ $auth = new Auth;
 $db = new DB;
 
 if ($userinfo = $auth->isUserLoggedin()) {
-    $stmt = $db->prepare("SELECT photo, video, link, quote, uploaded FROM users WHERE `id`=?");
+    $stmt = $db->prepare("SELECT id, photo, video, link, quote, uploaded FROM users WHERE `id`=?");
     $stmt->bind_param("i", $userinfo["id"]);
     $stmt->execute();
     $result = $stmt->get_result();

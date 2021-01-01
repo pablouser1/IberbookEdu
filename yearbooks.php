@@ -26,6 +26,7 @@ class Yearbooks {
                 "schoolname" => $row["schoolname"],
                 "schoolyear" => $row["schoolyear"],
                 "acyear" => $row["acyear"],
+                "url" => "/yearbooks/".$row["id"],
                 "banner" => $row["id"]."/assets/".$row["banner"],
                 "votes" => (int)$row["votes"],
                 "generated" => $row["generated"]

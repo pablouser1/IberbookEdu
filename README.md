@@ -1,6 +1,7 @@
 # IberbookEdu Backend
 
 Official backend of IberbookEdu using PHP, for the official frontend click [here](https://github.com/pablouser1/IberbookEdu-frontend)
+
 Generate yearbooks easily using info from local database or the following educational platforms:
 
 * PASEN/SÉNECA (Andalucía, Spain)
@@ -40,10 +41,18 @@ Once you finished installing everything and you had already copied the project t
 * Local API
 * Fix, better upload error handling
 * Maintenance mode
+* Refresh token
 
 # Credits
 
 This project wouldn't be possible without the help of the following projects:
 
-PHPMailer (https://github.com/PHPMailer/PHPMailer)
-PHP-JWT (https://github.com/firebase/php-jwt)
+## PHP Libraries
+* PHPMailer (https://github.com/PHPMailer/PHPMailer)
+* PHP-JWT (https://github.com/firebase/php-jwt)
+
+## Templates
+### Default
+* Animate.css (https://animate.style)
+* Confetti.js (https://github.com/mathusummut/confetti.js)
+* Spinkit (https://github.com/tobiasahlin/SpinKit)

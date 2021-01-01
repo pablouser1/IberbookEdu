@@ -106,50 +106,20 @@ class Api {
         switch($this->type){
             // -- Alumno -- //
             case 'students':
-                // Get school id and name
-                $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
-                $infocentro = $this->getcentrostudent($datacentro);
-                $schoolid = $infocentro["schoolid"];
-                $group = [
-                    "name" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"]
-                ];
-                if ($this->isAllowed($schoolid, $group["name"])) {
-                    // Set user info
-                    $userinfo = [
-                        "idced" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
-                        "name" => $info["RESULTADO"][0]["USUARIO"],
-                        "type" => "students",
-                        "schoolid" => $schoolid,
-                        "schoolname" => $infocentro["schoolname"],
-                        "year" => $group["name"],
-                        "schools" => [
-                            [
-                                "id" => $schoolid,
-                                "name" => $infocentro["schoolname"],
-                                "groups" => [$group]
-                            ]
-                        ]
-                    ];
-                }
-                break;
-            // -- Tutor legal -- //
-            case 'guardians':
-                // Set user info
-                $children = array();
-                foreach($info["RESULTADO"][0]["HIJOS"] as $tempchild){
-                    // Check if student is allowed
-                    $datacentro = array("X_CENTRO" => $tempchild["MATRICULAS"][0]["X_CENTRO"]);
+                // Check if user is actually student
+                if ($this->type == "students" && $info["RESULTADO"][0]["C_PERFIL"] == "ALU") {
+                    // Get school id and name
+                    $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
                     $infocentro = $this->getcentrostudent($datacentro);
-                    // If student is allowed, include him in array
                     $schoolid = $infocentro["schoolid"];
-                    $group =  [
-                        "name" => $tempchild["MATRICULAS"][0]["UNIDAD"]
+                    $group = [
+                        "name" => $info["RESULTADO"][0]["MATRICULAS"][0]["UNIDAD"]
                     ];
                     if ($this->isAllowed($schoolid, $group["name"])) {
-                        // Merge child info with school info
-                        $children[] = [
-                            "idced" => $tempchild["MATRICULAS"][0]["X_MATRICULA"],
-                            "name" => $tempchild["NOMBRE"],
+                        // Set user info
+                        $userinfo = [
+                            "idced" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
+                            "name" => $info["RESULTADO"][0]["USUARIO"],
                             "type" => "students",
                             "schoolid" => $schoolid,
                             "schoolname" => $infocentro["schoolname"],
@@ -164,11 +134,47 @@ class Api {
                         ];
                     }
                 }
-                $userinfo = [
-                    "name" => $info["RESULTADO"][0]["USUARIO"],
-                    "type" => "guardians",
-                    "children" => $children
-                ];
+                break;
+            // -- Tutor legal -- //
+            case 'guardians':
+                // Check if user is actually guardian
+                if ($this->type == "students" && $info["RESULTADO"][0]["C_PERFIL"] == "TUT_LEGAL") {
+                    // Set user info
+                    $children = array();
+                    foreach($info["RESULTADO"][0]["HIJOS"] as $tempchild){
+                        // Check if student is allowed
+                        $datacentro = array("X_CENTRO" => $tempchild["MATRICULAS"][0]["X_CENTRO"]);
+                        $infocentro = $this->getcentrostudent($datacentro);
+                        // If student is allowed, include him in array
+                        $schoolid = $infocentro["schoolid"];
+                        $group =  [
+                            "name" => $tempchild["MATRICULAS"][0]["UNIDAD"]
+                        ];
+                        if ($this->isAllowed($schoolid, $group["name"])) {
+                            // Merge child info with school info
+                            $children[] = [
+                                "idced" => $tempchild["MATRICULAS"][0]["X_MATRICULA"],
+                                "name" => $tempchild["NOMBRE"],
+                                "type" => "students",
+                                "schoolid" => $schoolid,
+                                "schoolname" => $infocentro["schoolname"],
+                                "year" => $group["name"],
+                                "schools" => [
+                                    [
+                                        "id" => $schoolid,
+                                        "name" => $infocentro["schoolname"],
+                                        "groups" => [$group]
+                                    ]
+                                ]
+                            ];
+                        }
+                    }
+                    $userinfo = [
+                        "name" => $info["RESULTADO"][0]["USUARIO"],
+                        "type" => "guardians",
+                        "children" => $children
+                    ];
+                }
                 break;
             // -- Profesor -- //
             case 'teachers':

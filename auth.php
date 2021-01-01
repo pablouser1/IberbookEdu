@@ -41,10 +41,19 @@ class Auth {
         return $userid;
     }
 
-    // Check if user is admin
     public function isUserAdmin($userinfo) {
+        if ($userinfo["rank"] == "admin") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Check if user is admin when loggin in
+    public function isUserAdminLogin($username) {
         // Check if user is admin
-        $sql = "SELECT `id`, `permissions` FROM `staff` WHERE id ='$userinfo[id]' AND permissions='admin'";
+        $sql = "SELECT `id`, `permissions` FROM `staff` WHERE username ='$username' AND permissions='admin'";
         $result = $this->db->query($sql);
         if ($result->num_rows === 1) {
             // User is admin

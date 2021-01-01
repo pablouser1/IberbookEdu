@@ -4,6 +4,7 @@ if (!isset($_SESSION["owner"])){
     header("Location: login.php");
     exit;
 }
+
 require_once("../helpers/db.php");
 require_once("../config/config.php");
 $db = new DB;
@@ -44,9 +45,9 @@ if (isset($_POST["id"], $_POST["clear"])){
 
     $tables = ["users", "gallery"];
     // Clear tables from database
-    cleardb();
+    cleardb($tables);
     // Delete uploads folder
-    recursiveRemoveDirectory($uploadpath.$_POST["id"]);
+    recursiveRemoveDirectory($uploadpath."/".$_POST["id"]);
         
     header('Location: dashboard.php');
     exit;

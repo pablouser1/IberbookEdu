@@ -3,6 +3,7 @@
 require_once("functions.php");
 require_once("headers.php");
 
+require_once("config/config.php");
 require_once("helpers/db.php");
 
 $db = new DB;
@@ -12,11 +13,10 @@ if ($result->num_rows === 1) {
     while($row = $result->fetch_assoc()) {
         $yearbook = [
             "id" => $row["id"],
-            "schoolid" => $row["schoolid"],
             "schoolname" => $row["schoolname"],
             "schoolyear" => $row["schoolyear"],
             "acyear" => $row["acyear"],
-            "url" => $row["id"]."/assets/".$row["banner"]
+            "url" => "/yearbooks/".$row["id"]."/assets/".$row["banner"]
         ];
     }
 }

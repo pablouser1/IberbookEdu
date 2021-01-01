@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $global_config = $_POST["global"]; // Server-level config
     $owner = $_POST["owner"];
     $schoolinfo = $_POST["schoolinfo"];
+    $frontends = $_POST["frontends"];
 
     // DB connection info
     $db_file = '
@@ -51,17 +52,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         default:
         die("Has elegido un sistema de login incorrecto");
     }
-
+    // Frontends setup
+    $filtered_frontends = [];
+    foreach ($frontends as $frontend) {
+        if (filter_var($frontend, FILTER_VALIDATE_URL)) {
+            array_push($filtered_frontends, $frontend);
+        }
+    }
     $global_config_file =
-    '<?php
-    // General
-    $login = "'.$login.'"; // Login system used
-    $base_url = "'.$base_url.'"; // Remote server url
-    $uploadpath = "'.$global_config["uploaddir"].'"; // Uploads dir
-    $token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHARE <--
-    // Api
-    $ssloptions = '.$ssloptions.'
-    ?>';
+'<?php
+// General
+$login = "'.$login.'"; // Login system used
+$base_url = "'.$base_url.'"; // Remote server url
+$uploadpath = "'.$global_config["uploaddir"].'"; // Uploads dir
+$frontends = '.$filtered_frontends.';
+$token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHARE <--
+// Api
+$ssloptions = '.$ssloptions.';
+?>';
     // Add global config file
     file_put_contents("helpers/config.php", $global_config_file);
     // Now that we have the config available, import db helper
@@ -135,7 +143,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "CREATE TABLE `schools` (
         `id` int NOT NULL UNIQUE,
         `name` varchar(128) NOT NULL,
-        `url` varchar(255),
         primary key(id)
         )";
     if ($db->query($sql) !== TRUE) {

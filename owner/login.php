@@ -81,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Login - IberbookEdu</title>
     <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <link rel="stylesheet" href="assets/styles/login.css"/>
+    <link rel="stylesheet" href="../assets/styles/login.css"/>
 </head>
 
 <body>

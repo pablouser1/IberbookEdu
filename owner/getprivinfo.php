@@ -4,17 +4,12 @@ if (!isset($_SESSION)) {
     session_start();
 }
 if (!isset($_SESSION["owner"])){
-    header("Location: ../login.php");
+    header("Location: login.php");
     exit;
 }
 
-function sendJSON($response) {
-    header('Content-type: application/json');
-    echo json_encode($response);
-    exit;
-}
-
-require_once("../helpers/db/db.php");
+require_once("../functions.php");
+require_once("../helpers/db.php");
 class DBPrivInfo {
     private $db;
     function __construct() {
@@ -88,12 +83,12 @@ class DBPrivInfo {
     public function schools() {
         $schools = [];
         // Get all schools
-        $sql = "SELECT id, url FROM schools";
+        $sql = "SELECT id, `name` FROM schools";
         $result = $this->db->query($sql);
         while ($row = mysqli_fetch_assoc($result)) {
             $schools[] = [
                 "id" => $row["id"],
-                "url" => $row["url"]
+                "name" => $row["name"]
             ];
         }
         return $schools;

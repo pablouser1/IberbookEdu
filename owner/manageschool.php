@@ -10,10 +10,10 @@ $db = new DB;
 if (isset($_POST["id"])){
     // ID and URL
     $id = trim($_POST["id"]);
-    $url = trim($_POST["schoolurl"]);
+    $name = trim($_POST["schoolname"]);
     if (isset($_POST["addschool"])){
-        $stmt = $db->prepare("INSERT INTO `schools` (`id`, `url`) VALUES (?, ?)");
-        $stmt->bind_param("is", $id, $url);
+        $stmt = $db->prepare("INSERT INTO `schools` (`id`, `name`) VALUES (?, ?)");
+        $stmt->bind_param("is", $id, $name);
         if ($stmt->execute() !== true) {
             die("Error al escribir los datos del centro");
         }

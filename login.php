@@ -36,7 +36,7 @@ class Login {
                     $id = $this->userinfo["id"];
                 }
                 $this->userinfo["id"] = $id;
-                if ($this->auth->isUserAdmin($this->userinfo)) {
+                if ($this->auth->isUserAdminLogin($username)) {
                     $this->userinfo["rank"] = "admin";
                 }
                 else {

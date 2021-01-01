@@ -52,7 +52,7 @@ class GenYB {
         $stmt->execute();
         $ybid = $stmt->insert_id;
         $stmt->close();
-        $this->baseurl = $_SERVER["DOCUMENT_ROOT"].$GLOBALS["ybpath"].$ybid;
+        $this->baseurl = __DIR__."/../../yearbooks/".$ybid;
         return $ybid;
     }
 
@@ -185,7 +185,7 @@ class GenYB {
                 sendJSON($response);
             }
             else {
-                move_uploaded_file($tmpFilePath, "$this->baseurl/assets/banner.$ext");
+                move_uploaded_file($tmpFilePath, "$this->baseurl/assets/$banner");
             }
         }
     }

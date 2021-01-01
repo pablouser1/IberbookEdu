@@ -18,13 +18,21 @@ class Vote {
     public function start($id) {
         $yearbook = $this->getYearbookInfo($id);
         if ($yearbook) {
-            if ($this->checkifvalid($yearbook)) {
-                $this->checkIfAlreadyVoted($id);
-                $this->addVote($id);
-                $this->setVoteToUser($id);
-                $response = [
-                    "code" => "C"
-                ];
+            if ($this->checkifValid($yearbook)) {
+                $alreadyvoted = $this->checkIfAlreadyVoted($id);
+                if ($alreadyvoted === "SAME-YEARBOOK") {
+                    $response = [
+                        "code" => "E",
+                        "error" => "Ya votaste a esta orla anteriormente"
+                    ];
+                }
+                else {
+                    $this->addVote($id);
+                    $this->setVoteToUser($id);
+                    $response = [
+                        "code" => "C"
+                    ];
+                }
             }
             else {
                 $response = [
@@ -43,7 +51,7 @@ class Vote {
     }
 
     private function getYearbookInfo($id) {
-        $stmt = $this->db->prepare("SELECT schoolid, schoolyear FROM yearbooks WHERE id=?");
+        $stmt = $this->db->prepare("SELECT schoolid, schoolyear, acyear FROM yearbooks WHERE id=?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -58,8 +66,13 @@ class Vote {
     }
 
     // Check if user can vote
-    private function checkifvalid($yearbook) {
+    private function checkifValid($yearbook) {
+        $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
         if ($yearbook["schoolid"] == $this->userinfo["schoolid"] && $yearbook["schoolyear"] == $this->userinfo["year"]) {
+            // Allow votes from the same group but different acyear
+            if ($acyear !== $yearbook["acyear"]) {
+                return true;
+            }
             return false;
         }
         else {
@@ -69,7 +82,7 @@ class Vote {
 
     // Check if user already voted and change vote if that's the case
     private function checkIfAlreadyVoted($ybid) {
-        $stmt = $this->db->prepare("SELECT votes from users WHERE id=?");
+        $stmt = $this->db->prepare("SELECT voted from users WHERE id=?");
         $stmt->bind_param("i", $this->userinfo["id"]);
         $stmt->execute();
         $stmt->store_result();
@@ -77,8 +90,17 @@ class Vote {
         $stmt->bind_result($uservote);
         $stmt->fetch();
         $stmt->close();
-        if ($uservote !== $ybid) {
+        if (!isset($uservote)) {
+            return false;
+        }
+        // Voted to another yearbook before
+        elseif ($uservote != $ybid) {
             $this->removeVote($uservote);
+            return "DIFFERENT-YEARBOOK";
+        }
+        // Is trying to vote to same yearbook
+        else {
+            return "SAME-YEARBOOK";
         }
     }
 
@@ -99,7 +121,7 @@ class Vote {
     }
 
     private function setVoteToUser($ybid) {
-        $stmt = $this->db->prepare("UPDATE users SET votes =? WHERE id=?");
+        $stmt = $this->db->prepare("UPDATE users SET voted =? WHERE id=?");
         $stmt->bind_param("ii", $ybid, $this->userinfo["id"]);
         $stmt->execute();
         $stmt->close();

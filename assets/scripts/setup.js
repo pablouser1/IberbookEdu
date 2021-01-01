@@ -121,16 +121,32 @@ Vue.component("server", {
             <p class="help">Aquí se guardan los archivos subidos por los usuarios, MUY recomendable que sea un directorio privado</p>
         </div>
         <div class="field">
+            <label class="label">Ubicación del directorio de las orlas</label>
+            <div class="control">
+                <input name="global[ybdir]" class="input" type="text" required value="/yearbooks">
+            </div>
+            <p class="help">Aquí se guardan las orlas generadas, tiene que ser un directorio público y relativo (Ej: /yearbooks)</p>
+        </div>
+        <div class="field">
             <h2 class="title">Centro admitido</h2>
             <label class="label">ID del centro</label>
             <div class="control">
                 <input name="schoolinfo[id]" class="input" type="number" placeholder="Ej: 181206713" required>
             </div>
             <p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
-            <label class="label">URL (opcional)<i class="fas fa-link"></i></label>
+            <label class="label">Nombre</label>
             <div class="control">
-                <input name="schoolinfo[url]" class="input" type="text">
-                <p class="help">Esta URL saldrá en cada orla generada</p>
+                <input name="schoolinfo[name]" class="input" type="text">
+            </div>
+        </div>
+        <h2 class="title">Frontend permitidos</h2>
+        <button v-on:click="addFrontend" type="button" class="button">Agregar frontend</button>
+        <div id="frontends">
+            <div class="field">
+                <div class="control">
+                    <input name="frontends[]" class="input" type="text" required value="https://iberbookedu.onrender.com">
+                </div>
+                <p class="help">Estos son los frontends permitidos por tu backend</p>
             </div>
         </div>
         <div class="field is-grouped">
@@ -152,7 +168,20 @@ Vue.component("server", {
             </div>
         </div>
     </div>
-    `
+    `,
+    methods: {
+        addFrontend: function() {
+            const frontend =
+            `
+            <div class="field">
+                <div class="control">
+                    <input name="frontends[]" class="input" type="text">
+                </div>
+            </div>
+            `
+            document.getElementById("frontends").innerHTML += frontend
+        }
+    }
 })
 
 var setup_vue = new Vue({

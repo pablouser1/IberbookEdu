@@ -1,16 +1,13 @@
 <?php
+require_once("config/config.php");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header("Access-Control-Allow-Credentials: true");
 
 if (isset($_SERVER['HTTP_ORIGIN'])) {
     $origin = $_SERVER['HTTP_ORIGIN'];
-    $allowed_domains = [
-        "http://localhost:8080",
-        "https://iberbookedu.onrender.com"
-    ];
     
-    if (in_array($origin, $allowed_domains)) {
+    if (in_array($origin, $frontends)) {
         header('Access-Control-Allow-Origin: ' . $origin);
     }
 }
