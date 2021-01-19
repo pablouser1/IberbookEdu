@@ -11,3 +11,6 @@ uploads/
 
 # User generated info about instance
 config/*
+
+# Lang cache
+lang/cache/*

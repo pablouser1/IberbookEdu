@@ -6,6 +6,8 @@ require_once("auth.php");
 require_once("helpers/db.php");
 require_once("config/config.php");
 
+require_once("lang/lang.php");
+
 class Yearbooks {
     private $conn;
     function __construct() {
@@ -130,7 +132,7 @@ if (isset($_GET["mode"])) {
         http_response_code(401);
         $response = [
             "code" => "E",
-            "error" => "No has iniciado sesión"
+            "error" => L::common_needToLogin
         ];
     }
 }
@@ -155,14 +157,14 @@ else {
         else {
             $response = [
                 "code" => "NO-MORE",
-                "error" => "Máximo de orlas alcanzados"
+                "error" => L::yearbooks_maximum
             ];
         }
     }
     else {
         $response = [
             "code" => "E",
-            "error" => "Parámetros inválidos"
+            "error" => L::yearbooks_params
         ];
     }
 }

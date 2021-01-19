@@ -16,7 +16,7 @@ var stories = {
     <div>
         <div class="modal is-active">
             <div class="modal-background" @click="stopVideo"></div>
-            <div class="modal-content animate__animated animate__fadeIn">
+            <div class="modal-content fade-in">
                 <div class="container has-text-centered">
                     <video id="videoStories" v-on:ended="stopVideo" controls>
                         <source :src="user.video">

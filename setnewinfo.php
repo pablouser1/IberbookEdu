@@ -4,6 +4,7 @@ require_once("headers.php");
 require_once("functions.php");
 require_once("auth.php");
 require_once("helpers/db.php");
+require_once("lang/lang.php");
 
 $db = new DB;
 $auth = new Auth;
@@ -17,7 +18,7 @@ if ($userinfo = $auth->isUserLoggedin()) {
     if (!isset($school)) {
         $response = [
             "code" => "E",
-            "error" => "No se ha encontrado el centro que solicitaste"
+            "error" => L::newinfo_notSchool
         ];
         sendJSON($response);
     }
@@ -30,7 +31,7 @@ if ($userinfo = $auth->isUserLoggedin()) {
     if (!isset($group)) {
         $response = [
             "code" => "E",
-            "error" => "No se ha encontrado el grupo que solicitaste"
+            "error" => L::newinfo_notGroup
         ];
         sendJSON($response);
     }
@@ -39,7 +40,7 @@ if ($userinfo = $auth->isUserLoggedin()) {
     if ($userinfo["schoolid"] == $school->id && $userinfo["year"] == $group->name) {
         $response = [
             "code" => "E",
-            "error" => "Ya utilizas esa combinación"
+            "error" => L::newinfo_alreadyUsing
         ];
         sendJSON($response);
     }

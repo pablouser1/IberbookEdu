@@ -6,7 +6,7 @@ const translate_common = {
     <ul>
         <li>Bulma (<a href="https://bulma.io">web</a>)</li>
         <li>Vue.js (<a href="https://vuejs.org">web</a>)</li>
-        <li>Animate.css (<a href="https://animate.style">web</a>)</li>
+        <li>Animista (<a href="https://animista.net">web</a>)</li>
         <li>Confetti.js (<a href="https://github.com/mathusummut/confetti.js">web</a>)</li>
         <li>Spinkit (<a href="https://github.com/tobiasahlin/SpinKit">web</a>)</li>
     </ul>

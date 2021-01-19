@@ -38,7 +38,7 @@ if ($userinfo && $auth->isUserAdmin($userinfo)) {
     $stmt->bind_param("iss", $userinfo["schoolid"], $userinfo["year"], $acyear);
     $stmt->execute();
     $stmt->close();
-    recursiveRemoveDirectory($_SERVER["DOCUMENT_ROOT"]."/iberbackend/yearbooks/".$ybid);
+    recursiveRemoveDirectory(__DIR__."/../../yearbooks/".$ybid);
     $response = [
         "code" => "C"
     ];

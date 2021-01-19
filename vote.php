@@ -4,7 +4,7 @@ require_once("headers.php");
 
 require_once("auth.php");
 require_once("helpers/db.php");
-
+require_once("lang/lang.php");
 $auth = new Auth;
 
 class Vote {
@@ -23,7 +23,7 @@ class Vote {
                 if ($alreadyvoted === "SAME-YEARBOOK") {
                     $response = [
                         "code" => "E",
-                        "error" => "Ya votaste a esta orla anteriormente"
+                        "error" => L::vote_alreadyVoted
                     ];
                 }
                 else {
@@ -37,14 +37,14 @@ class Vote {
             else {
                 $response = [
                     "code" => "E",
-                    "error" => "No puedes votar a tu propio grupo"
+                    "error" => L::vote_notYourself
                 ];
             }
         }
         else {
             $response = [
                 "code" => "E",
-                "error" => "Esa orla no existe"
+                "error" => L::vote_notExist
             ];
         }
         return $response;
@@ -135,7 +135,7 @@ if ($userinfo = $auth->isUserLoggedin()) {
 else {
     $response = [
         "code" => "E",
-        "error" => "Necesitas inciar sesión para votar"
+        "error" => L::common_needToLogin
     ];
 }
 sendJSON($response);

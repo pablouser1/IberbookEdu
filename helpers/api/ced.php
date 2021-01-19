@@ -71,7 +71,7 @@ class Api {
         {
             return array(
                 "code" => "CURL",
-                "error" => "Ha habido un error al conectarse con los servidores remotos"
+                "error" => L::ced_remoteServer
             );
         }
         $json_data = mb_substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));  

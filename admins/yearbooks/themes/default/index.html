@@ -31,8 +31,8 @@
     <script src="scripts/vendor/confetti.min.js"></script>
     <!-- Styles -->
     <link rel="stylesheet" href="styles/vendor/bulma.min.css"/>
-    <link rel="stylesheet" href="styles/vendor/animate.min.css"/>
     <link rel="stylesheet" href="styles/yearbook.css"/>
+    <link rel="stylesheet" href="styles/animations.css"/>
 </head>
 
 <body>
@@ -55,7 +55,7 @@
         </section>
         <!-- Banner -->
         <section id="banner" v-show="!splashscreen"
-            class="hero is-fullheight has-background animate__animated animate__fadeIn animate__fast">
+            class="hero is-fullheight has-background scale-in-center">
             <img v-if="ybinfo.banner !== null" class="hero-background" :src="'assets/' + ybinfo.banner" />
             <div class="hero-body">
                 <div class="columns is-mobile is-centered">

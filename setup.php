@@ -208,7 +208,7 @@ $ssloptions = '.$ssloptions.';
         </section>
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
             <div class="container">
-                <noscript>Este programa necesita Javascript</noscript>
+                <noscript>This app needs Javascript</noscript>
                 <database v-show="stage === 'database'"></database>
                 <owner v-show="stage === 'owner'"></owner>
                 <server v-bind:dirs="dirs" v-show="stage === 'server'"></server>

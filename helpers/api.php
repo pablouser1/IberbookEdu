@@ -9,6 +9,6 @@ switch ($login) {
         require_once("api/local.php");
     break;
     default:
-        die("No existe ese sistema de inicio de sesión");
+        die("That login method doesn't exist");
 }
 ?>

@@ -1,14 +1,13 @@
 <?php
-// TODO, add support for teachers and get school name
-require_once(__DIR__. "/../config.php");
-require_once(__DIR__. "/../db/db.php");
+// TODO, add support for teachers
+require_once(__DIR__. "/../../config/config.php");
+require_once(__DIR__. "/../db.php");
 class Api {
     private $db;
     private $type;
     private $userid;
 
     function __construct() {
-        // Class from requests.php
         $this->db = new DB;
     }
 
@@ -61,22 +60,43 @@ class Api {
     }
 
     function getinfo() {
-        $stmt = $this->db->prepare("SELECT `id`, `fullname`, `type`, `schoolid`, `group` FROM users WHERE id=?");
+        $stmt = $this->db->prepare("SELECT `id`, `fullname`, `type`, `schoolid`, `schoolyear` FROM users WHERE id=?");
         $stmt->bind_param("i", $this->userid);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
+            $schoolname = $this->getSchoolName($row["schoolid"]);
             $userinfo = [
-                "id" => $this->userid,
-                "name" => $row["fullname"],
-                "typer" => $row["type"],
-                "year" => $row["group"],
+                "id" => $row["id"],
+                "name" => $row["name"],
+                "type" => $row["type"],
                 "schoolid" => $row["schoolid"],
-                "schoolname" => "Test" // TODO, get school name
+                "schoolname" => $schoolname,
+                "year" => $schoolyear,
+                "schools" => [
+                    [
+                        "id" => $schoolyear,
+                        "name" => $schoolname,
+                        "groups" => [$schoolyear]
+                    ]
+                ]
             ];
         }
         $stmt->close();
         return $userinfo;
+    }
+
+    private function getSchoolName($schoolid) {
+        // Get all schools
+        $stmt = $this->db->prepare("SELECT `name` FROM schools WHERE id=?");
+        $stmt->bind_param("i", $schoolid);
+        $stmt->execute();
+        $stmt->store_result();
+        // Get profile id
+        $stmt->bind_result($schoolname);
+        $stmt->fetch();
+        $stmt->close();
+        return $schoolname;
     }
 }
 

@@ -15,15 +15,9 @@ if ($userinfo) {
         'httponly' => true,
         'secure' => true
     ]);
-    $response = [
-        "code" => "C"
-    ];
 }
-else {
-    $response = [
-        "code" => "E",
-        "error" => "No has iniciado sesión"
-    ];
-}
+$response = [
+    "code" => "C"
+];
 sendJSON($response);
 ?>

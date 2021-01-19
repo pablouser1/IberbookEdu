@@ -50,9 +50,10 @@ This project wouldn't be possible without the help of the following projects:
 ## PHP Libraries
 * PHPMailer (https://github.com/PHPMailer/PHPMailer)
 * PHP-JWT (https://github.com/firebase/php-jwt)
+* PHP-i18n (https://github.com/Philipp15b/php-i18n)
 
 ## Templates
 ### Default
-* Animate.css (https://animate.style)
+* Animista (https://animista.net)
 * Confetti.js (https://github.com/mathusummut/confetti.js)
 * Spinkit (https://github.com/tobiasahlin/SpinKit)

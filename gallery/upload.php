@@ -4,6 +4,7 @@ require_once("../functions.php");
 require_once("../auth.php");
 require_once("../helpers/db.php");
 require_once("../config/config.php");
+require_once("../lang/lang.php");
 
 class UploadGallery {
     private $conn;
@@ -137,7 +138,7 @@ else {
     http_response_code(401);
     $response = [
         "code" => "E",
-        "error" => "Sesión inválida"
+        "error" => L::common_needToLogin
     ];
 }
 

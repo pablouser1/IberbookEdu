@@ -3,6 +3,7 @@ require_once("../headers.php");
 require_once("../functions.php");
 require_once("../auth.php");
 require_once("../helpers/db.php");
+require_once("../lang/lang.php");
 
 $auth = new Auth;
 $db = new DB;
@@ -22,7 +23,7 @@ if ($userinfo = $auth->isUserLoggedin()) {
     else {
         $response = [
             "code" => "E",
-            "error" => "Ese usuario no existe"
+            "error" => L::user_notExist
         ];
     }
     sendJSON($response);

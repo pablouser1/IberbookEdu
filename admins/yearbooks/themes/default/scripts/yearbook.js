@@ -26,7 +26,7 @@ var users = {
     },
     template: 
     `
-    <div class="columns is-centered is-multiline is-vcentered animate__animated animate__fadeIn">
+    <div class="columns is-centered is-multiline is-vcentered fade-in">
         <div v-for="user in users" class="column is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
             <article class="media">
                 <div class="media-content">
@@ -57,7 +57,7 @@ var gallery = {
     },
     template: 
     `
-    <div class="columns is-centered is-multiline is-vcentered animate__animated animate__fadeIn">
+    <div class="columns is-centered is-multiline is-vcentered fade-in">
         <div v-for="(item) in gallery" class='column is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
             <article class="media">
                 <div class="media-content">
@@ -130,7 +130,7 @@ var main = new Vue({
     mounted() {
         document.onreadystatechange = () => {
             let splashscreen = document.getElementById("splashscreen")
-            splashscreen.classList.add("animate__animated", "animate__fadeOut", "animate__fast")
+            splashscreen.classList.add("animate__animated", "scale-out-center")
             splashscreen.addEventListener("animationend", () => {
                 this.splashscreen = false
             })

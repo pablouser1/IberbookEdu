@@ -7,6 +7,7 @@ require_once("../../config/config.php");
 require_once("../../helpers/email.php");
 require_once("../../helpers/zip.php");
 require_once("themes.php");
+require_once("../../lang/lang.php");
 
 class GenYB {
     private $conn;
@@ -180,7 +181,7 @@ class GenYB {
             if (!in_array($ext, ["jpg", "jpeg", "png", "gif"])) {
                 $response = [
                     "code" => "E",
-                    "description" => "El banner tiene una extensión no soportada"
+                    "description" => L::yearbooks_banner
                 ];
                 sendJSON($response);
             }
@@ -225,21 +226,23 @@ if ($userinfo && $auth->isUserAdmin($userinfo)) {
         // Zip Yearbook
         $genyb->zipYearbook();
         // Send emails
-        $mailclient = new Email($GLOBALS["email"]);
-        // Get email from specific group
-        $emails = $mailclient->getEmails($userinfo["schoolid"], $userinfo["year"]);
-        $mailclient->sendYearbook($emails, $ybid);
+        if ($GLOBALS["email"]["enabled"]) {
+            $mailclient = new Email($GLOBALS["email"]);
+            // Get email from specific group
+            $emails = $mailclient->getEmails($userinfo["schoolid"], $userinfo["year"]);
+            $mailclient->sendYearbook($emails, $ybid);
+        }
         // Everyting went OK
         $response = [
             "code" => "C",
-            "description" => "Yearbook generado con éxito"
+            "description" => L::yearbooks_generated
         ];
         sendJSON($response);
     }
     else {
         $response = [
             "code" => "E",
-            "error" => "Tema no válido"
+            "error" => L::yearbooks_theme
         ];
     }
 }

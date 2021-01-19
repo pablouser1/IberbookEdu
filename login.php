@@ -1,12 +1,11 @@
 <?php
-require "vendor/autoload.php";
-use \Firebase\JWT\JWT;
 require_once("headers.php");
 require_once("functions.php");
 require_once("auth.php");
 require_once("helpers/db.php");
 require_once("config/config.php");
 require_once("helpers/api.php");
+require_once("lang/lang.php");
 
 class Login {
     private $api;
@@ -59,14 +58,14 @@ class Login {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!$_POST["username"]){
-        $login_error[] = "No has escrito ningún nombre de usuario.";
+        $login_error[] = L::login_noUsername;
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
     if(!$_POST["password"]){
-        $login_error[] = "No has escrito ninguna contraseña.";
+        $login_error[] = L::login_noPassword;
     } 
     else{
         $password = trim($_POST["password"]);
@@ -74,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Get type
     if(!$_POST["type"]){
-        $login_error[] = "No has seleccionado tu tipo.";
+        $login_error[] = L::login_noType;
     } 
     else{
         $type = trim($_POST["type"]);
