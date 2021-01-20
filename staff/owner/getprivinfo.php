@@ -4,12 +4,12 @@ if (!isset($_SESSION)) {
     session_start();
 }
 if (!isset($_SESSION["owner"])){
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
 
-require_once("../functions.php");
-require_once("../helpers/db.php");
+require_once("../../functions.php");
+require_once("../../helpers/db.php");
 class DBPrivInfo {
     private $db;
     function __construct() {

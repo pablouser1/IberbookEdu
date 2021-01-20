@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION["owner"])){
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
 
@@ -16,7 +16,7 @@ $staff = $info->staff();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestión staff - IberbookEdu</title>
+    <title>Staff administration - IberbookEdu</title>
     <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
@@ -26,29 +26,29 @@ $staff = $info->staff();
         <div class="hero-body">
             <div class="container">
                 <h1 class="title">
-                    Gestión staff
+                    Staff administration
                 </h1>
                 <h2 class="subtitle">
-                    Agrega/elimina staff
+                    Add/remove staff
                 </h2>
             </div>
         </div>
     </section>
     <section id="option" class="section tab">
         <div class="container has-text-centered">
-            <p class="title">Elige la cuenta que quieras gestionar</p>
+            <p class="title">Choose what account you want to administrate</p>
             <div class="buttons is-centered">
                 <a href="#admins" class="button is-link">
                     <span class="icon">
                         <i class="fas fa-user-friends"></i>
                     </span>
-                    <span>Administradores</span>
+                    <span>Administrators</span>
                 </a>
                 <a href="#owners" class="button is-link">
                     <span class="icon">
                         <i class="fas fa-id-card"></i>
                     </span>
-                    <span>Dueños</span>
+                    <span>Owners</span>
                 </a>
             </div>
         </div>
@@ -59,7 +59,7 @@ $staff = $info->staff();
                 <span class="icon">
                     <i class="fas fa-user-friends"></i>
                 </span>
-                <span>Agregar nuevo admin</span>
+                <span>Add new admin</span>
             </button>
         </div>
         <form action="managestaff.php" method="POST">
@@ -69,9 +69,9 @@ $staff = $info->staff();
                         <div class="card-content">
                             <p class="title has-text-centered">Admin 0</p>
                             <div class="field">
-                                <label class="label">Usuario</label>
+                                <label class="label">User</label>
                                 <div class="control has-icons-left">
-                                    <input class="input" type="text" name="username[]" placeholder="usuario" required>
+                                    <input class="input" type="text" name="username[]" placeholder="user" required>
                                     <span class="icon is-left"><i class="fas fa-user"></i></span>
                                 </div>
                             </div>
@@ -83,11 +83,11 @@ $staff = $info->staff();
                 <div class="control">
                     <label class="radio">
                         <input value="add" type="radio" name="action">
-                        Agregar
+                        Add
                     </label>
                     <label class="radio">
                         <input value="remove" type="radio" name="action">
-                        Eliminar
+                        Remove
                     </label>
                 </div>
             </div>
@@ -97,7 +97,7 @@ $staff = $info->staff();
                         <span class="icon">
                             <i class="fas fa-paper-plane"></i>
                         </span>
-                        <span>Enviar</span>
+                        <span>Send</span>
                     </button>
                 </div>
             </div>
@@ -109,7 +109,7 @@ $staff = $info->staff();
                 <span class="icon">
                     <i class="fas fa-user-friends"></i>
                 </span>
-                <span>Agregar nuevo owner</span>
+                <span>Add another owner</span>
             </button>
         </div>
         <form action="managestaff.php" method="POST">
@@ -117,16 +117,16 @@ $staff = $info->staff();
                 <div class="column is-narrow">
                     <div class="card">
                         <div class="card-content">
-                            <p class="title has-text-centered">Dueño 0</p>
+                            <p class="title has-text-centered">Owner 0</p>
                             <div class="field">
-                                <label class="label">Usuario</label>
+                                <label class="label">User</label>
                                 <div class="control has-icons-left">
                                     <input class="input" type="text" name="username[]" placeholder="usuario" required>
                                     <span class="icon is-left"><i class="fas fa-user"></i></span>
                                 </div>
                             </div>
                             <div class="field">
-                                <label class="label">Contraseña</label>
+                                <label class="label">Password</label>
                                 <div class="control has-icons-left">
                                     <input class="input" type="password" name="password[]" placeholder="***********" required>
                                     <span class="icon is-left"><i class="fas fa-key"></i></span>
@@ -140,11 +140,11 @@ $staff = $info->staff();
                 <div class="control">
                     <label class="radio">
                         <input value="add" type="radio" name="action">
-                        Agregar
+                        Add
                     </label>
                     <label class="radio">
                         <input value="remove" type="radio" name="action">
-                        Eliminar
+                        Remove
                     </label>
                 </div>
             </div>
@@ -154,7 +154,7 @@ $staff = $info->staff();
                         <span class="icon">
                             <i class="fas fa-paper-plane"></i>
                         </span>
-                        <span>Enviar</span>
+                        <span>Send</span>
                     </button>
                 </div>
             </div>
@@ -166,14 +166,14 @@ $staff = $info->staff();
             <span class="icon">
                 <i class="fas fa-info-circle"></i>
             </span>
-            <span>Información</span>
+            <span>Information</span>
         </p>
         <table class="table is-bordered is-striped is-hoverable">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nombre de usuario</th>
-                    <th>Permisos</th>
+                    <th>Username</th>
+                    <th>Permissions</th>
                 </tr>
             </thead>
             <tbody>
@@ -199,7 +199,7 @@ $staff = $info->staff();
                         <span class="icon is-small">
                             <i class="fas fa-undo"></i>
                         </span>
-                        <span>Volver al inicio</span>
+                        <span>Back to main menu</span>
                     </a>
                 </li>
                 <li>
@@ -207,7 +207,7 @@ $staff = $info->staff();
                         <span class="icon is-small">
                             <i class="fas fa-columns" aria_hidden="true"></i>
                         </span>
-                        <span>Volver al panel de control</span>
+                        <span>Back to control panel</span>
                     </a>
                 </li>
                 <li>
@@ -215,7 +215,7 @@ $staff = $info->staff();
                         <span class="icon is-small">
                             <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                         </span>
-                        <span>Cerrar sesión</span>
+                        <span>Logout</span>
                     </a>
                 </li>
             </ul>

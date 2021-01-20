@@ -1,23 +1,23 @@
 <?php
 session_start();
 if (isset($_SESSION["owner"])){
-    header("Location: dashboard.php");
+    header("Location: owner/dashboard.php");
     exit;
 }
 
 $login_error = array();
-require_once("../helpers/db.php");
+require_once("../../helpers/db.php");
 $db = new DB;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!$_POST["username"]){
-        $login_error[] = "No has escrito ningún nombre de usuario.";
+        $login_error[] = "You didn't type a username";
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
     if(!$_POST["password"]){
-        $login_error[] = "No has escrito ninguna contraseña.";
+        $login_error[] = "You didn't type a password";
     } 
     else{
         $password = trim($_POST["password"]);
@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             ];
                             $_SESSION["ownerinfo"] = $ownerinfo;
                             // Redirect user to welcome page
-                            header("Location: dashboard.php");
+                            header("Location: owner/dashboard.php");
                             exit;
                         } else{
                             // Display an error message if password is not valid
@@ -91,10 +91,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="columns">
                     <div class="column left">
                         <h1 class="title is-1">IberbookEdu</h1>
-                        <h2 class="subtitle colored is-4">Inicia sesión con tus credenciales</h2>
+                        <h2 class="subtitle colored is-4">Login with your credentials</h2>
                         <div class="notification is-danger <?php if(!$login_error) echo("is-hidden"); ?>">
                             <span>
-                                <p>Hubo un error al procesar tu solicitud:</p>
+                                <p>There was an error processing your request:</p>
                                 <?php
                                 if($login_error) {
                                     foreach($login_error as $error) {
@@ -109,19 +109,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <!-- FORM -->
                         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                             <div class="field">
-                                <label class="label">Nombre de usuario</label>
+                                <label class="label">Username</label>
                                 <div class="control">
-                                    <input name="username" class="input is-medium" type="text" placeholder="usuario">
+                                    <input name="username" class="input is-medium" type="text" placeholder="user">
                                 </div>
                             </div>
 
                             <div class="field">
-                                <label class="label">Contraseña</label>
+                                <label class="label">Password</label>
                                 <div class="control">
                                     <input name="password" class="input is-medium" type="password" placeholder="**********">
                                 </div>
                             </div>
-                            <button class="button is-block is-primary is-fullwidth is-medium">Iniciar sesión</button>
+                            <button class="button is-block is-primary is-fullwidth is-medium">Login</button>
                         </form>
                     </div>
                 </div>
@@ -130,11 +130,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <nav class="level">
                     <div class="level-left">
                         <div class="level-item">
-                            Hecho con ❤️ en Github
+                            Made with ❤️ in Github
                         </div>
                     </div>
                     <div class="level-right">
-                        <a class="level-item" href="about.html">Acerca de</a>
+                        <a class="level-item" href="https://github.com/pablouser1/IberbookEdu-backend">Acerca de</a>
                     </div>
                 </nav>
             </div>

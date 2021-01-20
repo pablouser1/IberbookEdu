@@ -70,6 +70,9 @@ class Auth {
         if (isset($_COOKIE["login"]) && !empty($_COOKIE["login"])) {
             $token = $_COOKIE["login"];
             if ($userinfo = $this->authJWT($token)) {
+                if ($userinfo["type"] == "guardians") {
+                    return (array)$userinfo["child"];
+                }
                 return $userinfo;
             }
         }

@@ -23,11 +23,19 @@ class Login {
     public function loginUser($username, $password, $type) {
         $loginres = $this->api->login($username, $password, $type);
         if ($loginres["code"] === "C"){
+            $response = [
+                "code" => "",
+                "data" => []
+            ];
             // Get user info
             $this->userinfo = $this->api->getinfo();
-
-            // Guardians aren't registered on DB and can't be admin
-            if ($type !== "guardians") {
+            if ($type == "guardians") {
+                $id = $this->auth->doesUserExists($this->userinfo["child"]);
+                $this->userinfo["child"]["id"] = $id;
+                $response["data"]["userinfo"] = $this->userinfo["child"];
+                $response["data"]["guardianinfo"] = $this->userinfo;
+            }
+            else {
                 if ($GLOBALS["login"] !== "local") {
                     $id = $this->auth->doesUserExists($this->userinfo);
                 }
@@ -41,14 +49,12 @@ class Login {
                 else {
                     $this->userinfo["rank"] = "user";
                 }
+                $response["data"]["userinfo"] = $this->userinfo;
             }
+
             $this->auth->setToken($this->userinfo);
-            return [
-                "code" => "C",
-                "data" => [
-                    "userinfo" => $this->userinfo
-                ]
-            ];
+            $response["code"] = "C";
+            return $response;
         }
         else {
             return $loginres;

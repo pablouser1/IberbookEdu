@@ -29,13 +29,13 @@ Vue.component('mainmenu', {
                     <span class="icon">
                         <i class="fas fa-user-friends"></i>
                     </span>
-                    <span>Agregar/eliminar staff</span>
+                    <span>Add/remove staff</span>
                 </a>
             </div>
             <div class="column is-narrow">
                 <p class="title is-4">
                     <i class="fas fa-school"></i>
-                    <span>Centros</span>
+                    <span>Schools</span>
                 </p>
                 <table class="table is-bordered is-striped is-hoverable">
                     <thead>
@@ -56,7 +56,7 @@ Vue.component('mainmenu', {
                     <span class="icon">
                         <i class="fas fa-school"></i>
                     </span>
-                    <span>Agregar/eliminar centro</span>
+                    <span>Add/remove schools</span>
                 </button> 
             </div>
         </div>
@@ -78,13 +78,7 @@ Vue.component('users', {
     `
     <div>
         <div class="field">
-            <label class="label">ID centro</label>
-            <div class="control">
-                <input v-model="schoolid" class="input" type="number">
-            </div>
-        </div>
-        <div class="field">
-            <label class="label">Predefinido</label>
+            <label class="label">School ID</label>
             <div class="control">
                 <div class="select">
                     <select v-model="schoolid">
@@ -94,7 +88,7 @@ Vue.component('users', {
             </div>
         </div>
         <div class="field">
-            <label class="label">Curso</label>
+            <label class="label">School year</label>
             <div class="control">
                 <input v-model="schoolyear" class="input" type="text" placeholder="4º ESO A">
             </div>
@@ -110,13 +104,13 @@ Vue.component('users', {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nombre completo</th>
-                            <th>Foto</th>
-                            <th>Vídeo</th>
-                            <th>Enlace</th>
-                            <th>Cita</th>
-                            <th>Última modificación</th>
-                            <th>Asignatura</th>
+                            <th>Full name</th>
+                            <th>Photo</th>
+                            <th>Video</th>
+                            <th>Link</th>
+                            <th>Quote</th>
+                            <th>Last modified</th>
+                            <th>Subject</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,10 +118,10 @@ Vue.component('users', {
                             <td>{{ user.id }}</td>
                             <td>{{ user.name }}</td>
                             <td>
-                                <a :href="'../getmedia.php?id=' + user.id + '&media=photo&type=' + user.type" target='_blank'>{{ user.photo }}</a>
+                                <a :href="'../../users/getmedia.php?id=' + user.id + '&media=photo&type=' + user.type" target='_blank'>{{ user.photo }}</a>
                             </td>
                             <td>
-                                <a :href="'../getmedia.php?id=' + user.id + '&media=video&type=' + user.type" target='_blank'>{{ user.video }}</a>
+                                <a :href="'../../users/getmedia.php?id=' + user.id + '&media=video&type=' + user.type" target='_blank'>{{ user.video }}</a>
                             </td>
                             <td>
                                 <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
@@ -151,7 +145,7 @@ Vue.component('users', {
                     <tbody>
                         <tr v-for="item in gallery">
                             <td>
-                                <a :href="'../getgallery.php?id=' + item.id" target='_blank'>{{item.name}}</a>
+                                <a :href="'../../gallery/getgallery.php?id=' + item.id" target='_blank'>{{item.name}}</a>
                             </td>
                             <td>{{ item.description }}</td>
                             <td>{{ item.type }}</td>

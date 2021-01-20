@@ -5,7 +5,7 @@ if (!isset($_SESSION["owner"])){
     exit;
 }
 
-require_once("../helpers/db.php");
+require_once("../../helpers/db.php");
 $db = new DB;
 if (isset($_POST["id"])){
     // ID and URL

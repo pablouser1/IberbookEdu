@@ -39,7 +39,7 @@ class Api {
                 $this->base_url = $GLOBALS["base_url"].'senecadroid';
             break;
             default:
-                die("Tipo de usuario no válido");
+                die("Invalid user type");
         }
     }
 
@@ -138,7 +138,7 @@ class Api {
             // -- Tutor legal -- //
             case 'guardians':
                 // Check if user is actually guardian
-                if ($this->type == "students" && $info["RESULTADO"][0]["C_PERFIL"] == "TUT_LEGAL") {
+                if ($this->type == "guardians" && $info["RESULTADO"][0]["C_PERFIL"] == "TUT_LEGAL") {
                     // Set user info
                     $children = array();
                     foreach($info["RESULTADO"][0]["HIJOS"] as $tempchild){
@@ -172,6 +172,7 @@ class Api {
                     $userinfo = [
                         "name" => $info["RESULTADO"][0]["USUARIO"],
                         "type" => "guardians",
+                        "child" => $children[0], // Hijo seleccionado por defecto
                         "children" => $children
                     ];
                 }
@@ -221,12 +222,29 @@ class Api {
     }
 
     function isAllowed($schoolid, $group) {
+        $groupname = $group["name"];
+        $allowedSchool = $this->isSchoolAllowed($schoolid);
+        $allowedGroup = $this->isGroupAllowed($groupname);
+        if ($allowedSchool && $allowedGroup) {
+            return true;
+        }
+        return false;
+    }
+
+    private function isSchoolAllowed($schoolid) {
         $sql = "SELECT `id` FROM `schools` WHERE id=$schoolid";
         $result = $this->db->query($sql);
         if ($result && $result->num_rows === 1) {
-            if (preg_match("/(4º\sESO)|(2º\sBCT)|(6.)P/", $group)) {
-                return true;
-            }
+            return true;
+        }
+        return false;
+    }
+
+    private function isGroupAllowed($group) {
+        $sql = "SELECT `id` FROM groups WHERE `name`=$group";
+        $result = $this->db->query($sql);
+        if ($result && $result->num_rows === 1) {
+            return true;
         }
         return false;
     }
@@ -240,12 +258,6 @@ class Api {
             "schoolid" => $response["RESULTADO"][0]["DATOS"][0][1],
             "schoolname" => $response["RESULTADO"][0]["DATOS"][2][1]
         );
-    }
-
-    // Get pic of student
-    function getpicstudent($data){
-        $url = "{$this->base_url}/imageAlumno";
-        return base64_encode($this->req->post($url, $data));
     }
 
     // -- Teachers only -- //
@@ -297,6 +309,7 @@ class Api {
         $response = json_decode(utf8_encode($this->req->post($url, [])), true);
         // Get each course, split all groups and if there are any 4º ESO, 2º BCT, 6 Primaria add it to array
         foreach($response["RESULTADO"] as $id => $grupo){
+            // TODO, integrate with DB
             preg_match_all("/(4º\sESO)\s.|(2º\sBCT)\s.|(6.)P/", $grupo["UNIDADES"], $tempgrupo);
             foreach ($tempgrupo[0] as $temp) {
                 $grupos_repeated[] = [

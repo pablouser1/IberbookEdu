@@ -148,6 +148,16 @@ $ssloptions = '.$ssloptions.';
     if ($db->query($sql) !== TRUE) {
         die("Error creating schools");
     }
+
+    // Groups
+    $sql = "CREATE TABLE `groups` (
+        `id` int NOT NULL AUTO_INCREMENT,
+        `name` varchar(32) NOT NULL UNIQUE,
+        primary key(id)
+        )";
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating schools");
+    }
     // Writes data to DB
 
     // School info
