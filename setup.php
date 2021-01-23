@@ -82,7 +82,7 @@ $ssloptions = '.$ssloptions.';
             id INT NOT NULL AUTO_INCREMENT,
             username varchar(24) NOT NULL,
             `password` varchar(255) NOT NULL,
-            `type` varchar(12),
+            `type` varchar(12) NOT NULL,
             fullname varchar(255) NOT NULL,
             email varchar(255),
             voted int,
@@ -91,9 +91,8 @@ $ssloptions = '.$ssloptions.';
     }
     elseif ($login == "ced") {
         $sql = "CREATE TABLE users(
-            id INT NOT NULL AUTO_INCREMENT,
-            idced varchar(9),
-            `type` varchar(12),
+            id varchar(9) NOT NULL,
+            `type` varchar(12) NOT NULL,
             fullname varchar(255) NOT NULL,
             voted int,
             primary key(id)

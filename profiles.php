@@ -41,7 +41,7 @@ class Profiles {
 
     private function createProfile($userid, $schoolid, $group) {
         $stmt = $this->db->prepare("INSERT INTO profiles(userid, schoolid, schoolyear) VALUES(?, ?, ?)");
-        $stmt->bind_param("iis", $userid, $schoolid, $group);
+        $stmt->bind_param("iis", $userid, $schoolid, $group["name"]);
         $stmt->execute();
         $profileid = $stmt->insert_id;
         return $profileid;
