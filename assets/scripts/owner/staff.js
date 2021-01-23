@@ -22,12 +22,14 @@ document.getElementById("newadmin").addEventListener("click", () => {
     var html = `
     <div class="column is-narrow">
         <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">Admin ${admin_i}</p>
+            </header>
             <div class="card-content">
-                <p class="title has-text-centered">Admin ${admin_i}</p>
                 <div class="field">
-                    <label class="label">Usuario</label>
+                    <label class="label">Admin</label>
                     <div class="control has-icons-left">
-                        <input class="input" type="text" name="username[]" placeholder="usuario" required>
+                        <input class="input" type="text" name="username[]" placeholder="user" required>
                         <span class="icon is-left"><i class="fas fa-user"></i></span>
                     </div>
                 </div>
@@ -46,16 +48,16 @@ document.getElementById("newowner").addEventListener("click", () => {
     <div class="column is-narrow">
         <div class="card">
             <div class="card-content">
-                <p class="title has-text-centered">Dueño ${owner_i}</p>
+                <p class="title has-text-centered">Owner ${owner_i}</p>
                 <div class="field">
-                    <label class="label">Usuario</label>
+                    <label class="label">User</label>
                     <div class="control has-icons-left">
-                        <input class="input" type="text" name="username[]" placeholder="usuario" required>
+                        <input class="input" type="text" name="username[]" placeholder="user" required>
                         <span class="icon is-left"><i class="fas fa-user"></i></span>
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Contraseña</label>
+                    <label class="label">Password</label>
                     <div class="control has-icons-left">
                         <input class="input" type="text" name="password[]" placeholder="***********" required>
                         <span class="icon is-left"><i class="fas fa-key"></i></span>

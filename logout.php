@@ -9,8 +9,14 @@ $auth = new Auth;
 $userinfo = $auth->isUserLoggedin();
 
 if ($userinfo) {
-    unset($_COOKIE["login"]);
-    setcookie("login", "", [
+    unset($_COOKIE["user"]);
+    unset($_COOKIE["profile"]);
+    setcookie("user", "", [
+        'expires' => time()-86400,
+        'httponly' => true,
+        'secure' => true
+    ]);
+    setcookie("profile", "", [
         'expires' => time()-86400,
         'httponly' => true,
         'secure' => true

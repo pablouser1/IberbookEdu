@@ -1,5 +1,5 @@
 Vue.component('mainmenu', {
-    props: ["staff", "schools"],
+    props: ["staff", "schools", "groups"],
     template:
     `
     <div>
@@ -13,8 +13,8 @@ Vue.component('mainmenu', {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nombre de usuario</th>
-                            <th>Permisos</th>
+                            <th>Username</th>
+                            <th>Permissions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,21 +51,55 @@ Vue.component('mainmenu', {
                         </tr>
                     </tbody>
                 </table>
-                <!-- TODO. MAKE MODAL FOR SCHOOL ADD/REMOVE -->
-                <button id="manageschool" type="button" class="button is-info">
+                <button type="button" class="button is-info" @click="showSchools = true">
                     <span class="icon">
                         <i class="fas fa-school"></i>
                     </span>
                     <span>Add/remove schools</span>
                 </button> 
             </div>
+            <div class="column is-narrow">
+                <p class="title is-4">
+                    <i class="fas fa-school"></i>
+                    <span>Groups</span>
+                </p>
+                <table class="table is-bordered is-striped is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="group in groups">
+                            <td>{{ group.id }}</td>
+                            <td>{{ group.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="button is-info" @click="showGroups = true">
+                    <span class="icon">
+                        <i class="fas fa-users"></i>
+                    </span>
+                    <span>Add/remove groups</span>
+                </button> 
+            </div>
         </div>
+        <a href="users.php" class="button is-info">Add/remove users</a>
+        <schools v-bind:schools="schools" v-show="showSchools" @close="showSchools = false"></schools>
+        <groups v-bind:groups="groups" v-show="showGroups" @close="showGroups = false"></groups>
     </div>
-    `
+    `,
+    data() {
+        return {
+            showSchools: false, // Modal schools
+            showGroups: false // Modal groups
+        }
+    }
 })
 
 Vue.component('users', {
-    props: ["schools"],
+    props: ["schools", "groups"],
     data() {
         return {
             schoolid: "",
@@ -78,11 +112,11 @@ Vue.component('users', {
     `
     <div>
         <div class="field">
-            <label class="label">School ID</label>
+            <label class="label">School</label>
             <div class="control">
                 <div class="select">
                     <select v-model="schoolid">
-                        <option v-for="school in schools" :value="school.id">{{ school.id }}</option>
+                        <option v-for="school in schools" :value="school.id">{{ school.name }}</option>
                     </select>
                 </div>
             </div>
@@ -90,7 +124,11 @@ Vue.component('users', {
         <div class="field">
             <label class="label">School year</label>
             <div class="control">
-                <input v-model="schoolyear" class="input" type="text" placeholder="4º ESO A">
+                <div class="select">
+                    <select v-model="schoolyear">
+                        <option v-for="group in groups" :value="group.name">{{ group.name }}</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="field">
@@ -137,15 +175,15 @@ Vue.component('users', {
                 <table class="table is-bordered is-striped is-narrow is-hoverable">
                     <thead>
                         <tr>
-                            <th>Archivo</th>
-                            <th>Descripción</th>
-                            <th>Tipo</th>
+                            <th>File</th>
+                            <th>Description</th>
+                            <th>Type</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="item in gallery">
                             <td>
-                                <a :href="'../../gallery/getgallery.php?id=' + item.id" target='_blank'>{{item.name}}</a>
+                                <a :href="'../../gallery/getitem.php?id=' + item.id" target='_blank'>{{item.name}}</a>
                             </td>
                             <td>{{ item.description }}</td>
                             <td>{{ item.type }}</td>
@@ -179,7 +217,8 @@ var dashboard_vue = new Vue({
         showNav: false,
         tab: "mainmenu",
         staff: staff_js,
-        schools: schools_js
+        schools: schools_js,
+        groups: groups_js
     },
     methods: {
         changeTab: function(tab) {

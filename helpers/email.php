@@ -31,17 +31,27 @@ class Email {
     }
 
     public function getEmails($schoolid, $group) {
+        $users = [];
         $emails = [];
-        $stmt = $this->db->prepare("SELECT email FROM users WHERE schoolid=? AND schoolyear=?");
+        $stmt = $this->db->prepare("SELECT userid FROM profiles WHERE schoolid=? AND schoolyear=?");
         $stmt->bind_param("is", $schoolid, $group);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            if (isset($row["email"])) {
-                array_push($emails, $row["email"]);
-            }
+            $users[] = $row;
         }
         $stmt->close();
+
+        foreach ($users as $user) {
+            $stmt = $this->db->prepare("SELECT email FROM users WHERE id=?");
+            $stmt->bind_param("i", $user["userid"]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            array_push($emails, $row["email"]);
+            $stmt->close();
+        }
+
         return $emails;
     }
     // Send email to group when yearbook is generated

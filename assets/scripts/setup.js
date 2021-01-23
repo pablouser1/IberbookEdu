@@ -2,12 +2,12 @@ Vue.component("database", {
     template:
     `
     <div class="section">
-        <h1 class="title">Base de datos</h1>
+        <h1 class="title">Database</h1>
         <hr>
         <div class="field">
-            <label class="label">Nombre de la base de datos</label>
+            <label class="label">Database name</label>
             <div class="control">
-                <input name="db[name]" class="input" type="text" placeholder="Ej: iberbook_db" required>
+                <input name="db[name]" class="input" type="text" placeholder="Example: iberbook_db" required>
             </div>
         </div>
         <div class="field">
@@ -17,20 +17,20 @@ Vue.component("database", {
             </div>
         </div>
         <div class="field">
-            <label class="label">Puerto</label>
+            <label class="label">Port</label>
             <div class="control">
                 <input name="db[port]" class="input" type="text" value="3306" required>
             </div>
             <p class="help">Por detecto es 3306</p>
         </div>
         <div class="field">
-            <label class="label">Nombre de usuario</label>
+            <label class="label">Username</label>
             <div class="control">
-                <input name="db[username]" class="input" type="text" placeholder="Ej: usuario" required>
+                <input name="db[username]" class="input" type="text" placeholder="Ej: user" required>
             </div>
         </div>
         <div class="field">
-            <label class="label">Contraseña</label>
+            <label class="label">Password</label>
             <div class="control">
                 <input name="db[password]" class="input" type="password" placeholder="**********" required>
             </div>
@@ -41,7 +41,7 @@ Vue.component("database", {
                     <span class="icon">
                         <i class="fas fa-forward"></i>
                     </span>
-                    <span>Siguiente</span>
+                    <span>Next</span>
                 </button>
             </div>
         </div>
@@ -53,17 +53,18 @@ Vue.component("owner", {
     template:
     `
     <div class="section">
-        <h1 class="title">Datos del servidor</h1>
-        <h2 class="title">Cuenta del dueño</h2>
-        <h2 class="subtitle">Esta cuenta tendrá los máximos permisos posibles</h2>
+        <h1 class="title">Server details</h1>
+        <h2 class="title">Owner's account</h2>
+        <h2 class="subtitle">This account will have full permissions on the instance</h2>
         <div class="field">
-            <label class="label">Nombre de usuario</label>
+            <label class="label">Username</label>
             <div class="control">
-                <input name="owner[username]" class="input" type="text" placeholder="Ej: usuario" required>
+                <input name="owner[username]" class="input" type="text" placeholder="Ej: user" required>
             </div>
         </div>
         <div class="field">
-            <label class="label">Contraseña</label>
+            <label class="label">Password
+            </label>
             <div class="control">
                 <input name="owner[password]" class="input" type="password" placeholder="***********" required>
             </div>
@@ -74,7 +75,7 @@ Vue.component("owner", {
                     <span class="icon">
                         <i class="fas fa-backward"></i>
                     </span>
-                    <span>Atrás</span>
+                    <span>Back</span>
                 </button>
             </div>
             <div class="control">
@@ -82,7 +83,7 @@ Vue.component("owner", {
                     <span class="icon">
                         <i class="fas fa-forward"></i>
                     </span>
-                    <span>Siguiente</span>
+                    <span>Next</span>
                 </button>
             </div>
         </div>
@@ -96,57 +97,54 @@ Vue.component("server", {
             type: Object
         }
     },
+    data() {
+        return {
+            loginSystem: "local"
+        }
+    },
     template:
     `
     <div class="section">
-        <h1 class="title">Datos del servidor</h1>
-        <h2 class="title">Opciones</h2>
+        <h1 class="title">Server details</h1>
+        <h2 class="title">Options</h2>
         <div class="field">
-            <label class="label">Selecciona tu comunidad autónoma</label>
+            <label class="label">Choose your login system</label>
             <div class="control">
                 <div class="select">
-                    <select name="global[login]">
-                        <option value="andalucia">Andalucía</option>
-                        <option value="madrid">Madrid</option>
-                        <option value="local">Otros</option>
+                    <select v-model="loginSystem" name="global[login]">
+                        <option value="local">Local Database</option>
+                        <option value="andalucia">PASEN/SENECA (Andalucía)</option>
+                        <option value="madrid">ROBLE (Madrid)</option>
                     </select>
                 </div>
             </div>
         </div>
         <div class="field">
-            <label class="label">Ubicación del directorio de subida</label>
+            <label class="label">Uploads directory</label>
             <div class="control">
                 <input name="global[uploaddir]" class="input" type="text" :value="dirs.upload" required>
             </div>
-            <p class="help">Aquí se guardan los archivos subidos por los usuarios, MUY recomendable que sea un directorio privado</p>
+            <p class="help">Stores users' photos and videos, HIGHLY recommended to be a private directory</p>
         </div>
         <div class="field">
-            <label class="label">Ubicación del directorio de las orlas</label>
-            <div class="control">
-                <input name="global[ybdir]" class="input" type="text" required value="/yearbooks">
-            </div>
-            <p class="help">Aquí se guardan las orlas generadas, tiene que ser un directorio público y relativo (Ej: /yearbooks)</p>
-        </div>
-        <div class="field">
-            <h2 class="title">Centro admitido</h2>
-            <label class="label">ID del centro</label>
+            <h2 class="title">Schools</h2>
+            <label class="label">School's ID</label>
             <div class="control">
                 <input name="schoolinfo[id]" class="input" type="number" placeholder="Ej: 181206713" required>
             </div>
-            <p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p>
-            <label class="label">Nombre</label>
+            <p v-if="loginSystem == 'andalucia' || 'madrid'"><p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p></p>
+            <label class="label">Name</label>
             <div class="control">
                 <input name="schoolinfo[name]" class="input" type="text">
             </div>
         </div>
-        <h2 class="title">Frontend permitidos</h2>
-        <button v-on:click="addFrontend" type="button" class="button">Agregar frontend</button>
+        <h2 class="title">Allowed frontend servers</h2>
+        <button v-on:click="addFrontend" type="button" class="button">Add fronteend</button>
         <div id="frontends">
             <div class="field">
                 <div class="control">
                     <input name="frontends[]" class="input" type="text" required value="https://iberbookedu.onrender.com">
                 </div>
-                <p class="help">Estos son los frontends permitidos por tu backend</p>
             </div>
         </div>
         <div class="field is-grouped">
@@ -155,7 +153,7 @@ Vue.component("server", {
                     <span class="icon">
                         <i class="fas fa-backward"></i>
                     </span>
-                    <span>Atrás</span>
+                    <span>Back</span>
                 </button>
             </div>
             <div class="control">
@@ -163,7 +161,7 @@ Vue.component("server", {
                     <span class="icon">
                         <i class="fas fa-paper-plane"></i>
                     </span>
-                    <span>Enviar todo</span>
+                    <span>Send all</span>
                 </button>
             </div>
         </div>

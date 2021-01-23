@@ -11,15 +11,15 @@ require_once("../../lang/lang.php");
 
 class GenYB {
     private $conn;
-    private $userinfo;
+    private $profileinfo;
     private $themes;
     private $acyear;
     private $dt;
     private $baseurl;
     private $emails = [];
-    function __construct($userinfo, $themes) {
+    function __construct($profileinfo, $themes) {
         $this->db = new DB;
-        $this->userinfo = $userinfo;
+        $this->profileinfo = $profileinfo;
         $this->themes = $themes;
         $this->acyear = date("Y",strtotime("-1 year"))."-".date("Y");
         $this->dt = new DateTime("now");
@@ -49,38 +49,59 @@ class GenYB {
     public function writeToDB($banner) {
         // Writes data to DB
         $stmt = $this->db->prepare("INSERT INTO yearbooks(schoolid, schoolname, schoolyear, acyear, banner) VALUES(?, ?, ?, ?, ?)");
-        $stmt->bind_param("issss", $this->userinfo["schoolid"], $this->userinfo["schoolname"], $this->userinfo["year"], $this->acyear, $banner);
+        $stmt->bind_param("issss", $this->profileinfo["schoolid"], $this->profileinfo["schoolname"], $this->profileinfo["year"], $this->acyear, $banner);
         $stmt->execute();
         $ybid = $stmt->insert_id;
         $stmt->close();
         $this->baseurl = __DIR__."/../../yearbooks/".$ybid;
         return $ybid;
     }
-
+    
+    private function getUser($userid) {
+        $stmt = $this->db->prepare("SELECT fullname, `type` FROM users WHERE id=? LIMIT 1");
+        $stmt->bind_param("i", $userid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $user = [
+            "name" => $row["fullname"],
+            "type" => $row["type"]
+        ];
+        $stmt->close();
+        return $user; 
+    }
+    
     // Get users from DB
-    public function getUsers($type) {
-        $users = [];
-        $dir = "{$type}/";
-        $stmt = $this->db->prepare("SELECT id, fullname, `type`, photo, video, link, quote, uploaded, subject FROM users WHERE `type`='$type' AND schoolid=? AND schoolyear=? ORDER BY fullname");
-        $stmt->bind_param("is", $this->userinfo["schoolid"], $this->userinfo["year"]);
+    public function getUsers() {
+        $users = [
+            "students" => [],
+            "teachers" => []
+        ];
+        $stmt = $this->db->prepare("SELECT id, userid, photo, video, link, quote, uploaded, subject FROM profiles WHERE schoolid=? AND schoolyear=?");
+        $stmt->bind_param("is", $this->profileinfo["schoolid"], $this->profileinfo["year"]);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
             $id = $row["id"];
+            $user = $this->getUser($row["userid"]);
+            $dir = $user["type"]."/";
             $new_user = [
                 "userid" => $id,
-                "fullname" => $row["fullname"],
-                "type" => $row["type"],
+                "fullname" => $user["name"],
+                "type" => $user["type"],
                 "photo" => $dir.$id.'/'.$row["photo"],
                 "video" => $dir.$id.'/'.$row["video"],
                 "url" => $row["link"],
                 "quote" => $row["quote"], // User quote
                 "date" => $row["uploaded"]
             ];
-            if ($type == "teachers") {
+            if ($user["type"] == "teachers") {
                 $new_user["subject"] = $row["subject"];
+                array_push($users["teachers"], $new_user);
             }
-            array_push($users, $new_user);
+            else {
+                array_push($users["students"], $new_user);
+            }
         }
         $stmt->close();
         return $users;
@@ -91,7 +112,7 @@ class GenYB {
         $gallery = [];
         // Gallery
         $stmt = $this->db->prepare("SELECT name, description, type FROM gallery WHERE schoolid=? AND schoolyear=?");
-        $stmt->bind_param("is", $this->userinfo["schoolid"], $this->userinfo["year"]);
+        $stmt->bind_param("is", $this->profileinfo["schoolid"], $this->profileinfo["year"]);
         $stmt->execute();
         $result = $stmt->get_result();
         $gallery = array();
@@ -118,7 +139,7 @@ class GenYB {
     // Copy necessary files to yearbook dir
     public function copyFiles() {
         // Copy all user uploaded files
-        $source = $GLOBALS["uploadpath"].$this->userinfo["schoolid"]."/".$this->userinfo["year"]."/";
+        $source = $GLOBALS["uploadpath"].$this->profileinfo["schoolid"]."/".$this->profileinfo["year"]."/";
         $this->recursivecopy($source, $this->baseurl);
         
         // Copy all theme-specific assets
@@ -143,8 +164,8 @@ class GenYB {
         $gallery_js = json_encode($gallery, JSON_PRETTY_PRINT);
         // Yearbook info
         $ybinfo = [
-            "schoolname" => $this->userinfo["schoolname"],
-            "year" => $this->userinfo["year"],
+            "schoolname" => $this->profileinfo["schoolname"],
+            "year" => $this->profileinfo["year"],
             "acyear" => $this->acyear,
             "ybdate" => $this->dt->getTimestamp()
         ];
@@ -201,7 +222,8 @@ class GenYB {
 $auth = new Auth;
 
 $userinfo = $auth->isUserLoggedin();
-if ($userinfo && $auth->isUserAdmin($userinfo)) {
+$profileinfo = $auth->isProfileLoggedin();
+if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
     // BANNER //
     $banner = null;
     if ($_FILES['banner']['name']) {
@@ -209,13 +231,14 @@ if ($userinfo && $auth->isUserAdmin($userinfo)) {
     }
 
     // START CLASS //
-    $genyb = new GenYB($userinfo, $themes);
+    $genyb = new GenYB($profileinfo, $themes);
     if ($genyb->initialCheck($_POST["theme"])) {
         // Write yearbook to DB
         $ybid = $genyb->writeToDB($banner);
         // Get info
-        $students = $genyb->getUsers("students");
-        $teachers = $genyb->getUsers("teachers");
+        $users = $genyb->getUsers();
+        $students = $users["students"];
+        $teachers = $users["teachers"];
         $gallery = $genyb->getGallery();
         // Create dirs
         $genyb->createDirs();
@@ -229,7 +252,7 @@ if ($userinfo && $auth->isUserAdmin($userinfo)) {
         if ($GLOBALS["email"]["enabled"]) {
             $mailclient = new Email($GLOBALS["email"]);
             // Get email from specific group
-            $emails = $mailclient->getEmails($userinfo["schoolid"], $userinfo["year"]);
+            $emails = $mailclient->getEmails($profileinfo["schoolid"], $profileinfo["year"]);
             $mailclient->sendYearbook($emails, $ybid);
         }
         // Everyting went OK

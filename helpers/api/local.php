@@ -11,75 +11,65 @@ class Api {
         $this->db = new DB;
     }
 
-    function login($username, $password, $type) {
+    public function login($username, $password, $type) {
         // Prepare a select statement
-        $sql = "SELECT id, password FROM users WHERE username = ?";
-        if($stmt = $this->db->prepare($sql)){
-            // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "s", $param_username);
-            // Set parameters
-            $param_username = $username;
-            // Attempt to execute the prepared statement
-            if(mysqli_stmt_execute($stmt)){
-                // Store result
-                mysqli_stmt_store_result($stmt);
-                // Check if username exists, if yes then verify password
-                if(mysqli_stmt_num_rows($stmt) == 1){                    
-                    // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $hashed_password);
-                    if(mysqli_stmt_fetch($stmt)){
-                        if(password_verify($password, $hashed_password)){
-                            // User logged in correctly
-                            $this->type = $type;
-                            $this->userid = (int)$id;
-                            return [
-                                "code" => "C",
-                                "description" => null
-                            ];
-                        } else{
-                            // Display an error message if password is not valid
-                            $login_error = "esta contraseña no es válida.";
-                        }
-                    }
-                } else{
-                    // Display an error message if username doesn't exist
-                    $login_error = "no existe ninguna cuenta con este nombre de usuario.";
+        $stmt = $this->db->prepare("SELECT id, `password` FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        if ($stmt->execute()) {
+            $stmt->store_result();
+            if ($stmt->num_rows == 1) {
+                $stmt->bind_result($userid, $hashed_password);
+                $stmt->fetch();
+                if (password_verify($password, $hashed_password)) {
+                    // User logged in correctly
+                    $this->userid = $userid;
+                    $this->type = $type;
+                    $response = [
+                        "code" => "C"
+                    ];
                 }
-            } else{
-                $login_error = "por favor inténtelo más tarde";
+                else {
+                    // Display an error message if password is not valid
+                    $response = [
+                        "code" => "E",
+                        "error" => "Invalid password"
+                    ];
+                }
             }
-            // Close statement
-            $stmt->close();
+            else {
+                $response = [
+                    "code" => "E",
+                    "error" => "That username doesn't exist"
+                ];
+            }
         }
-        if ($login_error) {
-            return [
+        else {
+            $response = [
                 "code" => "E",
-                "description" => "Ha habido un error, {$login_error}"
+                "error" => "There was an error processing your request, try again later"
             ];
         }
+        $stmt->close();
+        return $response;
     }
 
-    function getinfo() {
-        $stmt = $this->db->prepare("SELECT `id`, `fullname`, `type`, `schoolid`, `schoolyear` FROM users WHERE id=?");
+    public function getinfo() {
+        $stmt = $this->db->prepare("SELECT `id`, `fullname`, `type`, `schools` FROM users WHERE id=?");
         $stmt->bind_param("i", $this->userid);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            $schoolname = $this->getSchoolName($row["schoolid"]);
+            // Get user's schools and groups
+            $schools = json_decode($row["schools"], true);
+            foreach ($schools as $i => $school) {
+                $schoolname = $this->getSchoolName($school["id"]);
+                $schools[$i]["name"] = $schoolname;
+            }
             $userinfo = [
                 "id" => $row["id"],
-                "name" => $row["name"],
+                "name" => $row["fullname"],
                 "type" => $row["type"],
-                "schoolid" => $row["schoolid"],
-                "schoolname" => $schoolname,
-                "year" => $schoolyear,
-                "schools" => [
-                    [
-                        "id" => $schoolyear,
-                        "name" => $schoolname,
-                        "groups" => [$schoolyear]
-                    ]
-                ]
+                "schools" => $schools
             ];
         }
         $stmt->close();

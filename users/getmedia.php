@@ -12,33 +12,43 @@ switch ($_GET["media"]) {
         $media = $_GET["media"];
     break;
     default:
-        die("Ese tipo de archivo no existe");
+        die("That file type doesn't exist");
 }
 
 $db = new DB;
 $auth = new Auth;
-if ($userinfo = $auth->isUserLoggedin()) {
-    $stmt = $db->prepare("SELECT $media, id, `type` FROM users WHERE id=?");
+$userinfo = $auth->isUserLoggedin();
+$profileinfo = $auth->isProfileLoggedin();
+if ($userinfo && $profileinfo) {
+    $downloadable = false;
+    $stmt = $db->prepare("SELECT id, userid, $media FROM profiles WHERE id=?");
     $stmt->bind_param("i", $_GET["id"]);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($medianame, $mediaid, $type);
+    $stmt->bind_result($mediaid, $userid, $medianame);
     $stmt->fetch();
-    $downloadable = false;
     if ($stmt->num_rows == 1) {
         // Check if ids match or user is admin
-        if ($mediaid == $userinfo["id"] || $auth->isUserAdmin($userinfo)){
+        if ($mediaid == $profileinfo["id"] || $auth->isUserAdmin($userinfo)){
             $downloadable = true;
         }
         else{
-            die("No tienes permisos para descargar eso");
+            die("You don't have permissions");
         }
     }
     else{
-        die("No se ha podido encontrar los datos que solicitaste");
+        die("That file couldn't be found");
     }
+    $stmt->close();
+    $stmt = $db->prepare("SELECT `type` FROM users WHERE id=?");
+    $stmt->bind_param("i", $userid);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($type);
+    $stmt->fetch();
+    $stmt->close();
     if ($downloadable){
-        $filepath = $uploadpath.$userinfo["schoolid"]."/".$userinfo["year"]."/{$type}/{$mediaid}/{$medianame}";
+        $filepath = $uploadpath.$profileinfo["schoolid"]."/".$profileinfo["year"]."/{$type}/{$mediaid}/{$medianame}";
         if(file_exists($filepath)){
             // https://www.sitepoint.com/community/t/loading-html5-video-with-php-chunks-or-not/350957
             $fp = @fopen($filepath, 'rb');
@@ -113,6 +123,7 @@ if ($userinfo = $auth->isUserLoggedin()) {
     }
 }
 else {
+    echo("You aren't logged in");
     http_response_code(401);
     exit;
 }

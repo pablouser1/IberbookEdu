@@ -8,15 +8,15 @@ require_once("../helpers/db.php");
 
 $db = new DB;
 $auth = new Auth;
-if ($userinfo = $auth->isUserLoggedin()) {
+if ($profileinfo = $auth->isProfileLoggedin()) {
     $stmt = $db->prepare("SELECT name, id FROM gallery where id=? and schoolid=? and schoolyear=?");
-    $stmt->bind_param("sis", $_GET["id"], $userinfo["schoolid"], $userinfo["year"]);
+    $stmt->bind_param("sis", $_GET["id"], $profileinfo["schoolid"], $profileinfo["year"]);
     $stmt->execute();
     $stmt->store_result();
     $stmt->bind_result($medianame, $mediaid);
     $stmt->fetch();
     if ($stmt->num_rows == 1) {
-        $filepath = $uploadpath.$userinfo["schoolid"]."/".$userinfo["year"]."/gallery/".$medianame;
+        $filepath = $uploadpath.$profileinfo["schoolid"]."/".$profileinfo["year"]."/gallery/".$medianame;
         // https://stackoverflow.com/a/27805443 and https://stackoverflow.com/a/23447332
         if(file_exists($filepath)){
             $finfo = finfo_open(FILEINFO_MIME_TYPE);

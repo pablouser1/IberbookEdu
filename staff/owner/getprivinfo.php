@@ -80,18 +80,39 @@ class DBPrivInfo {
         return $staff;
     }
 
+    public function groups() {
+        $groups = [];
+        // Get all groups
+        $sql = "SELECT id, `name` FROM groups ORDER BY `name` ASC";
+        $result = $this->db->query($sql);
+        while ($row = $result->fetch_assoc()) {
+            $groups[] = $row;
+        }
+        return $groups;
+    }
+
     public function schools() {
         $schools = [];
         // Get all schools
         $sql = "SELECT id, `name` FROM schools";
         $result = $this->db->query($sql);
-        while ($row = mysqli_fetch_assoc($result)) {
-            $schools[] = [
-                "id" => $row["id"],
-                "name" => $row["name"]
-            ];
+        while ($row = $result->fetch_assoc()) {
+            $schools[] = $row;
         }
         return $schools;
+    }
+    public function allUsers() {
+        $users = [];
+        $stmt = $this->db->prepare("SELECT id, fullname, `type`, schoolid, schoolyear, subject FROM users ORDER BY fullname");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $users[] = $row;
+            }
+            $stmt->close();
+        }
+        return $users;
     }
 }
 

@@ -8,16 +8,16 @@ $auth = new Auth;
 
 class Gallery {
     private $conn;
-    private $userinfo;
-    function __construct($userinfo) {
+    private $profileinfo;
+    function __construct($profileinfo) {
         $this->db = new DB;
-        $this->userinfo = $userinfo;
+        $this->profileinfo = $profileinfo;
     }
 
     public function getItems() {
         $gallery = [];
         $stmt = $this->db->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
-        $stmt->bind_param("is", $this->userinfo["schoolid"], $this->userinfo["year"]);
+        $stmt->bind_param("is", $this->profileinfo["schoolid"], $this->profileinfo["year"]);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
@@ -32,8 +32,9 @@ class Gallery {
         return $gallery;
     }
 }
-if ($userinfo = $auth->isUserLoggedin()) {
-    $gallery = new Gallery($userinfo);
+$profileinfo = $auth->isProfileLoggedin();
+if ($profileinfo) {
+    $gallery = new Gallery($profileinfo);
     $items = $gallery->getItems();
 
     $response = [

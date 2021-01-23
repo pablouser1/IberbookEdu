@@ -9,12 +9,14 @@ require_once("../config/config.php");
 class Upload {
     private $db;
     private $userinfo;
+    private $profileinfo;
     private $baseurl;
 
-    function __construct($userinfo) {
+    function __construct($userinfo, $profileinfo) {
         $this->db = new DB;
         $this->userinfo = $userinfo;
-        $this->baseurl = $GLOBALS["uploadpath"].$this->userinfo["schoolid"]."/".$this->userinfo["year"]."/".$this->userinfo["type"]."/".$this->userinfo["id"]."/";
+        $this->profileinfo = $profileinfo;
+        $this->baseurl = $GLOBALS["uploadpath"].$this->profileinfo["schoolid"]."/".$this->profileinfo["year"]."/".$this->userinfo["type"]."/".$this->profileinfo["id"]."/";
     }
 
     public function startUpload($files) {
@@ -66,8 +68,8 @@ class Upload {
             if (in_array($ext, $allowed_pic)) {
                 $picname = basename($picPath);
                 move_uploaded_file($tmpFilePath, $picPath);
-                $stmt = $this->db->prepare("UPDATE users SET photo = ? WHERE id=?");
-                $stmt->bind_param("ss", $photo["name"], $this->userinfo["id"]);
+                $stmt = $this->db->prepare("UPDATE profiles SET photo = ? WHERE id=?");
+                $stmt->bind_param("ss", $photo["name"], $this->profileinfo["id"]);
                 $stmt->execute();
                 $stmt->close();
                 return $photo["name"];
@@ -86,8 +88,8 @@ class Upload {
             if (in_array($ext, $allowed_vid)) {
                 $vidname = basename($vidPath);
                 move_uploaded_file($tmpFilePath, $vidPath);
-                $stmt = $this->db->prepare("UPDATE users SET video = ? WHERE id=?");
-                $stmt->bind_param("ss", $video["name"], $this->userinfo["id"]);
+                $stmt = $this->db->prepare("UPDATE profiles SET video = ? WHERE id=?");
+                $stmt->bind_param("ss", $video["name"], $this->profileinfo["id"]);
                 $stmt->execute();
                 $stmt->close();
                 return $video["name"];
@@ -103,8 +105,8 @@ class Upload {
         }
         else {
             $sanitizedQuote = nl2br(htmlspecialchars($quote));
-            $stmt = $this->db->prepare("UPDATE users SET quote = ? WHERE id=?");
-            $stmt->bind_param("ss", $sanitizedQuote, $this->userinfo["id"]);
+            $stmt = $this->db->prepare("UPDATE profiles SET quote = ? WHERE id=?");
+            $stmt->bind_param("ss", $sanitizedQuote, $this->profileinfo["id"]);
             $stmt->execute();
             $stmt->close();
             return $sanitizedQuote;
@@ -116,8 +118,8 @@ class Upload {
             return false;
         }
         else {
-            $stmt = $this->db->prepare("UPDATE users SET link = ? WHERE id=?");
-            $stmt->bind_param("ss", $link, $this->userinfo["id"]);
+            $stmt = $this->db->prepare("UPDATE profiles SET link = ? WHERE id=?");
+            $stmt->bind_param("ss", $link, $this->profileinfo["id"]);
             $stmt->execute();
             $stmt->close();
             return $link;
@@ -131,15 +133,15 @@ class Upload {
     }
 
     private function deleteMedia($element) {
-        $stmt = $this->db->prepare("SELECT $element from users where id=?");
-        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt = $this->db->prepare("SELECT $element from profiles where id=?");
+        $stmt->bind_param("i", $this->profileinfo["id"]);
         $stmt->execute();
         $stmt->bind_result($name);
         $stmt->fetch();
 
         $stmt->close();
-        $stmt = $this->db->prepare("UPDATE users SET $element = NULL WHERE id=?");
-        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt = $this->db->prepare("UPDATE profiles SET $element = NULL WHERE id=?");
+        $stmt->bind_param("i", $this->profileinfo["id"]);
         $stmt->execute();
         // Delete from file system
         unlink($this->baseurl.$name);
@@ -148,8 +150,8 @@ class Upload {
     // Get elements not uploaded yet
     private function getNotUploaded() {
         $remain = [];
-        $stmt = $this->db->prepare("SELECT photo, video, link, quote FROM users WHERE id=?");
-        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt = $this->db->prepare("SELECT photo, video, link, quote FROM profiles WHERE id=?");
+        $stmt->bind_param("i", $this->profileinfo["id"]);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows == 1){
@@ -167,8 +169,9 @@ class Upload {
 
 $auth = new Auth;
 $userinfo = $auth->isUserLoggedin();
-if ($userinfo && $_SERVER["REQUEST_METHOD"] === "POST") {
-    $upload = new Upload($userinfo);
+$profileinfo = $auth->isProfileLoggedin();
+if ($userinfo && $profileinfo && $_SERVER["REQUEST_METHOD"] === "POST") {
+    $upload = new Upload($userinfo, $profileinfo);
     $uploadResult = $upload->startUpload($_FILES);
     if ($uploadResult) {
         $response = [

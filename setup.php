@@ -77,27 +77,49 @@ $ssloptions = '.$ssloptions.';
     $db = new DB;
     // Creating tables
     // Users
-    $sql = "CREATE TABLE users(
+    if ($login == "local") {
+        $sql = "CREATE TABLE users(
+            id INT NOT NULL AUTO_INCREMENT,
+            username varchar(24) NOT NULL,
+            `password` varchar(255) NOT NULL,
+            `type` varchar(12),
+            fullname varchar(255) NOT NULL,
+            email varchar(255),
+            voted int,
+            primary key(id)
+            )";
+    }
+    elseif ($login == "ced") {
+        $sql = "CREATE TABLE users(
+            id INT NOT NULL AUTO_INCREMENT,
+            idced varchar(9),
+            `type` varchar(12),
+            fullname varchar(255) NOT NULL,
+            voted int,
+            primary key(id)
+            )";
+    }
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating users");
+    }
+
+    // Profiles
+    $sql = "CREATE TABLE profiles(
         id INT NOT NULL AUTO_INCREMENT,
-        userid varchar(9),
-        `type` varchar(12),
-        fullname varchar(255) NOT NULL,
+        userid INT NOT NULL,
         schoolid varchar(12) NOT NULL,
         schoolyear varchar(12) NOT NULL,
-        email varchar(255),
         photo varchar(255),
         video varchar(255),
         link varchar(255),
         quote varchar(280),
         uploaded DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         `subject` varchar(24),
-        voted int,
-        primary key(id)
+        PRIMARY KEY(id)
         )";
     if ($db->query($sql) !== TRUE) {
-        die("Error creating users");
+        die("Error creating profiles");
     }
-
     // Gallery
     $sql = "CREATE TABLE gallery(
         id int not null auto_increment,
@@ -156,7 +178,7 @@ $ssloptions = '.$ssloptions.';
         primary key(id)
         )";
     if ($db->query($sql) !== TRUE) {
-        die("Error creating schools");
+        die("Error creating groups");
     }
     // Writes data to DB
 
@@ -168,7 +190,7 @@ $ssloptions = '.$ssloptions.';
         die("Error writing school");
     }
     
-    // Staff info
+    // Owner info
     $owner_password = password_hash($owner["password"], PASSWORD_DEFAULT);
     $stmt = $db->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
     $stmt->bind_param("ss", $owner["username"], $owner_password);
@@ -179,7 +201,7 @@ $ssloptions = '.$ssloptions.';
     // Elimina setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
-    echo("Setup realizado con éxito");
+    echo("Setup finished successfully");
     exit;
 }
 ?>
@@ -194,9 +216,8 @@ $ssloptions = '.$ssloptions.';
         const dirs = <?php echo json_encode($dirs); ?>;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+    <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
 
 <body>
@@ -204,14 +225,14 @@ $ssloptions = '.$ssloptions.';
         <section v-if="stage === 'splashscreen'" class="hero is-success is-fullheight">
             <div class="hero-body">
                 <div class="container">
-                    <h1 class="title animate__animated animate__fadeInDown">
-                        Bienvenido a Iberbook
+                    <h1 class="title">
+                        Welcome to IberbookEdu
                     </h1>
-                    <h2 class="subtitle animate__animated animate__fadeInUp">
-                        Vamos a empezar con las preparaciones...
+                    <h2 class="subtitle">
+                        Let's start with some preparations...
                     </h2>
-                    <p class="subtitle animate__animated animate__fadeInUp">
-                        <button v-on:click="stage = 'database'" type="button" class="button is-link">Continuar</button>
+                    <p class="subtitle">
+                        <button v-on:click="stage = 'database'" type="button" class="button is-link">Continue</button>
                     </p>
                 </div>
             </div>

@@ -66,10 +66,12 @@ $staff = $info->staff();
             <div id="admin_columns" class="columns is-mobile is-multiline">
                 <div class="column is-narrow">
                     <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">Admin 0</p>
+                        </header>
                         <div class="card-content">
-                            <p class="title has-text-centered">Admin 0</p>
                             <div class="field">
-                                <label class="label">User</label>
+                                <label class="label">Admin</label>
                                 <div class="control has-icons-left">
                                     <input class="input" type="text" name="username[]" placeholder="user" required>
                                     <span class="icon is-left"><i class="fas fa-user"></i></span>
@@ -221,7 +223,7 @@ $staff = $info->staff();
             </ul>
         </nav>
     </footer>
-    <script src="../assets/scripts/owner/staff.js"></script>
+    <script src="../../assets/scripts/owner/staff.js"></script>
 </body>
 
 </html>

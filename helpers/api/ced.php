@@ -108,6 +108,9 @@ class Api {
             case 'students':
                 // Check if user is actually student
                 if ($this->type == "students" && $info["RESULTADO"][0]["C_PERFIL"] == "ALU") {
+                    // Get id from local database
+                    $idced = $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"];
+                    $id = $this->doesUserExists($idced);
                     // Get school id and name
                     $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
                     $infocentro = $this->getcentrostudent($datacentro);
@@ -118,7 +121,7 @@ class Api {
                     if ($this->isAllowed($schoolid, $group["name"])) {
                         // Set user info
                         $userinfo = [
-                            "idced" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"],
+                            "id" => $id,
                             "name" => $info["RESULTADO"][0]["USUARIO"],
                             "type" => "students",
                             "schoolid" => $schoolid,
@@ -150,15 +153,14 @@ class Api {
                         $group =  [
                             "name" => $tempchild["MATRICULAS"][0]["UNIDAD"]
                         ];
+                        $idced = $tempchild["MATRICULAS"][0]["X_MATRICULA"];
+                        $id = $this->doesUserExists($idced);
                         if ($this->isAllowed($schoolid, $group["name"])) {
                             // Merge child info with school info
                             $children[] = [
-                                "idced" => $tempchild["MATRICULAS"][0]["X_MATRICULA"],
+                                "id" => $id,
                                 "name" => $tempchild["NOMBRE"],
                                 "type" => "students",
-                                "schoolid" => $schoolid,
-                                "schoolname" => $infocentro["schoolname"],
-                                "year" => $group["name"],
                                 "schools" => [
                                     [
                                         "id" => $schoolid,
@@ -179,7 +181,7 @@ class Api {
                 break;
             // -- Profesor -- //
             case 'teachers':
-                $idteacher = $this->getidteacher();
+                $idced = $this->getidteacher();
                 // Only one school
                 if (!isset($info["RESULTADO"][0]["CENTROS"])) {
                     $schoolid = $info["RESULTADO"][0]["C_CODIGO"];
@@ -206,13 +208,11 @@ class Api {
                     }
                 }
 
+                $id = $this->doesUserExists($idced);
                 $userinfo = array(
-                    "idced" => $idteacher,
+                    "id" => $id,
                     "name" => $info["RESULTADO"][0]["USUARIO"],
                     "type" => "teachers",
-                    "schoolid" => $finalschools[0]["id"],
-                    "schoolname" => $finalschools[0]["name"],
-                    "year" => $finalschools[0]["groups"][0]["name"],
                     "subject" => $finalschools[0]["groups"][0]["subject"],
                     "schools" => $finalschools
                 );
@@ -327,6 +327,37 @@ class Api {
         else {
             return [];
         }
+    }
+
+    public function doesUserExists($userinfo) {
+        $stmt = $this->db->prepare("SELECT id FROM users WHERE idced=? AND schoolyear=? AND schoolid=?");
+        $stmt->bind_param("ssi", $userinfo["idced"], $userinfo["year"], $userinfo["schoolid"]);
+        $stmt->execute();
+        $stmt->store_result();
+        // Get profile id
+        $stmt->bind_result($idprofile);
+        $stmt->fetch();
+        $exists = $stmt->num_rows;
+        $stmt->close();
+        if ($exists === 0) {
+            return $this->createUser($userinfo);
+        }
+        else {
+            return $idprofile;
+        }
+    }
+
+    private function createUser($userinfo) {
+        $subject = null;
+        if (isset($userinfo["subject"])) {
+            $subject = $userinfo["subject"];
+        }
+        // Create user
+        $stmt = $this->db->prepare("INSERT INTO `users` (`idced`, `type`, `fullname`, `subject`) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssiss", $userinfo["idced"], $userinfo["type"], $userinfo["name"], $userinfo["schoolid"], $userinfo["year"], $subject);
+        $stmt->execute();
+        $userid = $stmt->insert_id;
+        return $userid;
     }
 }
 ?>

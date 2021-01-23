@@ -41,10 +41,10 @@ class Yearbooks {
     }
 
     // Get yearbook from logged in user
-    public function getUserYearbook($userinfo) {
+    public function getUserYearbook($profileinfo) {
         $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
         $stmt = $this->db->prepare("SELECT id, schoolid, schoolname, schoolyear, acyear, banner, votes, `generated` FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=? LIMIT 1");
-        $stmt->bind_param("iss", $userinfo["schoolid"], $userinfo["year"], $acyear);
+        $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows === 1) {
@@ -113,8 +113,8 @@ $yearbook = new Yearbooks;
 
 // Loggedin user's yearbook
 if (isset($_GET["mode"])) {
-    if ($userinfo = $auth->isUserLoggedin()) {
-        $useryb = $yearbook->getUserYearbook($userinfo);
+    if ($profileinfo = $auth->isProfileLoggedin()) {
+        $useryb = $yearbook->getUserYearbook($profileinfo);
         if ($useryb) {
             $response = [
                 "code" => "C",

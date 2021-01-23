@@ -6,7 +6,7 @@ if (isset($_SESSION["owner"])){
 }
 
 $login_error = array();
-require_once("../../helpers/db.php");
+require_once("../helpers/db.php");
 $db = new DB;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!$_POST["username"]){
@@ -23,51 +23,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = trim($_POST["password"]);
     }
 
-    if (!$login_error) {
+    if (empty($login_error)) {
         // Prepare a select statement
-        $sql = "SELECT username, password FROM staff WHERE username = ? and permissions='owner'";
-        if($stmt = $db->prepare($sql)){
-            // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "s", $param_username);
-            
-            // Set parameters
-            $param_username = $username;
-                
-            // Attempt to execute the prepared statement
-            if(mysqli_stmt_execute($stmt)){
-                // Store result
-                mysqli_stmt_store_result($stmt);
-                    
-                // Check if username exists, if yes then verify password
-                if(mysqli_stmt_num_rows($stmt) == 1){                    
-                    // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $username, $hashed_password);
-                    if(mysqli_stmt_fetch($stmt)){
-                        if(password_verify($password, $hashed_password)){
-                            // Store data in session variables
-                            $_SESSION["owner"] = true;
-                            $ownerinfo = [
-                                "username" => $username
-                            ];
-                            $_SESSION["ownerinfo"] = $ownerinfo;
-                            // Redirect user to welcome page
-                            header("Location: owner/dashboard.php");
-                            exit;
-                        } else{
-                            // Display an error message if password is not valid
-                            $login_error[] = "Esta contraseña no es válida.";
-                        }
-                    }
-                } else{
-                    // Display an error message if username doesn't exist
-                    $login_error[] = "No existe ninguna cuenta con este nombre de usuario.";
+        $stmt = $db->prepare("SELECT `password` FROM staff WHERE username = ? and permissions='owner'");
+        $stmt->bind_param("s", $username);
+        if ($stmt->execute()) {
+            $stmt->store_result();
+            if ($stmt->num_rows == 1) {
+                $stmt->bind_result($hashed_password);
+                $stmt->fetch();
+                if (password_verify($password, $hashed_password)) {
+                    // Store data in session variables
+                    $_SESSION["owner"] = true;
+                    $ownerinfo = [
+                        "username" => $username
+                    ];
+                    $_SESSION["ownerinfo"] = $ownerinfo;
+                    $stmt->close();
+                    // Redirect user to welcome page
+                    header("Location: owner/dashboard.php");
+                    exit;
                 }
-            } else{
-                $login_error[] = "Ha habido un error, por favor inténtelo más tarde";
+                else {
+                    // Display an error message if password is not valid
+                    $login_error[] = "Invalid password";
+                }
             }
-            // Close statement
-            $stmt->close();
+            else {
+                $login_error[] = "That user doesn't exist";
+            }
         }
+        else {
+            $login_error[] = "There was an error processing your request, try again later";
+        }
+        $stmt->close();
     }
 }
 ?>
@@ -134,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
                     <div class="level-right">
-                        <a class="level-item" href="https://github.com/pablouser1/IberbookEdu-backend">Acerca de</a>
+                        <a class="level-item" href="https://github.com/pablouser1/IberbookEdu-backend">About</a>
                     </div>
                 </nav>
             </div>

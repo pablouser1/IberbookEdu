@@ -31,7 +31,7 @@ Este programa funciona para 2º de Bachillerato, 4º ESO y 6º Primaria (FP plan
 You will need the following programs to make IberBookEdu work:
 * PHP5.5 (PHP7 recommended)
 * Extensions: php-mysqli, php-zip, php-curl
-* Database server MySQL / MariaDB
+* Database server MySQL 5.7.8 or higher / MariaDB
 
 Once you finished installing everything and you had already copied the project to your server you can start the installation starting the script named "setup.php"
 

@@ -22,12 +22,13 @@ $db = new DB;
 $auth = new Auth;
 
 $userinfo = $auth->isUserLoggedin();
-if ($userinfo && $auth->isUserAdmin($userinfo)) {
+$profileinfo = $auth->isProfileLoggedin();
+if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
     // Get academic year (2020-2021 for example)
     $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
     // Get yearbook id
     $stmt = $db->prepare("SELECT id FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
-    $stmt->bind_param("iss", $userinfo["schoolid"], $userinfo["year"], $acyear);
+    $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
     $stmt->execute();
     $stmt->bind_result($ybid);
     $stmt->fetch();
@@ -35,7 +36,7 @@ if ($userinfo && $auth->isUserAdmin($userinfo)) {
 
     // Delete yearbook
     $stmt = $db->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=? and acyear=?");
-    $stmt->bind_param("iss", $userinfo["schoolid"], $userinfo["year"], $acyear);
+    $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
     $stmt->execute();
     $stmt->close();
     recursiveRemoveDirectory(__DIR__."/../../yearbooks/".$ybid);

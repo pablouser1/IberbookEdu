@@ -12,6 +12,7 @@ require_once("getprivinfo.php");
 $info = new DBPrivInfo;
 $staff = $info->staff();
 $schools = $info->schools();
+$groups = $info->groups();
 ?>
 
 <!DOCTYPE html>
@@ -31,12 +32,12 @@ $schools = $info->schools();
         // Initial vars
         const staff_js = <?php echo(json_encode($staff));?>;
         const schools_js = <?php echo(json_encode($schools));?>;
+        const groups_js = <?php echo(json_encode($groups));?>;
     </script>
 </head>
 
 <body>
     <div id="main">
-        <!-- End navbar -->
         <section class="hero is-info welcome is-small">
             <div class="hero-body">
                 <div class="container">
@@ -62,14 +63,15 @@ $schools = $info->schools();
             <div class="column is-9">
                 <section id="items" class="section">
                     <!-- Main Menu --->
-                    <mainmenu v-if="tab === 'mainmenu'" v-bind:staff="staff" v-bind:schools="schools"></mainmenu>
+                    <mainmenu v-if="tab === 'mainmenu'" v-bind:staff="staff" v-bind:schools="schools" v-bind:groups="groups"></mainmenu>
                     <!-- User -->
-                    <users v-if="tab === 'users'" v-bind:schools="schools"></users>
+                    <users v-if="tab === 'users'" v-bind:schools="schools" v-bind:groups="groups"></users>
                 </section>
             </div>
         </div>
     </div>
-    <script src="../../assets/scripts/owner/dashboard.js"></script>
+    <script src="../../assets/scripts/owner/dashboard/modals.js"></script>
+    <script src="../../assets/scripts/owner/dashboard/dashboard.js"></script>
 </body>
 
 </html>

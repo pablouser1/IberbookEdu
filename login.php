@@ -29,30 +29,14 @@ class Login {
             ];
             // Get user info
             $this->userinfo = $this->api->getinfo();
-            if ($type == "guardians") {
-                $id = $this->auth->doesUserExists($this->userinfo["child"]);
-                $this->userinfo["child"]["id"] = $id;
-                $response["data"]["userinfo"] = $this->userinfo["child"];
-                $response["data"]["guardianinfo"] = $this->userinfo;
+            if ($this->auth->isUserAdminLogin($username)) {
+                $this->userinfo["rank"] = "admin";
             }
             else {
-                if ($GLOBALS["login"] !== "local") {
-                    $id = $this->auth->doesUserExists($this->userinfo);
-                }
-                else {
-                    $id = $this->userinfo["id"];
-                }
-                $this->userinfo["id"] = $id;
-                if ($this->auth->isUserAdminLogin($username)) {
-                    $this->userinfo["rank"] = "admin";
-                }
-                else {
-                    $this->userinfo["rank"] = "user";
-                }
-                $response["data"]["userinfo"] = $this->userinfo;
+                $this->userinfo["rank"] = "user";
             }
-
-            $this->auth->setToken($this->userinfo);
+            $response["data"]["userinfo"] = $this->userinfo;
+            $this->auth->setUserToken($this->userinfo);
             $response["code"] = "C";
             return $response;
         }
@@ -63,14 +47,14 @@ class Login {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(!$_POST["username"]){
+    if(!isset($_POST["username"])){
         $login_error[] = L::login_noUsername;
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
-    if(!$_POST["password"]){
+    if(!isset($_POST["password"])){
         $login_error[] = L::login_noPassword;
     } 
     else{
@@ -78,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     // Get type
-    if(!$_POST["type"]){
+    if(!isset($_POST["type"])){
         $login_error[] = L::login_noType;
     } 
     else{

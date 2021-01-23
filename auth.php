@@ -9,38 +9,6 @@ class Auth {
         $this->db = new DB;
     }
 
-    // CED Api exclusive
-    public function doesUserExists($userinfo) {
-        $stmt = $this->db->prepare("SELECT id FROM users WHERE idced=? AND schoolyear=? AND schoolid=?");
-        $stmt->bind_param("ssi", $userinfo["idced"], $userinfo["year"], $userinfo["schoolid"]);
-        $stmt->execute();
-        $stmt->store_result();
-        // Get profile id
-        $stmt->bind_result($idprofile);
-        $stmt->fetch();
-        $exists = $stmt->num_rows;
-        $stmt->close();
-        if ($exists === 0) {
-            return $this->createUser($userinfo);
-        }
-        else {
-            return $idprofile;
-        }
-    }
-
-    private function createUser($userinfo) {
-        $subject = null;
-        if (isset($userinfo["subject"])) {
-            $subject = $userinfo["subject"];
-        }
-        // Create user
-        $stmt = $this->db->prepare("INSERT INTO `users` (`idced`, `type`, `fullname`, `schoolid`, `schoolyear`, `subject`) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssiss", $userinfo["idced"], $userinfo["type"], $userinfo["name"], $userinfo["schoolid"], $userinfo["year"], $subject);
-        $stmt->execute();
-        $userid = $stmt->insert_id;
-        return $userid;
-    }
-
     public function isUserAdmin($userinfo) {
         if ($userinfo["rank"] == "admin") {
             return true;
@@ -67,13 +35,20 @@ class Auth {
 
     // Check if user sent valid cookie
     public function isUserLoggedin() {
-        if (isset($_COOKIE["login"]) && !empty($_COOKIE["login"])) {
-            $token = $_COOKIE["login"];
+        if (isset($_COOKIE["user"]) && !empty($_COOKIE["user"])) {
+            $token = $_COOKIE["user"];
             if ($userinfo = $this->authJWT($token)) {
-                if ($userinfo["type"] == "guardians") {
-                    return (array)$userinfo["child"];
-                }
                 return $userinfo;
+            }
+        }
+        return false;
+    }
+
+    public function isProfileLoggedin() {
+        if (isset($_COOKIE["profile"]) && !empty($_COOKIE["profile"])) {
+            $token = $_COOKIE["profile"];
+            if ($profileinfo = $this->authJWT($token)) {
+                return $profileinfo;
             }
         }
         return false;
@@ -83,14 +58,20 @@ class Auth {
         $secret_key = $GLOBALS["token_secret"];
         try {
             $decoded = JWT::decode($key, $secret_key, array('HS256'));
-            return (array) $decoded->data->userinfo;
-        } catch (\Firebase\JWT\SignatureInvalidException $th) {
+            if (isset($decoded->data->userinfo)) {
+                return (array) $decoded->data->userinfo;
+            }
+            elseif (isset($decoded->data->profileinfo)) {
+                return (array) $decoded->data->profileinfo;
+            }
+        }
+        catch (\Firebase\JWT\SignatureInvalidException $th) {
             return null;
         }
     }
 
     // Set JWT token
-    public function setToken($userinfo) {
+    public function setUserToken($userinfo) {
         $key = $GLOBALS["token_secret"];
         $issuedAt = time();
         $payload = array(
@@ -102,7 +83,26 @@ class Auth {
         );
         $jwt = JWT::encode($payload, $key);
 
-        setcookie("login", $jwt, [
+        setcookie("user", $jwt, [
+            'expires' => time()+86400,
+            'httponly' => true,
+            'secure' => true
+        ]);
+    }
+    
+    public function setProfileToken($profileinfo) {
+        $key = $GLOBALS["token_secret"];
+        $issuedAt = time();
+        $payload = array(
+            "iss" => $_SERVER["HTTP_HOST"],
+            "iat" => $issuedAt,
+            "data" => [
+                "profileinfo" => $profileinfo
+            ]
+        );
+        $jwt = JWT::encode($payload, $key);
+
+        setcookie("profile", $jwt, [
             'expires' => time()+86400,
             'httponly' => true,
             'secure' => true

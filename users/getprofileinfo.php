@@ -8,9 +8,9 @@ require_once("../lang/lang.php");
 $auth = new Auth;
 $db = new DB;
 
-if ($userinfo = $auth->isUserLoggedin()) {
-    $stmt = $db->prepare("SELECT id, photo, video, link, quote, uploaded FROM users WHERE `id`=?");
-    $stmt->bind_param("i", $userinfo["id"]);
+if ($profileinfo = $auth->isProfileLoggedin()) {
+    $stmt = $db->prepare("SELECT id, photo, video, link, quote, uploaded FROM profiles WHERE `id`=?");
+    $stmt->bind_param("i", $profileinfo["id"]);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows === 1) {
