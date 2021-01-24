@@ -94,11 +94,11 @@ const translations = {
         },
         about: {
             attribution: `Ce projet ne serait pas possible sans l'aide des projets suivants
-            distribués sous <a href="externalprojects.html">les licences suivantes</a>:<br>
+            distribués sous <a href="licenses/externalProjects.html">les licences suivantes</a>:<br>
             ${translate_common.external}`,
             credits: `Cet annuaire a été généré en utilisant
             <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un projet open source
-            distribué sous la <a href="LICENSE.html" target="_blank">licence AGPLv3</a>`
+            distribué sous la <a href="licenses/IberbookEdu.html" target="_blank">licence AGPLv3</a>`
         },
         footer: {
             madewith: "Fait avec <span style='color: #e25555;'> &#9829; </span> în Github"
