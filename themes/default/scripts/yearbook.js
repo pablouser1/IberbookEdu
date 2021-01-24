@@ -117,14 +117,18 @@ var main = new Vue({
                     this.longtimeago = true
                     break;
                 default:
-                    alert("Aquí no hay ningun easter egg")
+                    alert("No easter eggs in here")
                     break;
             }
         }
     },
     created() {
         if (!this.ybinfo.banner) {
-            document.getElementById("banner").classList.replace("has-background", "is-primary")
+            document.getElementById("banner").classList.replace("has-bg-img", "is-primary")
+        }
+        else {
+            document.getElementById("banner").style.background = `url(assets/${this.ybinfo.banner})center center`
+            document.getElementById("banner").style.backgroundSize = "cover"
         }
         document.title = `Yearbook ${this.ybinfo.year}`
     },

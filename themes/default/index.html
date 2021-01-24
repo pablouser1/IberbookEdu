@@ -54,22 +54,17 @@
             </div>
         </section>
         <!-- Banner -->
-        <section id="banner" v-show="!splashscreen"
-            class="hero is-fullheight has-background scale-in-center">
-            <img v-if="ybinfo.banner !== null" class="hero-background" :src="'assets/' + ybinfo.banner" />
+        <section id="banner" class="hero is-fullheight has-bg-img scale-in-center" v-show="!splashscreen">
             <div class="hero-body">
-                <div class="columns is-mobile is-centered">
-                    <div class="column is-narrow">
-                        <div class="box has-text-centered animate__animated animate__zoomIn">
-                            <p class="title has-text-black">
-                                <i class="fas fa-graduation-cap"></i>
-                                <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
-                            </p>
-                            <h2 class="subtitle has-text-black">{{ ybinfo.acyear }}</h2>
-                            <h2 v-if="longtimeago" class="subtitle has-text-black">{{ lang.misc.longtime }}</h2>
-                            <button id="enterButton" v-on:click="enterYearbook" type="button"
-                                class="button is-primary">Entrar</button>
-                        </div>
+                <div class="container">
+                    <div class="box has-text-centered">
+                        <p class="title has-text-black">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
+                        </p>
+                        <h2 class="subtitle has-text-black">{{ ybinfo.acyear }}</h2>
+                        <h2 v-if="longtimeago" class="subtitle has-text-black">{{ lang.misc.longtime }}</h2>
+                        <button id="enterButton" v-on:click="enterYearbook" type="button" class="button is-primary">Start</button>
                     </div>
                 </div>
             </div>
