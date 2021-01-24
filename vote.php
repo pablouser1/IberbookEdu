@@ -5,18 +5,21 @@ require_once("headers.php");
 require_once("auth.php");
 require_once("helpers/db.php");
 require_once("lang/lang.php");
+require_once("classes/yearbooks.php");
 $auth = new Auth;
 
 class Vote {
     private $conn;
     private $userinfo;
+    private $yearbooks;
     function __construct($userinfo) {
         $this->db = new DB;
         $this->userinfo = $userinfo;
+        $this->yearbooks = new Yearbooks;
     }
 
     public function start($id) {
-        $yearbook = $this->getYearbookInfo($id);
+        $yearbook = $this->yearbooks->getOne($id);
         if ($yearbook) {
             if ($this->checkifValid($yearbook)) {
                 $alreadyvoted = $this->checkIfAlreadyVoted($id);
@@ -48,21 +51,6 @@ class Vote {
             ];
         }
         return $response;
-    }
-
-    private function getYearbookInfo($id) {
-        $stmt = $this->db->prepare("SELECT schoolid, schoolyear, acyear FROM yearbooks WHERE id=?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows === 1) {
-            $yearbook = $result->fetch_assoc();
-            $stmt->close();
-            return $yearbook;
-        }
-        else {
-            return false;
-        }
     }
 
     // Check if user can vote
@@ -138,5 +126,5 @@ else {
         "error" => L::common_needToLogin
     ];
 }
-sendJSON($response);
+Utils::sendJSON($response);
 ?>

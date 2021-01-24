@@ -156,10 +156,10 @@ Vue.component('users', {
                             <td>{{ user.id }}</td>
                             <td>{{ user.name }}</td>
                             <td>
-                                <a :href="'../../users/getmedia.php?id=' + user.id + '&media=photo&type=' + user.type" target='_blank'>{{ user.photo }}</a>
+                                <a :href="'../../users/getMedia.php?id=' + user.id + '&media=photo&type=' + user.type" target='_blank'>{{ user.photo }}</a>
                             </td>
                             <td>
-                                <a :href="'../../users/getmedia.php?id=' + user.id + '&media=video&type=' + user.type" target='_blank'>{{ user.video }}</a>
+                                <a :href="'../../users/getMedia.php?id=' + user.id + '&media=video&type=' + user.type" target='_blank'>{{ user.video }}</a>
                             </td>
                             <td>
                                 <a :disabled="!user.link" :href="user.link" target='_blank' class="button is-small is-link">Abrir enlace</a>
@@ -183,7 +183,7 @@ Vue.component('users', {
                     <tbody>
                         <tr v-for="item in gallery">
                             <td>
-                                <a :href="'../../gallery/getitem.php?id=' + item.id" target='_blank'>{{item.name}}</a>
+                                <a :href="'../../gallery/getItem.php?id=' + item.id" target='_blank'>{{item.name}}</a>
                             </td>
                             <td>{{ item.description }}</td>
                             <td>{{ item.type }}</td>

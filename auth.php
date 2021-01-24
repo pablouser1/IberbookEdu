@@ -18,12 +18,14 @@ class Auth {
         }
     }
 
-    // Check if user is admin when loggin in
+    // Check if user is admin when login
     public function isUserAdminLogin($username) {
         // Check if user is admin
-        $sql = "SELECT `id`, `permissions` FROM `staff` WHERE username ='$username' AND permissions='admin'";
-        $result = $this->db->query($sql);
-        if ($result->num_rows === 1) {
+        $stmt = $this->db->prepare("SELECT `id`, `permissions` FROM `staff` WHERE username=? AND permissions='admin'");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows === 1) {
             // User is admin
             return true;
         }

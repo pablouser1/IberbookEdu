@@ -84,6 +84,7 @@ $ssloptions = '.$ssloptions.';
             `password` varchar(255) NOT NULL,
             `type` varchar(12) NOT NULL,
             fullname varchar(255) NOT NULL,
+            schools TEXT NOT NULL,
             email varchar(255),
             voted int,
             primary key(id)
@@ -119,6 +120,7 @@ $ssloptions = '.$ssloptions.';
     if ($db->query($sql) !== TRUE) {
         die("Error creating profiles");
     }
+
     // Gallery
     $sql = "CREATE TABLE gallery(
         id int not null auto_increment,
@@ -179,11 +181,21 @@ $ssloptions = '.$ssloptions.';
     if ($db->query($sql) !== TRUE) {
         die("Error creating groups");
     }
+
+    // Themes
+    $sql = "CREATE TABLE `themes` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(32) NOT NULL UNIQUE,
+        PRIMARY KEY(id)
+        )";
+    if ($db->query($sql) !== TRUE) {
+        die("Error creating themes");
+    }
     // Writes data to DB
 
     // School info
     // First we need to get the school's name
-    $stmt = $db->prepare("INSERT INTO schools (id. `name`) VALUES (?, ?);");
+    $stmt = $db->prepare("INSERT INTO schools (id. `name`) VALUES (?, ?)");
     $stmt->bind_param("is", $schoolinfo["id"], $schoolinfo["name"]);
     if ($stmt->execute() !== true) {
         die("Error writing school");
@@ -191,13 +203,20 @@ $ssloptions = '.$ssloptions.';
     
     // Owner info
     $owner_password = password_hash($owner["password"], PASSWORD_DEFAULT);
-    $stmt = $db->prepare("INSERT INTO staff (username, password, permissions) VALUES  (?, ?, 'owner');");
+    $stmt = $db->prepare("INSERT INTO staff (username, password, permissions) VALUES (?, ?, 'owner')");
     $stmt->bind_param("ss", $owner["username"], $owner_password);
     if ($stmt->execute() !== true) {
         die("Error writing owner");
     }
+
+    // Default theme
+    $sql = "INSERT INTO themes (`name`) VALUES ('default')";
+    if ($db->query($sql) !== TRUE) {
+        die("Error writing theme");
+    }
+
     mkdir($global_config["uploaddir"], 0755);
-    // Elimina setup
+    // Delete setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
     echo("Setup finished successfully");

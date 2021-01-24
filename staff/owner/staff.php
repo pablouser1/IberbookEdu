@@ -5,9 +5,9 @@ if (!isset($_SESSION["owner"])){
     exit;
 }
 
-require_once("getprivinfo.php");
-$info = new DBPrivInfo;
-$staff = $info->staff();
+require_once("../../classes/staff.php");
+$staffClass = new Staff;
+$staff = $staffClass->getStaff();
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +62,7 @@ $staff = $info->staff();
                 <span>Add new admin</span>
             </button>
         </div>
-        <form action="managestaff.php" method="POST">
+        <form action="mngStaff.php" method="POST">
             <div id="admin_columns" class="columns is-mobile is-multiline">
                 <div class="column is-narrow">
                     <div class="card">

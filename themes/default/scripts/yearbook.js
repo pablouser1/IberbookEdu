@@ -33,12 +33,13 @@ var users = {
                     <p>
                         <strong>{{user.fullname}}</strong>
                         <figure @click="$root.videoWatching = user" class="image user-images">
-                            <img :src="user.photo">
+                            <img :src="'users/' + user.id + '/' + user.photo">
                         </figure>
-                        <q v-html="user.quote"></q>
+                        <q v-if="user.quote" v-html="user.quote"></q>
                         <br>
                         <i><small>{{user.date}}</small></i>
                     </p>
+                    <a v-if="user.link" :href="user.link">Link</a>
                     <span v-if="user.type == 'teachers'" class="tag">{{user.subject}}</span>
                 </div>
             </article>
@@ -63,11 +64,11 @@ var gallery = {
                 <div class="media-content">
                     <a v-if="item.type == 'picture'" :href="item.path" target="_blank">
                         <figure class="image">
-                            <img :src="item.path">
+                            <img :src="'gallery/' + item.name">
                         </figure>
                     </a>
                     <video v-else preload="metadata" controls>
-                        <source :src="item.path"></script>
+                        <source :src="'gallery/' + item.name"></source>
                     </video>
                     <p>{{ item.description }}</p>
                 </div>

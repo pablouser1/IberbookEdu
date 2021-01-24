@@ -142,5 +142,5 @@ else {
     ];
 }
 
-sendJSON($response);
+Utils::sendJSON($response);
 ?>

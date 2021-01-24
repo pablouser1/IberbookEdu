@@ -5,17 +5,22 @@ if (!isset($_SESSION["owner"])){
     exit;
 }
 require_once("../../config/config.php");
-require_once("getprivinfo.php");
+require_once("../../classes/groups.php");
+require_once("../../classes/users.php");
+require_once("../../classes/schools.php");
 
 if ($login !== "local") {
     echo("This page is only available for local DB api");
     exit;
 }
 
-$info = new DBPrivInfo;
-$users = $info->allUsers();
-$groups = $info->groups();
-$schools = $info->schools();
+$groupsClass = new Groups;
+$usersClass = new Users;
+$schoolsClass = new Schools;
+
+$users = $usersClass->getAllUsers();
+$groups = $groupsClass->getGroups();
+$schools = $schoolsClass->getSchools();
 ?>
 
 <!DOCTYPE html>
@@ -78,7 +83,7 @@ $schools = $info->schools();
             </div>
             <form id="add_form" autocomplete="off" action="manageusers.php?action=add" method="POST">
                 <div id="add_columns" class="columns is-multiline"></div>
-                <button type="submit" class="button is-success">Send</button>
+                <button type="submit" class="button is-success">Add</button>
             </form>
         </section>
         <hr>
@@ -102,6 +107,8 @@ $schools = $info->schools();
     </section>
     <section id="remove" class="section is-hidden tab">
         <form action="manageusers.php?action=remove" method="POST">
+            <div id="remove_columns"></div>
+            <button type="submit" class="button is-dangeer">Delete</button>
         </form>
     </section>
     <footer class="footer">

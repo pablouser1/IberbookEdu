@@ -32,11 +32,11 @@ const translations = {
         },
         about: {
             attribution: `This project wouldn't be possible without the help of the following projects 
-            distributed under <a href="externalprojects.html" target="_blank">the following licenses</a>:<br>
+            distributed under <a href="licenses/externalProjects.html" target="_blank">the following licenses</a>:<br>
             ${translate_common.external}`,
             credits: `This yearbook was made using 
             <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, an open source project
-            distributed under the <a href="LICENSE.html" target="_blank">AGPLv3 license</a>`
+            distributed under the <a href="licenses/IberbookEdu.html" target="_blank">AGPLv3 license</a>`
         },
         footer: {
             madewith: "Made with <span style='color: #e25555;'> &#9829; </span> using <a href='https://twitter.com/search?q=%23IberbookEdu' target='_blank'>#IberbookEdu</a>"
@@ -63,11 +63,11 @@ const translations = {
         },
         about: {
             attribution: `Este proyecto no sería posible sin la ayuda de los siguientes proyectos
-            distribuidos bajo <a href="externalprojects.html" target="_blank">las siguientes licencias</a>:<br>
+            distribuidos bajo <a href="licenses/externalProjects.html" target="_blank">las siguientes licencias</a>:<br>
             ${translate_common.external}`,
             credits: `Este yearbook fue generado usando
             <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
-            distribuido bajo la <a href="LICENSE.html" target="_blank">licencia AGPLv3</a>`
+            distribuido bajo la <a href="licenses/IberbookEdu.html" target="_blank">licencia AGPLv3</a>`
         },
         footer: {
             madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> usando <a href='https://twitter.com/search?q=%23IberbookEdu' target='_blank'>#IberbookEdu</a>"

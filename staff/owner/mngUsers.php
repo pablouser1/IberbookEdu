@@ -79,7 +79,7 @@ class ManageUsers {
 
 if (isset($_GET["action"])) {
     if (isset($_FILES["csv"])) {
-        $csv = $mngUsers->checkCSV($_FILES["csv"]);
+        $users = $mngUsers->checkCSV($_FILES["csv"]);
     }
     else {
         $users = $_POST["users"];
@@ -93,7 +93,6 @@ if (isset($_GET["action"])) {
             $response = $mngUsers->removeUsers($users);
             break;
         case "csv":
-            $users = $mngUsers->setCSV($csv);
             $response = $mngUsers->addUsers($users);
             break;
         default:

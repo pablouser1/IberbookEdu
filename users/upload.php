@@ -16,7 +16,7 @@ class Upload {
         $this->db = new DB;
         $this->userinfo = $userinfo;
         $this->profileinfo = $profileinfo;
-        $this->baseurl = $GLOBALS["uploadpath"].$this->profileinfo["schoolid"]."/".$this->profileinfo["year"]."/".$this->userinfo["type"]."/".$this->profileinfo["id"]."/";
+        $this->baseurl = $GLOBALS["uploadpath"].$this->profileinfo["schoolid"]."/".$this->profileinfo["year"]."/users/".$this->profileinfo["id"]."/";
     }
 
     public function startUpload($files) {

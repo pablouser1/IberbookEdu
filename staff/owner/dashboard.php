@@ -7,12 +7,21 @@ if (!isset($_SESSION["owner"])){
 }
 
 $ownerinfo = $_SESSION["ownerinfo"];
-require_once("getprivinfo.php");
+require_once("../../classes/staff.php");
+require_once("../../classes/schools.php");
+require_once("../../classes/groups.php");
 
-$info = new DBPrivInfo;
-$staff = $info->staff();
-$schools = $info->schools();
-$groups = $info->groups();
+// Get staff
+$staffClass = new Staff;
+$staff = $staffClass->getStaff();
+
+// Get schools
+$schoolsClass = new Schools;
+$schools = $schoolsClass->getSchools();
+
+// Get groups
+$groupsClass = new Groups;
+$groups = $groupsClass->getGroups();
 ?>
 
 <!DOCTYPE html>

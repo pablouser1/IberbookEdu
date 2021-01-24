@@ -5,28 +5,18 @@ if (!isset($_SESSION["owner"])){
     exit;
 }
 
+require_once("../../functions.php");
 require_once("../../helpers/db.php");
 require_once("../../config/config.php");
+
 $db = new DB;
-function recursiveRemoveDirectory($directory)
-{
-    foreach(glob("{$directory}/*") as $file)
-    {
-        if(is_dir($file)) { 
-            recursiveRemoveDirectory($file);
-        } else {
-            unlink($file);
-        }
-    }
-    rmdir($directory);
-}
 
 function cleardb($tables) {
     foreach ($tables as $table) {
         $stmt = $db->prepare("DELETE FROM $table WHERE schoolid=?");
         $stmt->bind_param("i", $_POST["id"]);
         if ($stmt->execute() !== true) {
-            die("Error al intentar eliminar la base de datos");
+            die("Error while truncating database");
         }
         $stmt->close();
     }
@@ -39,15 +29,15 @@ if (isset($_POST["id"], $_POST["clear"])){
     $stmt->execute();
     $stmt->store_result();
     if ($stmt->num_rows == 0) {
-        die("Ha habido un error al procesar tu solicitud, ¿has escrito bien el código?");
+        die("There was an error processing your request, did you type the id correctly?");
     }
     $stmt->close();
 
-    $tables = ["users", "gallery"];
+    $tables = ["users", "profiles", "gallery"];
     // Clear tables from database
     cleardb($tables);
     // Delete uploads folder
-    recursiveRemoveDirectory($uploadpath."/".$_POST["id"]);
+    Utils::recursiveDelete($uploadpath."/".$_POST["id"]);
         
     header('Location: dashboard.php');
     exit;

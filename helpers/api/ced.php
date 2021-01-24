@@ -1,4 +1,6 @@
 <?php
+require_once(__DIR__."/../../classes/groups.php");
+require_once(__DIR__."/../../classes/schools.php");
 require_once(__DIR__. "/../../config/config.php");
 require_once(__DIR__. "/requests.php");
 class Api {
@@ -6,7 +8,7 @@ class Api {
     private $req;
     private $db;
     private $base_url;
-    public $type;
+    private $type;
     private $cookies;
 
     // -- Base functions -- //
@@ -223,27 +225,11 @@ class Api {
 
     function isAllowed($schoolid, $group) {
         $groupname = $group["name"];
-        $allowedSchool = $this->isSchoolAllowed($schoolid);
-        $allowedGroup = $this->isGroupAllowed($groupname);
+        $schools = new Schools;
+        $groups = new Groups;
+        $allowedSchool = $schools->isAllowed($schoolid);
+        $allowedGroup = $groups->isAllowed($groupname);
         if ($allowedSchool && $allowedGroup) {
-            return true;
-        }
-        return false;
-    }
-
-    private function isSchoolAllowed($schoolid) {
-        $sql = "SELECT `id` FROM `schools` WHERE id=$schoolid";
-        $result = $this->db->query($sql);
-        if ($result && $result->num_rows === 1) {
-            return true;
-        }
-        return false;
-    }
-
-    private function isGroupAllowed($group) {
-        $sql = "SELECT `id` FROM groups WHERE `name`=$group";
-        $result = $this->db->query($sql);
-        if ($result && $result->num_rows === 1) {
             return true;
         }
         return false;

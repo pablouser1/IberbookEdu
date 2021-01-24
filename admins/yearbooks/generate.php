@@ -4,45 +4,42 @@ require_once("../../functions.php");
 require_once("../../auth.php");
 require_once("../../helpers/db.php");
 require_once("../../config/config.php");
+require_once("../../classes/groups.php");
+require_once("../../classes/gallery.php");
 require_once("../../helpers/email.php");
 require_once("../../helpers/zip.php");
-require_once("themes.php");
 require_once("../../lang/lang.php");
+require_once("../../classes/themes.php");
 
 class GenYB {
-    private $conn;
+    private $db;
+    private $groups;
+    private $gallery;
     private $profileinfo;
-    private $themes;
+    private $theme;
+    private $themesMng;
+    private $themeinfo;
     private $acyear;
-    private $dt;
     private $baseurl;
     private $emails = [];
-    function __construct($profileinfo, $themes) {
+    function __construct($profileinfo) {
         $this->db = new DB;
+        $this->groups = new Groups;
+        $this->gallery = new Gallery;
+        $this->themesMng = new Themes;
         $this->profileinfo = $profileinfo;
-        $this->themes = $themes;
         $this->acyear = date("Y",strtotime("-1 year"))."-".date("Y");
-        $this->dt = new DateTime("now");
-    }
-    
-    // Copy files
-    private function recursivecopy($source, $dest){
-        foreach ($iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),\RecursiveIteratorIterator::SELF_FIRST) as $item) {
-            if ($item->isDir()) {
-                mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-            } 
-            else {
-                copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-            }
-        }
     }
 
     // Check if theme is valid
     public function initialCheck($theme) {
-        if (in_array($theme, $this->themes)) {
+        if($themeinfo = $this->themesMng->checkTheme($theme)) {
+            $this->theme = $themeinfo;
             return true;
         }
-        return false;
+        else {
+            return false;
+        }
     }
 
     // Write yearbook to database
@@ -57,75 +54,31 @@ class GenYB {
         return $ybid;
     }
     
-    private function getUser($userid) {
-        $stmt = $this->db->prepare("SELECT fullname, `type` FROM users WHERE id=? LIMIT 1");
-        $stmt->bind_param("i", $userid);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        $user = [
-            "name" => $row["fullname"],
-            "type" => $row["type"]
-        ];
-        $stmt->close();
-        return $user; 
-    }
-    
     // Get users from DB
     public function getUsers() {
         $users = [
             "students" => [],
             "teachers" => []
         ];
-        $stmt = $this->db->prepare("SELECT id, userid, photo, video, link, quote, uploaded, subject FROM profiles WHERE schoolid=? AND schoolyear=?");
-        $stmt->bind_param("is", $this->profileinfo["schoolid"], $this->profileinfo["year"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $id = $row["id"];
-            $user = $this->getUser($row["userid"]);
-            $dir = $user["type"]."/";
-            $new_user = [
-                "userid" => $id,
-                "fullname" => $user["name"],
-                "type" => $user["type"],
-                "photo" => $dir.$id.'/'.$row["photo"],
-                "video" => $dir.$id.'/'.$row["video"],
-                "url" => $row["link"],
-                "quote" => $row["quote"], // User quote
-                "date" => $row["uploaded"]
-            ];
-            if ($user["type"] == "teachers") {
-                $new_user["subject"] = $row["subject"];
-                array_push($users["teachers"], $new_user);
-            }
-            else {
-                array_push($users["students"], $new_user);
+        $tempUsers = $this->groups->getProfilesGroupFull($this->profileinfo["schoolid"], $this->profileinfo["year"]);
+        foreach ($tempUsers as $tempUser) {
+            // Users need to have at least a photo and a video
+            if ($tempUser["photo"] && $tempUser["video"]) {
+                if ($tempUser["type"] == "teachers") {
+                    array_push($users["teachers"], $tempUser);
+                }
+                else {
+                    array_push($users["students"], $tempUser);
+                }
             }
         }
-        $stmt->close();
         return $users;
     }
 
     // Get gallery from DB
     public function getGallery() {
-        $gallery = [];
-        // Gallery
-        $stmt = $this->db->prepare("SELECT name, description, type FROM gallery WHERE schoolid=? AND schoolyear=?");
-        $stmt->bind_param("is", $this->profileinfo["schoolid"], $this->profileinfo["year"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $gallery = array();
-        $gallery_dir = 'gallery/';
-        while($row = mysqli_fetch_assoc($result)) {
-            $gallery[] = [
-                "path" => $gallery_dir.$row["name"],
-                "description" => $row["description"],
-                "type" => $row["type"]
-            ];
-        }
-        $stmt->close();
-        return $gallery;
+        $items = $this->gallery->getItems($this->profileinfo["schoolid"], $this->profileinfo["year"]);
+        return $items;
     }
 
     // Create yearbook dir if it doesn't exist
@@ -140,16 +93,15 @@ class GenYB {
     public function copyFiles() {
         // Copy all user uploaded files
         $source = $GLOBALS["uploadpath"].$this->profileinfo["schoolid"]."/".$this->profileinfo["year"]."/";
-        $this->recursivecopy($source, $this->baseurl);
+        Utils::recursiveCopy($source, $this->baseurl);
         
-        // Copy all theme-specific assets
-        $theme = $_POST["theme"];
-        $source = "themes/{$theme}/";
-        $this->recursivecopy($source, $this->baseurl);
+        $themename = $this->theme["name"];
+        $source = "../../themes/{$themename}/";
+        Utils::recursiveCopy($source, $this->baseurl);
         
         // Copy all common assets
-        $source = "themes/common/";
-        $this->recursivecopy($source, $this->baseurl);
+        $source = "../../themes/common/";
+        Utils::recursiveCopy($source, $this->baseurl);
         
         copy("../../favicon.ico",  "{$this->baseurl}/favicon.ico");
     }
@@ -163,11 +115,12 @@ class GenYB {
         // Gallery
         $gallery_js = json_encode($gallery, JSON_PRETTY_PRINT);
         // Yearbook info
+        $dt = new DateTime("now");
         $ybinfo = [
             "schoolname" => $this->profileinfo["schoolname"],
             "year" => $this->profileinfo["year"],
             "acyear" => $this->acyear,
-            "ybdate" => $this->dt->getTimestamp()
+            "ybdate" => $dt->getTimestamp()
         ];
         $ybinfo["banner"] = $banner;
 
@@ -178,7 +131,7 @@ class GenYB {
         // Data to be written in js file
         $data = "
         // Config auto-generated using IberbookEdu, DO NOT MODIFY MANUALLY
-
+        
         // Teachers
         const teachers_js = {$teachers_js};
         // Students
@@ -215,7 +168,9 @@ class GenYB {
     // Zip Yearbook
     public function zipYearbook() {
         // Zip yearbook
-        HZip::zipDir($this->baseurl, $this->baseurl."/yearbook.zip");
+        if ($this->theme["zip"]) {
+            HZip::zipDir($this->baseurl, $this->baseurl."/yearbook.zip");
+        }
     }
 }
 
@@ -231,7 +186,7 @@ if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
     }
 
     // START CLASS //
-    $genyb = new GenYB($profileinfo, $themes);
+    $genyb = new GenYB($profileinfo);
     if ($genyb->initialCheck($_POST["theme"])) {
         // Write yearbook to DB
         $ybid = $genyb->writeToDB($banner);

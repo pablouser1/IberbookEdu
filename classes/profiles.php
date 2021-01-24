@@ -1,54 +1,84 @@
 <?php
-// Get pic and vid of user
-require_once("../headers.php");
-require_once("../functions.php");
-require_once("../auth.php");
-require_once("../helpers/db.php");
-require_once("../config/config.php");
-
-switch ($_GET["media"]) {
-    case "photo":
-    case "video":
-        $media = $_GET["media"];
-    break;
-    default:
-        die("That file type doesn't exist");
-}
-
-$db = new DB;
-$auth = new Auth;
-$userinfo = $auth->isUserLoggedin();
-$profileinfo = $auth->isProfileLoggedin();
-if ($userinfo && $profileinfo) {
-    $downloadable = false;
-    $stmt = $db->prepare("SELECT id, userid, $media FROM profiles WHERE id=?");
-    $stmt->bind_param("i", $_GET["id"]);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($mediaid, $userid, $medianame);
-    $stmt->fetch();
-    if ($stmt->num_rows == 1) {
-        // Check if ids match or user is admin
-        if ($mediaid == $profileinfo["id"] || $auth->isUserAdmin($userinfo)){
-            $downloadable = true;
+require_once(__DIR__."/../helpers/db.php");
+require_once(__DIR__."/../auth.php");
+require_once(__DIR__."/../config/config.php");
+class Profiles {
+    private $db;
+    private $auth;
+    function __construct() {
+        $this->db = new DB;
+        $this->auth = new Auth;
+    }
+    
+    public function getProfile($userid) {
+        $stmt = $this->db->prepare("SELECT id, userid, photo, video, link, quote, uploaded FROM profiles WHERE `id`=?");
+        $stmt->bind_param("i", $userid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+            return $user;
         }
-        else{
-            die("You don't have permissions");
+        else {
+            return false;
         }
     }
-    else{
-        die("That file couldn't be found");
+
+    /**
+     * changeProfile
+     *
+     * @param array school id and name
+     * @param array group name and subject (if any)
+     * @return array new profile
+     */
+    public function changeProfile($userid, $school, $group) {
+        $stmt = $this->db->prepare("SELECT id FROM profiles WHERE userid=? AND schoolid=? AND schoolyear=?");
+        $stmt->bind_param("iis", $userid, $school["id"], $group["name"]);
+        $stmt->execute();
+        $stmt->store_result();
+        // Get profile id
+        $stmt->bind_result($profileid);
+        $stmt->fetch();
+        $exists = $stmt->num_rows;
+        $stmt->close();
+        if (!$exists) {
+            $profileid = $this->createProfile($this->userid, $school["id"], $group);
+            if (!$profileid) {
+                return false;
+            }
+        }
+        $profile = [
+            "id" => $profileid,
+            "schoolid" => $school["id"],
+            "schoolname" => $school["name"],
+            "year" => $group["name"]
+        ];
+        $this->auth->setProfileToken($profile);
+        return $profile;
     }
-    $stmt->close();
-    $stmt = $db->prepare("SELECT `type` FROM users WHERE id=?");
-    $stmt->bind_param("i", $userid);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($type);
-    $stmt->fetch();
-    $stmt->close();
-    if ($downloadable){
-        $filepath = $uploadpath.$profileinfo["schoolid"]."/".$profileinfo["year"]."/{$type}/{$mediaid}/{$medianame}";
+    
+    /**
+     * createProfile
+     *
+     * @param int $userid
+     * @param int $schoolid
+     * @param array $group
+     * @return int Profile ID
+     */
+    public function createProfile($userid, $schoolid, $group) {
+        $subject = null;
+        if (isset($group["subject"])) {
+            $subject = $group["subject"];
+        }
+        $stmt = $this->db->prepare("INSERT INTO profiles(userid, schoolid, schoolyear, `subject`) VALUES(?, ?, ?, ?)");
+        $stmt->bind_param("iiss", $userid, $schoolid, $group["name"], $subject);
+        $stmt->execute();
+        $profileid = $stmt->insert_id;
+        return $profileid;
+    }
+
+    public function streamMedia($schoolid, $year, $mediaid, $medianame) {
+        $filepath = $GLOBALS["uploadpath"].$schoolid."/".$year."/users/{$mediaid}/{$medianame}";
         if(file_exists($filepath)){
             // https://www.sitepoint.com/community/t/loading-html5-video-with-php-chunks-or-not/350957
             $fp = @fopen($filepath, 'rb');
@@ -121,10 +151,5 @@ if ($userinfo && $profileinfo) {
             exit();
         }
     }
-}
-else {
-    echo("You aren't logged in");
-    http_response_code(401);
-    exit;
 }
 ?>

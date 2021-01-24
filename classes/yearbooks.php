@@ -1,15 +1,7 @@
 <?php
-require_once("functions.php");
-require_once("headers.php");
-
-require_once("auth.php");
-require_once("helpers/db.php");
-require_once("config/config.php");
-
-require_once("lang/lang.php");
-
+require_once(__DIR__."/../helpers/db.php");
 class Yearbooks {
-    private $conn;
+    private $db;
     function __construct() {
         $this->db = new DB;
     }
@@ -41,10 +33,10 @@ class Yearbooks {
     }
 
     // Get yearbook from logged in user
-    public function getUserYearbook($profileinfo) {
+    public function getUserYearbook($schoolid, $year) {
         $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
         $stmt = $this->db->prepare("SELECT id, schoolid, schoolname, schoolyear, acyear, banner, votes, `generated` FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=? LIMIT 1");
-        $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
+        $stmt->bind_param("iss", $schoolid, $year, $acyear);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows === 1) {
@@ -95,6 +87,7 @@ class Yearbooks {
         if (!is_numeric($_GET["offset"])) {
             return false;
         }
+        // Sorting method
         switch ($sort){
             case "votes":
             case "schoolyear":
@@ -106,67 +99,24 @@ class Yearbooks {
             return false;
         }
     }
-}
 
-$auth = new Auth;
-$yearbook = new Yearbooks;
-
-// Loggedin user's yearbook
-if (isset($_GET["mode"])) {
-    if ($profileinfo = $auth->isProfileLoggedin()) {
-        $useryb = $yearbook->getUserYearbook($profileinfo);
-        if ($useryb) {
-            $response = [
-                "code" => "C",
-                "data" => $useryb
+    public function getRandom() {
+        $sql = "SELECT id, schoolid, schoolname, schoolyear, acyear, banner FROM yearbooks ORDER BY RAND() LIMIT 1";
+        $result = $this->db->query($sql);
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+            $random = [
+                "id" => $row["id"],
+                "schoolname" => $row["schoolname"],
+                "schoolyear" => $row["schoolyear"],
+                "acyear" => $row["acyear"],
+                "url" => "/yearbooks/".$row["id"]."/assets/".$row["banner"]
             ];
+            return $random;
         }
         else {
-            $response = [
-                "code" => "C",
-                "data" => null
-            ];
+            return false;
         }
     }
-    else {
-        http_response_code(401);
-        $response = [
-            "code" => "E",
-            "error" => L::common_needToLogin
-        ];
-    }
 }
-elseif (isset($_GET["id"])) {
-    $individual = $yearbook->getOne($_GET["id"]);
-    $response = [
-        "code" => "C",
-        "data" => $individual
-    ];
-}
-// Multiple yearbooks
-else {
-    $sanitized = $yearbook->sanitizeInput($_GET["offset"], $_GET["sort"]);
-    if ($sanitized) {
-        $yearbooks = $yearbook->getYearbooks($_GET["offset"], $_GET["sort"]);
-        if ($yearbooks) {
-            $response = [
-                "code" => "C",
-                "data" => $yearbooks
-            ];
-        }
-        else {
-            $response = [
-                "code" => "NO-MORE",
-                "error" => L::yearbooks_maximum
-            ];
-        }
-    }
-    else {
-        $response = [
-            "code" => "E",
-            "error" => L::yearbooks_params
-        ];
-    }
-}
-sendJSON($response);
 ?>

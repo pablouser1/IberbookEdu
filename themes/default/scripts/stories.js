@@ -19,7 +19,7 @@ var stories = {
             <div class="modal-content fade-in">
                 <div class="container has-text-centered">
                     <video id="videoStories" v-on:ended="stopVideo" controls>
-                        <source :src="user.video">
+                        <source :src="'users/' + user.id + '/' + user.video">
                     </video>
                 </div>
             </div>

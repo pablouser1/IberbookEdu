@@ -9,7 +9,7 @@ class req {
     }
     
     // Get requests
-    function get($url){
+    public function get($url){
         // Options
         $initial_options = array(
             CURLOPT_URL => $url,
@@ -34,7 +34,7 @@ class req {
     }
     
     // Post requests
-    function post($url, $data){
+    public function post($url, $data){
         // Options
         $initial_options = array(
             CURLOPT_URL => $url,
@@ -55,7 +55,7 @@ class req {
     
         $data = mb_substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));  
 
-        curl_close ($ch);
+        curl_close($ch);
         return $data;
     }
 }

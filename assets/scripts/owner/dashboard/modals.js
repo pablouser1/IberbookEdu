@@ -8,7 +8,7 @@ Vue.component('schools', {
             <div class="modal-background" @click="$emit('close')"></div>
             <div class="modal-content">
                 <div class="box">
-                    <form action="manageschool.php?action=add" method="post">
+                    <form action="mngSchools.php?action=add" method="post">
                         <p class="title">Add</p>
                         <div class="field">
                             <label class="label">School id</label>
@@ -25,7 +25,7 @@ Vue.component('schools', {
                         <button class="button is-success" type="submit">Add</button>
                     </form>
                     <hr>
-                    <form action="manageschool.php?action=remove" method="post">
+                    <form action="mngSchools.php?action=remove" method="post">
                         <p class="title">Remove</p>
                         <div class="field">
                             <div class="control">
@@ -55,7 +55,7 @@ Vue.component('groups', {
             <div class="modal-background" @click="$emit('close')"></div>
             <div class="modal-content">
                 <div class="box">
-                    <form action="managegroup.php?action=add" method="post">
+                    <form action="mngGroups.php?action=add" method="post">
                         <p class="title">Add</p>
                         <div class="field">
                             <label class="label">Group name</label>
@@ -66,7 +66,7 @@ Vue.component('groups', {
                         <button class="button is-success" type="submit">Add</button>
                     </form>
                     <hr>
-                    <form action="managegroup.php?action=remove" method="post">
+                    <form action="mngGroups.php?action=remove" method="post">
                         <p class="title">Remove</p>
                         <div class="field">
                             <div class="control">

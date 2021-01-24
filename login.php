@@ -70,6 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $login = new Login;
     $loginoutput = $login->loginUser($username, $password, $type);
-    sendJSON($loginoutput);
+    Utils::sendJSON($loginoutput);
 }
 ?>
