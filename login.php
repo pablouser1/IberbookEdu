@@ -29,15 +29,23 @@ class Login {
             ];
             // Get user info
             $this->userinfo = $this->api->getinfo();
-            if ($this->auth->isUserAdminLogin($username)) {
-                $this->userinfo["rank"] = "admin";
+            if ($this->userinfo) {
+                if ($this->auth->isUserAdminLogin($username)) {
+                    $this->userinfo["rank"] = "admin";
+                }
+                else {
+                    $this->userinfo["rank"] = "user";
+                }
+                $response["data"]["userinfo"] = $this->userinfo;
+                $this->auth->setUserToken($this->userinfo);
+                $response["code"] = "C";
             }
             else {
-                $this->userinfo["rank"] = "user";
+                $response = [
+                    "code" => "E",
+                    "error" => "Error when getting user info"
+                ];
             }
-            $response["data"]["userinfo"] = $this->userinfo;
-            $this->auth->setUserToken($this->userinfo);
-            $response["code"] = "C";
             return $response;
         }
         else {
@@ -47,14 +55,15 @@ class Login {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(!isset($_POST["username"])){
+    $login_error = [];
+    if(!isset($_POST["username"]) || empty($_POST["username"])){
         $login_error[] = L::login_noUsername;
     }
     else{
         $username = trim($_POST["username"]);
     }
     // Check if password is empty
-    if(!isset($_POST["password"])){
+    if(!isset($_POST["password"]) || empty($_POST["password"])){
         $login_error[] = L::login_noPassword;
     } 
     else{
@@ -62,14 +71,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     // Get type
-    if(!isset($_POST["type"])){
-        $login_error[] = L::login_noType;
-    } 
-    else{
-        $type = trim($_POST["type"]);
+    if(isset($_POST["type"]) && !empty($_POST["type"])){
+        switch ($_POST["type"]) {
+            case "students":
+            case "guardians":
+            case "teachers":
+                $type = $_POST["type"];
+                break;
+            default:
+                $login_error[] = L::login_noType;
+        }
     }
-    $login = new Login;
-    $loginoutput = $login->loginUser($username, $password, $type);
+    else{
+        $login_error[] = L::login_noType;
+    }
+    
+    if (empty($login_error)) {
+        $login = new Login;
+        $loginoutput = $login->loginUser($username, $password, $type);
+    }
+    else {
+        $loginoutput = [
+            "code" => "E",
+            "error" => $login_error
+        ];
+    }
+
     Utils::sendJSON($loginoutput);
 }
 ?>

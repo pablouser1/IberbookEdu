@@ -30,7 +30,7 @@ class Api {
     }
 
     // -- Common functions -- //
-    function settype($type) {
+    function seturl($type) {
         $this->type = $type;
         switch ($type) {
             case "students":
@@ -41,15 +41,16 @@ class Api {
                 $this->base_url = $GLOBALS["base_url"].'senecadroid';
             break;
             default:
-                die("Invalid user type");
+                return false;
         }
+        return true;
     }
 
     // Login user
     function login($username, $password, $type){
         // Initial config
         $useragent = "IberbookEdu Testing";
-        $this->settype($type);
+        $this->seturl($type);
         $data = array('p' => '{"version":"11.10.5"}', 'USUARIO' => $username, 'CLAVE' => $password);
         // Options
         $url = "{$this->base_url}/login";
@@ -72,7 +73,7 @@ class Api {
         if(curl_error($ch))
         {
             return array(
-                "code" => "CURL",
+                "code" => "E",
                 "error" => L::ced_remoteServer
             );
         }
@@ -112,7 +113,6 @@ class Api {
                 if ($this->type == "students" && $info["RESULTADO"][0]["C_PERFIL"] == "ALU") {
                     // Get id from local database
                     $idced = $info["RESULTADO"][0]["MATRICULAS"][0]["X_MATRICULA"];
-                    $id = $this->doesUserExists($idced);
                     // Get school id and name
                     $datacentro = array("X_CENTRO" => $info["RESULTADO"][0]["MATRICULAS"][0]["X_CENTRO"]);
                     $infocentro = $this->getcentrostudent($datacentro);
@@ -123,12 +123,9 @@ class Api {
                     if ($this->isAllowed($schoolid, $group["name"])) {
                         // Set user info
                         $userinfo = [
-                            "id" => $id,
+                            "idced" => $idced,
                             "name" => $info["RESULTADO"][0]["USUARIO"],
                             "type" => "students",
-                            "schoolid" => $schoolid,
-                            "schoolname" => $infocentro["schoolname"],
-                            "year" => $group["name"],
                             "schools" => [
                                 [
                                     "id" => $schoolid,
@@ -137,6 +134,8 @@ class Api {
                                 ]
                             ]
                         ];
+                        $id = $this->doesUserExists($userinfo);
+                        $userinfo["id"] = $id;
                     }
                 }
                 break;
@@ -156,11 +155,10 @@ class Api {
                             "name" => $tempchild["MATRICULAS"][0]["UNIDAD"]
                         ];
                         $idced = $tempchild["MATRICULAS"][0]["X_MATRICULA"];
-                        $id = $this->doesUserExists($idced);
                         if ($this->isAllowed($schoolid, $group["name"])) {
                             // Merge child info with school info
                             $children[] = [
-                                "id" => $id,
+                                "idced" => $idced,
                                 "name" => $tempchild["NOMBRE"],
                                 "type" => "students",
                                 "schools" => [
@@ -171,6 +169,8 @@ class Api {
                                     ]
                                 ]
                             ];
+                            $id = $this->doesUserExists($idced);
+                            $children["id"] = $id;
                         }
                     }
                     $userinfo = [
@@ -210,29 +210,29 @@ class Api {
                     }
                 }
 
-                $id = $this->doesUserExists($idced);
                 $userinfo = array(
-                    "id" => $id,
+                    "idced" => $idced,
                     "name" => $info["RESULTADO"][0]["USUARIO"],
                     "type" => "teachers",
-                    "subject" => $finalschools[0]["groups"][0]["subject"],
                     "schools" => $finalschools
                 );
+                $id = $this->doesUserExists($userinfo);
+                $userinfo["id"] = $id;
             break;
         }
         return $userinfo;
     }
 
     function isAllowed($schoolid, $group) {
-        $groupname = $group["name"];
+        $allowed = false;
         $schools = new Schools;
         $groups = new Groups;
         $allowedSchool = $schools->isAllowed($schoolid);
-        $allowedGroup = $groups->isAllowed($groupname);
+        $allowedGroup = $groups->isAllowed($group);
         if ($allowedSchool && $allowedGroup) {
-            return true;
+            $allowed = true;
         }
-        return false;
+        return $allowed;
     }
 
     // -- Students only -- //
@@ -293,7 +293,6 @@ class Api {
     function getgroupsteachers(){
         $url = "{$this->base_url}/getGrupos";
         $response = json_decode(utf8_encode($this->req->post($url, [])), true);
-        // Get each course, split all groups and if there are any 4º ESO, 2º BCT, 6 Primaria add it to array
         foreach($response["RESULTADO"] as $id => $grupo){
             // TODO, integrate with DB
             preg_match_all("/(4º\sESO)\s.|(2º\sBCT)\s.|(6.)P/", $grupo["UNIDADES"], $tempgrupo);
@@ -316,8 +315,8 @@ class Api {
     }
 
     public function doesUserExists($userinfo) {
-        $stmt = $this->db->prepare("SELECT id FROM users WHERE idced=? AND schoolyear=? AND schoolid=?");
-        $stmt->bind_param("ssi", $userinfo["idced"], $userinfo["year"], $userinfo["schoolid"]);
+        $stmt = $this->db->prepare("SELECT id FROM users WHERE idced=?");
+        $stmt->bind_param("s", $userinfo["idced"]);
         $stmt->execute();
         $stmt->store_result();
         // Get profile id
@@ -338,9 +337,10 @@ class Api {
         if (isset($userinfo["subject"])) {
             $subject = $userinfo["subject"];
         }
+        $schools = json_encode($userinfo["schools"]);
         // Create user
-        $stmt = $this->db->prepare("INSERT INTO `users` (`idced`, `type`, `fullname`, `subject`) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssiss", $userinfo["idced"], $userinfo["type"], $userinfo["name"], $userinfo["schoolid"], $userinfo["year"], $subject);
+        $stmt = $this->db->prepare("INSERT INTO `users` (`idced`, `type`, `fullname`, `schools`) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $userinfo["idced"], $userinfo["type"], $userinfo["name"], $schools);
         $stmt->execute();
         $userid = $stmt->insert_id;
         return $userid;

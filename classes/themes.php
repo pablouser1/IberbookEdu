@@ -17,7 +17,8 @@ class Themes {
                     "id" => (int) $row["id"],
                     "name" => $row["name"],
                     "description" => $themeDetails["description"],
-                    "zip" => (boolean) $themeDetails["zip"]
+                    "zip" => (boolean) $themeDetails["zip"],
+                    "banner" => (boolean) $themeDetails["banner"]
                 ];
             }
             return $themes;
@@ -28,7 +29,7 @@ class Themes {
     }
 
     public function checkTheme($theme) {
-        $stmt = $this->db->prepare("SELECT `id`, `name` FROM themes WHERE `id`=? LIMIT 1");
+        $stmt = $this->db->prepare("SELECT `id`, `name` FROM themes WHERE `id`=?");
         $stmt->bind_param("i", $theme);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -39,7 +40,8 @@ class Themes {
                 "id" => (int) $row["id"],
                 "name" => $row["name"],
                 "description" => $themeDetails["description"],
-                "zip" => (boolean) $themeDetails["zip"]
+                "zip" => (boolean) $themeDetails["zip"],
+                "banner" => (boolean) $themeDetails["banner"]
             ];
             return $theme;
         }

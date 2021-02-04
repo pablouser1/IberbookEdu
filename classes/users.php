@@ -41,6 +41,6 @@ class Users {
             ];
         }
         return $users;
-    }    
+    }
 }
 ?>

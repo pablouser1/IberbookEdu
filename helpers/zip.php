@@ -1,9 +1,9 @@
 <?php
 // ZIP class
 
-// https://stackoverflow.com/a/19730838 Generate ZIP file from yearbook folder
-class HZip 
-{ 
+// Derivate from https://stackoverflow.com/a/19730838
+class Zip
+{
   /** 
    * Add files and sub-directories in a folder to zip file. 
    * @param string $folder 
@@ -16,7 +16,7 @@ class HZip
       if ($f != '.' && $f != '..') {
         $filePath = "$folder/$f";
         // Remove prefix from file path before add to zip.
-        $localPath = "yearbook".substr($filePath, $exclusiveLength);
+        $localPath = substr($filePath, $exclusiveLength);
         if (is_file($filePath)) {
           $zipFile->addFile($filePath, $localPath);
         } elseif (is_dir($filePath)) {
@@ -45,6 +45,17 @@ class HZip
     $z->open($outZipPath, ZIPARCHIVE::CREATE);
     self::folderToZip($sourcePath, $z, strlen("$sourcePath"));
     $z->close();
+  }
+
+  public static function unZip($file) {
+    $zip = new ZipArchive;
+    $res = $zip->open($file);
+    if ($res) {
+      // TODO
+    }
+    else {
+      // TODO
+    }
   }
 }
 ?>

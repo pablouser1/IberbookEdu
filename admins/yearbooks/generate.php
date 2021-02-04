@@ -16,12 +16,11 @@ class GenYB {
     private $groups;
     private $gallery;
     private $profileinfo;
-    private $theme;
+    public $theme;
     private $themesMng;
     private $themeinfo;
     private $acyear;
     private $baseurl;
-    private $emails = [];
     function __construct($profileinfo) {
         $this->db = new DB;
         $this->groups = new Groups;
@@ -157,7 +156,7 @@ class GenYB {
                     "code" => "E",
                     "description" => L::yearbooks_banner
                 ];
-                sendJSON($response);
+                Utils::sendJSON($response);
             }
             else {
                 move_uploaded_file($tmpFilePath, "$this->baseurl/assets/$banner");
@@ -168,9 +167,7 @@ class GenYB {
     // Zip Yearbook
     public function zipYearbook() {
         // Zip yearbook
-        if ($this->theme["zip"]) {
-            HZip::zipDir($this->baseurl, $this->baseurl."/yearbook.zip");
-        }
+        Zip::zipDir($this->baseurl, $this->baseurl."/yearbook.zip");
     }
 }
 
@@ -179,15 +176,12 @@ $auth = new Auth;
 $userinfo = $auth->isUserLoggedin();
 $profileinfo = $auth->isProfileLoggedin();
 if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
-    // BANNER //
-    $banner = null;
-    if ($_FILES['banner']['name']) {
-        $banner = $_FILES['banner']['name'];
-    }
-
-    // START CLASS //
     $genyb = new GenYB($profileinfo);
     if ($genyb->initialCheck($_POST["theme"])) {
+        $banner = null;
+        if ($genyb->theme["banner"] && isset($_FILES['banner'])) {
+            $banner = $_FILES['banner']['name'];
+        }
         // Write yearbook to DB
         $ybid = $genyb->writeToDB($banner);
         // Get info
@@ -202,10 +196,12 @@ if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
         // Create and copy config files
         $genyb->setConfig($students, $teachers, $gallery, $banner);
         // Zip Yearbook
-        $genyb->zipYearbook();
+        if ($genyb->theme["zip"]) {
+            $genyb->zipYearbook();
+        }
         // Send emails
-        if ($GLOBALS["email"]["enabled"]) {
-            $mailclient = new Email($GLOBALS["email"]);
+        if ($email["enabled"]) {
+            $mailclient = new Email($email);
             // Get email from specific group
             $emails = $mailclient->getEmails($profileinfo["schoolid"], $profileinfo["year"]);
             $mailclient->sendYearbook($emails, $ybid);
@@ -215,7 +211,7 @@ if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
             "code" => "C",
             "description" => L::yearbooks_generated
         ];
-        sendJSON($response);
+        Utils::sendJSON($response);
     }
     else {
         $response = [

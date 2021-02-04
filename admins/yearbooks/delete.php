@@ -3,20 +3,6 @@ require_once("../../headers.php");
 require_once("../../functions.php");
 require_once("../../auth.php");
 require_once("../../helpers/db.php");
-require_once("../../config/config.php");
-
-function recursiveRemoveDirectory($directory)
-{
-    foreach(glob("{$directory}/*") as $file)
-    {
-        if(is_dir($file)) { 
-            recursiveRemoveDirectory($file);
-        } else {
-            unlink($file);
-        }
-    }
-    rmdir($directory);
-}
 
 $db = new DB;
 $auth = new Auth;
@@ -39,10 +25,10 @@ if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
     $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
     $stmt->execute();
     $stmt->close();
-    recursiveRemoveDirectory(__DIR__."/../../yearbooks/".$ybid);
+    Utils::recursiveRemove("/../../yearbooks/".$ybid);
     $response = [
         "code" => "C"
     ];
-    sendJSON($response);
+    Utils::sendJSON($response);
 }
 ?>

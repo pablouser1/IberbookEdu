@@ -9,54 +9,15 @@ require_once("classes/yearbooks.php");
 $auth = new Auth;
 
 class Vote {
-    private $conn;
-    private $userinfo;
-    private $yearbooks;
-    function __construct($userinfo) {
+    private $db;
+    function __construct() {
         $this->db = new DB;
-        $this->userinfo = $userinfo;
-        $this->yearbooks = new Yearbooks;
-    }
-
-    public function start($id) {
-        $yearbook = $this->yearbooks->getOne($id);
-        if ($yearbook) {
-            if ($this->checkifValid($yearbook)) {
-                $alreadyvoted = $this->checkIfAlreadyVoted($id);
-                if ($alreadyvoted === "SAME-YEARBOOK") {
-                    $response = [
-                        "code" => "E",
-                        "error" => L::vote_alreadyVoted
-                    ];
-                }
-                else {
-                    $this->addVote($id);
-                    $this->setVoteToUser($id);
-                    $response = [
-                        "code" => "C"
-                    ];
-                }
-            }
-            else {
-                $response = [
-                    "code" => "E",
-                    "error" => L::vote_notYourself
-                ];
-            }
-        }
-        else {
-            $response = [
-                "code" => "E",
-                "error" => L::vote_notExist
-            ];
-        }
-        return $response;
     }
 
     // Check if user can vote
-    private function checkifValid($yearbook) {
+    public function checkifValid($yearbook, $profileinfo) {
         $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
-        if ($yearbook["schoolid"] == $this->userinfo["schoolid"] && $yearbook["schoolyear"] == $this->userinfo["year"]) {
+        if ($yearbook["schoolid"] == $profileinfo["schoolid"] && $yearbook["schoolyear"] == $profileinfo["year"]) {
             // Allow votes from the same group but different acyear
             if ($acyear !== $yearbook["acyear"]) {
                 return true;
@@ -69,9 +30,9 @@ class Vote {
     }
 
     // Check if user already voted and change vote if that's the case
-    private function checkIfAlreadyVoted($ybid) {
+    public function checkIfAlreadyVoted($ybid, $userid) {
         $stmt = $this->db->prepare("SELECT voted from users WHERE id=?");
-        $stmt->bind_param("i", $this->userinfo["id"]);
+        $stmt->bind_param("i", $userid);
         $stmt->execute();
         $stmt->store_result();
         // Get profile id
@@ -93,7 +54,7 @@ class Vote {
     }
 
     // Add 1 vote to yearbook and set voted to yb id
-    private function addVote($ybid) {
+    public function addVote($ybid) {
         $stmt = $this->db->prepare("UPDATE yearbooks SET votes = votes + 1 WHERE id=?");
         $stmt->bind_param("i", $ybid);
         $stmt->execute();
@@ -101,24 +62,63 @@ class Vote {
     }
 
     // Remove 1 vote from yearbook
-    private function removeVote($ybid) {
+    public function removeVote($ybid) {
         $stmt = $this->db->prepare("UPDATE yearbooks SET votes = votes - 1 WHERE id=?");
         $stmt->bind_param("i", $ybid);
         $stmt->execute();
         $stmt->close();
     }
 
-    private function setVoteToUser($ybid) {
+    public function setVoteToUser($ybid, $userid) {
         $stmt = $this->db->prepare("UPDATE users SET voted =? WHERE id=?");
-        $stmt->bind_param("ii", $ybid, $this->userinfo["id"]);
+        $stmt->bind_param("ii", $ybid, $userid);
         $stmt->execute();
         $stmt->close();
     }
 }
+$userinfo = $auth->isUserLoggedin();
+$profileinfo = $auth->isProfileLoggedin();
 
-if ($userinfo = $auth->isUserLoggedin()) {
-    $vote = new Vote($userinfo);
-    $response = $vote->start($_POST["id"]);
+if ($userinfo && $profileinfo) {
+    $vote = new Vote;
+    $yearbookClass = new Yearbooks;
+    if (isset($_POST["id"])) {
+        $yearbook = $yearbookClass->getOne($_POST["id"]);
+        if ($yearbook) {
+            $ybid = $yearbook["id"];
+            if ($vote->checkifValid($yearbook, $profileinfo)) {
+                $alreadyvoted = $vote->checkIfAlreadyVoted($ybid, $userinfo["id"]);
+                if ($alreadyvoted === "SAME-YEARBOOK") {
+                    $response = [
+                        "code" => "E",
+                        "error" => L::vote_alreadyVoted
+                    ];
+                }
+                else {
+                    $vote->addVote($ybid);
+                    $vote->setVoteToUser($ybid, $userinfo["id"]);
+                    $response = [
+                        "code" => "C"
+                    ];
+                }
+            }
+            else {
+                $response = [
+                    "code" => "E",
+                    "error" => "Not valid"
+                ];
+            }
+        }
+        else {
+            $response = [
+                "code" => "E",
+                "error" => L::vote_notExist
+            ];
+        }
+    }
+    else {
+
+    }
 }
 else {
     $response = [

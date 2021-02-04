@@ -63,13 +63,14 @@ class Email {
         return $emails;
     }
     // Send email to group when yearbook is generated
-    public function sendYearbook($emails, $ybid) {
+    public function sendYearbook($users, $ybid) {
         $this->mail->Subject = 'Your yearbook is ready!';
-        //$this->mail->msgHTML($body);
-        //$this->mail->AltBody = 'To view the message, please use an HTML compatible email viewer!';
-        $this->mail->Body = "Your group's administrator has generated your yearbook, check IberbookEdu!";
-        foreach ($emails as $email) {
-            $this->mail->addAddress($email["email"], $email["fullname"]);
+        $body = file_get_contents(__DIR__."/templates/email/yearbook.html");
+        $this->mail->AltBody = 'To view the message, please use an HTML compatible email viewer!';
+        foreach ($users as $user) {
+            $customBody = str_replace("%fullname%", $user["fullname"], $body);
+            $this->mail->msgHTML($customBody);
+            $this->mail->addAddress($user["email"], $user["fullname"]);
             $this->mail->send();
             $this->mail->clearAddresses();
         }

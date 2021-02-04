@@ -27,7 +27,7 @@ if ($userinfo && $profileinfo) {
     if ($_GET["id"] == $profileinfo["id"] || $auth->isUserAdmin($userinfo)) {
         $profile = $profiles->getProfile($_GET["id"]);
         $user = $users->getUser($profile["userid"]);
-        if ($profile && $user && isset($profile[$media])) {
+        if ($profile && $user && isset($profile[$media]) && $profileinfo["schoolid"] === $profile["schoolid"] && $profileinfo["year"] === $profile["schoolyear"]) {
             $mediaid = $profile["id"];
             $medianame = $profile[$media];
             $downloadable = true;
@@ -35,10 +35,12 @@ if ($userinfo && $profileinfo) {
     }
 
     if ($downloadable) {
-        $profiles->streamMedia($profileinfo["schoolid"], $profileinfo["year"], $mediaid, $medianame);
+        // Stream file
+        $profiles->streamMedia($profile["schoolid"], $profile["schoolyear"], $mediaid, $medianame);
     }
     else {
-        echo("Error when getting media");
+        echo("You can't download that");
+        http_response_code(401);
         exit;
     }
 }

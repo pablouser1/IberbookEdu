@@ -139,13 +139,17 @@ Vue.component("server", {
             </div>
         </div>
         <h2 class="title">Allowed frontend servers</h2>
-        <button v-on:click="addFrontend" type="button" class="button">Add fronteend</button>
+        <button v-on:click="addFrontend" type="button" class="button">Add frontend</button>
         <div id="frontends">
             <div class="field">
                 <div class="control">
                     <input name="frontends[]" class="input" type="text" required value="https://iberbookedu.onrender.com">
                 </div>
             </div>
+        </div>
+        <div class="field">
+            <h2 class="title">Email system</h2>
+            <p>TODO</p>
         </div>
         <div class="field is-grouped">
             <div class="control">

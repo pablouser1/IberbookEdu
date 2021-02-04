@@ -25,5 +25,5 @@ if ($userinfo) {
 $response = [
     "code" => "C"
 ];
-sendJSON($response);
+Utils::sendJSON($response);
 ?>

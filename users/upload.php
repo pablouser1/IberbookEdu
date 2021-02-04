@@ -178,7 +178,7 @@ if ($userinfo && $profileinfo && $_SERVER["REQUEST_METHOD"] === "POST") {
             "code" => "C",
             "data" => $uploadResult
         ];
-        sendJSON($response);
+        Utils::sendJSON($response);
     }
 }
 ?>

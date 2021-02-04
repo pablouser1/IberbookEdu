@@ -12,12 +12,12 @@ if ($userinfo && $profileinfo) {
         $users = $groups->getProfilesGroupFull($profileinfo["schoolid"], $profileinfo["year"]);
     }
     else {
-        $users = $groups->getProfilesGroupBasic();
+        $users = $groups->getProfilesGroupBasic($profileinfo["schoolid"], $profileinfo["year"]);
     }
     $response = [
         "code" => "C",
         "data" => $users
     ];
-    sendJSON($response);
+    Utils::sendJSON($response);
 }
 ?>

@@ -10,6 +10,8 @@ $ownerinfo = $_SESSION["ownerinfo"];
 require_once("../../classes/staff.php");
 require_once("../../classes/schools.php");
 require_once("../../classes/groups.php");
+require_once("../../classes/themes.php");
+require_once("../../classes/users.php");
 
 // Get staff
 $staffClass = new Staff;
@@ -22,6 +24,13 @@ $schools = $schoolsClass->getSchools();
 // Get groups
 $groupsClass = new Groups;
 $groups = $groupsClass->getGroups();
+
+// Get themes
+$themesClass = new Themes;
+$themes = $themesClass->getThemes();
+
+$usersClass = new Users;
+$users = $usersClass->getAllUsers();
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +51,8 @@ $groups = $groupsClass->getGroups();
         const staff_js = <?php echo(json_encode($staff));?>;
         const schools_js = <?php echo(json_encode($schools));?>;
         const groups_js = <?php echo(json_encode($groups));?>;
+        const themes_js = <?php echo(json_encode($themes));?>;
+        const users_js = <?php echo(json_encode($users));?>;
     </script>
 </head>
 
@@ -61,25 +72,27 @@ $groups = $groupsClass->getGroups();
                 <aside class="menu is-hidden-mobile">
                     <p class="menu-label">General</p>
                     <ul class="menu-list">
-                        <li><a :class="{'is-active': tab === 'mainmenu'}" v-on:click="changeTab('mainmenu')">Main menu</a></li>
+                        <li><a :class="{'is-active': tab === 'mainmenu'}" @click="changeTab('mainmenu')">Main menu</a></li>
                     </ul>
-                    <p class="menu-label">Information</p>
+                    <p class="menu-label">Manage</p>
                     <ul class="menu-list">
-                        <li><a :class="{'is-active': tab === 'users'}" v-on:click="changeTab('users')">Uploads</a></li>
+                        <li><a :class="{'is-active': tab === 'themes'}" @click="changeTab('themes')">Themes</a></li>
                     </ul>
                 </aside>
             </div>
             <div class="column is-9">
                 <section id="items" class="section">
                     <!-- Main Menu --->
-                    <mainmenu v-if="tab === 'mainmenu'" v-bind:staff="staff" v-bind:schools="schools" v-bind:groups="groups"></mainmenu>
-                    <!-- User -->
-                    <users v-if="tab === 'users'" v-bind:schools="schools" v-bind:groups="groups"></users>
+                    <mainmenu v-if="tab === 'mainmenu'" :staff="staff" :schools="schools" :groups="groups" :users="users"></mainmenu>
+                    <!-- Themes -->
+                    <themes v-if="tab === 'themes'" v-bind:themes="themes"></themes>
                 </section>
             </div>
         </div>
     </div>
     <script src="../../assets/scripts/owner/dashboard/modals.js"></script>
+    <script src="../../assets/scripts/owner/dashboard/mainmenu.js"></script>
+    <script src="../../assets/scripts/owner/dashboard/themes.js"></script>
     <script src="../../assets/scripts/owner/dashboard/dashboard.js"></script>
 </body>
 

@@ -28,7 +28,7 @@ if (isset($_POST["id"], $_POST["clear"])){
     $stmt->bind_param("i", $_POST["id"]);
     $stmt->execute();
     $stmt->store_result();
-    if ($stmt->num_rows == 0) {
+    if ($stmt->num_rows === 0) {
         die("There was an error processing your request, did you type the id correctly?");
     }
     $stmt->close();

@@ -11,7 +11,7 @@ class Profiles {
     }
     
     public function getProfile($userid) {
-        $stmt = $this->db->prepare("SELECT id, userid, photo, video, link, quote, uploaded FROM profiles WHERE `id`=?");
+        $stmt = $this->db->prepare("SELECT id, userid, schoolid, schoolyear, photo, video, link, quote, uploaded FROM profiles WHERE `id`=?");
         $stmt->bind_param("i", $userid);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -42,7 +42,7 @@ class Profiles {
         $exists = $stmt->num_rows;
         $stmt->close();
         if (!$exists) {
-            $profileid = $this->createProfile($this->userid, $school["id"], $group);
+            $profileid = $this->createProfile($userid, $school["id"], $group);
             if (!$profileid) {
                 return false;
             }
@@ -76,7 +76,15 @@ class Profiles {
         $profileid = $stmt->insert_id;
         return $profileid;
     }
-
+    
+    /**
+     * streamMedia
+     *
+     * @param int Schoolid
+     * @param string Scool year
+     * @param int User id
+     * @param string File name
+     */
     public function streamMedia($schoolid, $year, $mediaid, $medianame) {
         $filepath = $GLOBALS["uploadpath"].$schoolid."/".$year."/users/{$mediaid}/{$medianame}";
         if(file_exists($filepath)){
@@ -87,6 +95,9 @@ class Profiles {
             $start = 0; // Start byte
             $end = $size - 1; // End byte
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            //header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+            //header("Cache-Control: post-check=0, pre-check=0", false);
+            //header("Pragma: no-cache");
             header('Content-Type: ' . finfo_file($finfo, $filepath));
             finfo_close($finfo);
             header('Content-Disposition: inline; filename="'.basename($filepath).'"');
@@ -149,6 +160,34 @@ class Profiles {
             }
             fclose($fp);
             exit();
+        }
+    }
+
+    public function deleteProfileItems($id, $elements, $schoolid, $year) {
+        $allowed_elements = ["video", "photo", "link", "quote"];
+        $deleted_elements = 0;
+        foreach ($elements as $element) {
+            if (in_array($element, $allowed_elements)) {
+                $profile = $this->getProfile($id);
+                if ($profile) {
+                    $stmt = $this->db->prepare("UPDATE profiles SET $element = NULL WHERE `id`=? AND schoolid=? AND schoolyear=?");
+                    $stmt->bind_param("iis", $id, $schoolid, $year);
+                    if ($stmt->execute()) {
+                        // Files
+                        if ($element == "photo" || $element == "video") {
+                            $file = $GLOBALS["uploadpath"].$schoolid."/".$year."/users/".$id."/".$profile[$element];
+                            unlink($file);
+                        }
+                        $deleted_elements++;
+                    }
+                }
+            }
+        }
+        if (count($elements) === $deleted_elements) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
 }

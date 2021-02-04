@@ -12,9 +12,6 @@ function hashchange() {
 // -- Common -- //
 window.addEventListener("hashchange", hashchange)
 
-// -- Add users -- //
-const users_columns = document.getElementById("add_columns")
-
 // Options //
 // Schools html
 var schools_html = ""
@@ -28,6 +25,8 @@ for (var i=0; i<groups.length; i++) {
     groups_html += `<option>${groups[i].name}</option>`
 }
 
+// -- Add users -- //
+const users_columns = document.getElementById("add_columns")
 var user_i = 0;
 function appendAddUserCard() {
     const user_html = `
@@ -87,14 +86,19 @@ function appendAddUserCard() {
 document.getElementById("add_form").addEventListener("submit", function(event) {
     event.preventDefault();
     const formData = new FormData(this);
-    fetch("manageusers.php", {
+    fetch("mngUsers.php", {
         method: 'POST',
         body : formData
     })
     .then(response => response.json())
-    .then(
-        success => console.log(success)
-    )
+    .then(function(res_json) {
+        if (res_json.code === "C") {
+            generateTXT(res_json.data)
+        }
+        else {
+            alert("Error while generating users")
+        }
+    })
     .catch(
         error => console.log(error)
     );
@@ -113,17 +117,37 @@ csvinput.onchange = () => {
 
 document.getElementById("csvsend").addEventListener("click", function () {
     const csv = csvinput.files[0];
-    fetch("manageusers.php?action=csv", {
+    let formData = new FormData;
+    formData.append("csv", csv)
+    fetch("mngUsers.php?action=csv", {
         method: 'POST',
-        body: csv
+        body: formData
     })
     .then(response => response.json())
-    .then(
-        success => console.log(success)
-    )
+    .then(function(res_json) {
+        if (res_json.code === "C") {
+            generateTXT(res_json.data)
+        }
+        else {
+            alert("Error while generating users")
+        }
+    })
     .catch(
         error => console.log(error)
     );
 })
+
+// Download txt with changes
+function generateTXT(users_json) {
+    console.log(users_json)
+    let passwords = ""
+    for (let i=0; i<users_json.length; i++) {
+        let user = users_json[i]
+        passwords += `${user.username}:${user.password}\n`
+    }
+    const blobText = new Blob([passwords], {type: "text/plain"})
+    const blobLink = URL.createObjectURL(blobText)
+    window.open(blobLink)
+}
 
 hashchange()

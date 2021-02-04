@@ -1,12 +1,14 @@
 <?php
 // Common functions
 class Utils {
+    // Send JSON to client
     static public function sendJSON($response) {
         header('Content-type: application/json');
         echo json_encode($response);
         exit;
     }
-    // Copy files
+
+    // Copy directory
     static public function recursiveCopy($source, $dest){
         foreach ($iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),\RecursiveIteratorIterator::SELF_FIRST) as $item) {
             if ($item->isDir()) {
@@ -18,6 +20,7 @@ class Utils {
         }
     }
 
+    // Remove directory
     static public function recursiveRemove($directory) {
         foreach(glob("{$directory}/*") as $file) {
             if(is_dir($file)) { 

@@ -11,7 +11,7 @@ class Groups {
 
     public function getProfilesGroupBasic($schoolid, $year) {
         $users = [];
-        $stmt = $this->db->prepare("SELECT uploaded, `subject`
+        $stmt = $this->db->prepare("SELECT userid, uploaded, `subject`
                                     FROM profiles WHERE schoolid=? AND schoolyear=?");
 
         $stmt->bind_param("is", $schoolid, $year);
@@ -74,8 +74,8 @@ class Groups {
         return $groups;
     }
 
-    public function isAllowed() {
-        $sql = "SELECT `id` FROM groups WHERE `name`=$group";
+    public function isAllowed($group) {
+        $sql = "SELECT `id` FROM groups WHERE `name`='$group'";
         $result = $this->db->query($sql);
         if ($result && $result->num_rows === 1) {
             return true;

@@ -1,12 +1,12 @@
 <?php
 if (!extension_loaded('mysqli') || !extension_loaded('zip') || !extension_loaded('curl')) {
-    die("Este programa necesita los siguientes plugins para funcionar: php-mysqli, php-zip y php-curl");
+    die("This app needs the following plugins to work: php-mysqli, php-zip y php-curl");
 }
 
 // Default values
 $dirs = [
-    "upload" => dirname(__FILE__)."/uploads/",
-    "yearbook" => dirname($_SERVER['PHP_SELF'])."/yearbooks/"
+    "upload" => __DIR__."/uploads/",
+    "yearbook" => __DIR__."/yearbooks/"
 ];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db_username = "'.$db_config["username"].'";
     $db_password = "'.$db_config["password"].'";
     ?>';
-    file_put_contents("helpers/db/dbconf.php", $db_file);
+    file_put_contents("config/dbconf.php", $db_file);
 
     // Config info
     switch ($global_config["login"]) { // Login system used
@@ -71,9 +71,9 @@ $token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHA
 $ssloptions = '.$ssloptions.';
 ?>';
     // Add global config file
-    file_put_contents("helpers/config.php", $global_config_file);
+    file_put_contents("config/config.php", $global_config_file);
     // Now that we have the config available, import db helper
-    require_once("helpers/db/db.php");
+    require_once("helpers/db.php");
     $db = new DB;
     // Creating tables
     // Users
@@ -219,8 +219,7 @@ $ssloptions = '.$ssloptions.';
     // Delete setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");
-    echo("Setup finished successfully");
-    exit;
+    die("Setup finished successfully");
 }
 ?>
 <!DOCTYPE html>

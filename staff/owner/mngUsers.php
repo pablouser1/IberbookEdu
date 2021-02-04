@@ -13,24 +13,24 @@ require_once("../../helpers/db.php");
 
 class ManageUsers {
     private $db;
-    private $pdf;
     function __construct() {
         $this->db = new DB;
     }
 
     public function addUsers($users) {
+        $generatedUsers = [];
         foreach ($users as $user) {
-            $password = password_hash($this->random_password(8), PASSWORD_DEFAULT);
-            $stmt = $this->db->prepare("INSERT INTO users (username, `password`, `type`, fullname, schoolid, schoolyear) VALUES(?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssis", $user["username"], $password, $user["type"], $user["fullname"], $user["schoolid"], $user["schoolyear"]);
-            $stmt->execute();
+            $password = $this->random_password(10);
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare("INSERT INTO users (username, `password`, `type`, fullname, schools) VALUES(?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssss", $user["username"], $hashedPassword, $user["type"], $user["fullname"], $user["schools"]);
+            if ($stmt->execute()) {
+                $user["password"] = $password;
+                array_push($generatedUsers, $user);
+            }
             $stmt->close();
-            $user["password"] = $password;
         }
-        $response = [
-            "code" => "C"
-        ];
-        return $response;
+        return $generatedUsers;
     }
 
     public function removeUsers($users) {
@@ -45,16 +45,20 @@ class ManageUsers {
         }
     }
 
-    public function checkCSV($csv) {
-        $csvfile = array_map('str_getcsv', file($csv));
-        array_walk($csvfile, function(&$a) use ($csvfile) {
-          $a = array_combine($csvfile[0], $a);
-        });
-        array_shift($csvfile);
-        $users = sanitizeInput($csvfile);
+    public function checkCSV($csvPOST) {
+        $users = [];
+        $csvfile = array_map('str_getcsv', file($csvPOST["tmp_name"]));
+        foreach ($csvfile as $user) {
+            $users[] = [
+                "username" => $user[0],
+                "type" => $user[1],
+                "fullname" => $user[2],
+                "schools" => $user[3]
+            ];
+        }
         return $users;
     }
-    
+
     /**
      * A PHP function that will generate a secure random password.
      * 
@@ -62,51 +66,59 @@ class ManageUsers {
      * @return string The random password.
      */
     private function random_password($length){
-        //A list of characters that can be used in our
-        //random password.
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!-.[]?*()';
-        //Create a blank string.
-        $password = '';
-        //Get the index of the last character in our $characters string.
-        $characterListLength = mb_strlen($characters, '8bit') - 1;
-        //Loop from 1 to the $length that was specified.
-        foreach(range(1, $length) as $i){
-            $password .= $characters[random_int(0, $characterListLength)];
+        $char = [range('A','Z'),range('a','z'),range(0,9),['*','#','@','!','?','.']];
+        $pw = '';
+        for($a = 0; $a < count($char); $a++)
+        {
+            $randomkeys = array_rand($char[$a], 2);
+            $pw .= $char[$a][$randomkeys[0]].$char[$a][$randomkeys[1]];
         }
-        return $password;
+        $userPassword = str_shuffle($pw);
+        return $userPassword;
     }
 }
 
 if (isset($_GET["action"])) {
+    $mngUsers = new ManageUsers;
     if (isset($_FILES["csv"])) {
         $users = $mngUsers->checkCSV($_FILES["csv"]);
     }
-    else {
+    elseif (isset($_POST["users"])) {
         $users = $_POST["users"];
     }
-    $mngUsers = new ManageUsers;
-    switch ($_GET["action"]) {
-        case "add":
-            $response = $mngUsers->addUsers($users);
-            break;
-        case "remove":
-            $response = $mngUsers->removeUsers($users);
-            break;
-        case "csv":
-            $response = $mngUsers->addUsers($users);
-            break;
-        default:
-            $response = [
-                "code" => "E",
-                "error" => "Not a valid action"
-            ];
-    }
-    if (!isset($response) || empty($response)) {
+    else {
         $response = [
             "code" => "E",
-            "error" => "Unknown error, please try again later"
+            "error" => "Need more info"
         ];
     }
-    sendJSON($response);
+
+    if (isset($users)) {
+        switch ($_GET["action"]) {
+            case "add":
+            case "csv":
+                $generatedUsers = $mngUsers->addUsers($users);
+                $response = [
+                    "code" => "C",
+                    "data" => $generatedUsers
+                ];
+                break;
+            case "remove":
+                $response = $mngUsers->removeUsers($users);
+                break;
+            default:
+                $response = [
+                    "code" => "E",
+                    "error" => "Not a valid action"
+                ];
+        }
+        if (!isset($response) || empty($response)) {
+            $response = [
+                "code" => "E",
+                "error" => "Unknown error, please try again later"
+            ];
+        }
+    }
+    Utils::sendJSON($response);
 }
 ?>

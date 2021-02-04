@@ -35,7 +35,7 @@ const translations = {
             distributed under <a href="licenses/externalProjects.html" target="_blank">the following licenses</a>:<br>
             ${translate_common.external}`,
             credits: `This yearbook was made using 
-            <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, an open source project
+            <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, an open source project
             distributed under the <a href="licenses/IberbookEdu.html" target="_blank">AGPLv3 license</a>`
         },
         footer: {
@@ -66,7 +66,7 @@ const translations = {
             distribuidos bajo <a href="licenses/externalProjects.html" target="_blank">las siguientes licencias</a>:<br>
             ${translate_common.external}`,
             credits: `Este yearbook fue generado usando
-            <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
+            <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
             distribuido bajo la <a href="licenses/IberbookEdu.html" target="_blank">licencia AGPLv3</a>`
         },
         footer: {
@@ -97,11 +97,11 @@ const translations = {
             distribués sous <a href="licenses/externalProjects.html">les licences suivantes</a>:<br>
             ${translate_common.external}`,
             credits: `Cet annuaire a été généré en utilisant
-            <a href="https://github.com/pablouser1/IberbookEdu" target="_blank">IberbookEdu</a>, un projet open source
+            <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, un projet open source
             distribué sous la <a href="licenses/IberbookEdu.html" target="_blank">licence AGPLv3</a>`
         },
         footer: {
-            madewith: "Fait avec <span style='color: #e25555;'> &#9829; </span> în Github"
+            madewith: "Fait avec <span style='color: #e25555;'> &#9829; </span> în <a href='https://twitter.com/search?q=%23IberbookEdu' target='_blank'>#IberbookEdu</a>"
         },
         misc: {
             longtime: "Salut!👋 Cela fait plus de cinq ans depuis cette graduation, comment ça va?"

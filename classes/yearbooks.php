@@ -101,7 +101,7 @@ class Yearbooks {
     }
 
     public function getRandom() {
-        $sql = "SELECT id, schoolid, schoolname, schoolyear, acyear, banner FROM yearbooks ORDER BY RAND() LIMIT 1";
+        $sql = "SELECT id, schoolid, schoolname, schoolyear, acyear, banner FROM yearbooks WHERE `banner` IS NOT NULL ORDER BY RAND() LIMIT 1";
         $result = $this->db->query($sql);
         if ($result->num_rows === 1) {
             $row = $result->fetch_assoc();
