@@ -81,7 +81,7 @@ $schools = $schoolsClass->getSchools();
                     <span>Append new</span>
                 </button>
             </div>
-            <form id="add_form" autocomplete="off" action="manageusers.php?action=add" method="POST">
+            <form id="add_form" autocomplete="off">
                 <div id="add_columns" class="columns is-multiline"></div>
                 <button type="submit" class="button is-success">Add</button>
             </form>
@@ -106,7 +106,7 @@ $schools = $schoolsClass->getSchools();
         </section>
     </section>
     <section id="remove" class="section is-hidden tab">
-        <form action="manageusers.php?action=remove" method="POST">
+        <form>
             <div id="remove_columns"></div>
             <button type="submit" class="button is-dangeer">Delete</button>
         </form>
@@ -141,7 +141,9 @@ $schools = $schoolsClass->getSchools();
             </ul>
         </nav>
     </footer>
-    <script src="../../assets/scripts/owner/users.js"></script>
+    <script src="../../assets/scripts/owner/users/addUsers.js"></script>
+    <!-- <script src="../../assets/scripts/owner/users/removeUsers.js"></script> -->
+    <script src="../../assets/scripts/owner/users/users.js"></script>
 </body>
 
 </html>

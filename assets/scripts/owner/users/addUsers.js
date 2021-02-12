@@ -1,17 +1,3 @@
-// -- Main menu -- //
-function hashchange() {
-    var hash = window.location.hash.substring(1);
-    if (hash == "") {
-        hash = "option"
-    }
-    var old_tab = document.querySelector(".tab:not(.is-hidden)")
-    var new_tab = document.getElementById(hash);
-    old_tab.classList.add("is-hidden")
-    new_tab.classList.remove("is-hidden")
-}
-// -- Common -- //
-window.addEventListener("hashchange", hashchange)
-
 // Options //
 // Schools html
 var schools_html = ""
@@ -49,18 +35,18 @@ function appendAddUserCard() {
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Group</label>
-                    <div class="control">
-                        <div class="select">
-                            <select name="users[${user_i}][schoolyear]" requiered>${groups_html}</select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
                     <label class="label">School</label>
                     <div class="control">
                         <div class="select">
                             <select name="users[${user_i}][schoolid]" requiered>${schools_html}</select>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Group</label>
+                    <div class="control">
+                        <div class="select">
+                            <select name="users[${user_i}][schoolyear]" requiered>${groups_html}</select>
                         </div>
                     </div>
                 </div>
@@ -86,7 +72,7 @@ function appendAddUserCard() {
 document.getElementById("add_form").addEventListener("submit", function(event) {
     event.preventDefault();
     const formData = new FormData(this);
-    fetch("mngUsers.php", {
+    fetch("mngUsers.php?action=add", {
         method: 'POST',
         body : formData
     })
@@ -139,7 +125,6 @@ document.getElementById("csvsend").addEventListener("click", function () {
 
 // Download txt with changes
 function generateTXT(users_json) {
-    console.log(users_json)
     let passwords = ""
     for (let i=0; i<users_json.length; i++) {
         let user = users_json[i]
@@ -149,5 +134,3 @@ function generateTXT(users_json) {
     const blobLink = URL.createObjectURL(blobText)
     window.open(blobLink)
 }
-
-hashchange()

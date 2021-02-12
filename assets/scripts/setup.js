@@ -113,8 +113,6 @@ Vue.component("server", {
                 <div class="select">
                     <select v-model="loginSystem" name="global[login]">
                         <option value="local">Local Database</option>
-                        <option value="andalucia">PASEN/SENECA (Andalucía)</option>
-                        <option value="madrid">ROBLE (Madrid)</option>
                     </select>
                 </div>
             </div>
@@ -127,12 +125,7 @@ Vue.component("server", {
             <p class="help">Stores users' photos and videos, HIGHLY recommended to be a private directory</p>
         </div>
         <div class="field">
-            <h2 class="title">Schools</h2>
-            <label class="label">School's ID</label>
-            <div class="control">
-                <input name="schoolinfo[id]" class="input" type="number" placeholder="Ej: 181206713" required>
-            </div>
-            <p v-if="loginSystem == 'andalucia' || 'madrid'"><p class="help">Puedes conseguir la información necesaria <a href="https://www.juntadeandalucia.es/educacion/vscripts/centros/index.asp" target="_blank">aquí</a> (Andalucia) o <a href="https://www.madrid.org/wpad_pub/run/j/MostrarConsultaGeneral.icm" target="_blank">aquí</a> (Madrid)</p></p>
+            <h2 class="title">School</h2>
             <label class="label">Name</label>
             <div class="control">
                 <input name="schoolinfo[name]" class="input" type="text">
@@ -146,10 +139,6 @@ Vue.component("server", {
                     <input name="frontends[]" class="input" type="text" required value="https://iberbookedu.onrender.com">
                 </div>
             </div>
-        </div>
-        <div class="field">
-            <h2 class="title">Email system</h2>
-            <p>TODO</p>
         </div>
         <div class="field is-grouped">
             <div class="control">

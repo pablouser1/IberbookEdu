@@ -23,10 +23,6 @@ class Login {
     public function loginUser($username, $password, $type) {
         $loginres = $this->api->login($username, $password, $type);
         if ($loginres["code"] === "C"){
-            $response = [
-                "code" => "",
-                "data" => []
-            ];
             // Get user info
             $this->userinfo = $this->api->getinfo();
             if ($this->userinfo) {
@@ -36,9 +32,13 @@ class Login {
                 else {
                     $this->userinfo["rank"] = "user";
                 }
-                $response["data"]["userinfo"] = $this->userinfo;
                 $this->auth->setUserToken($this->userinfo);
-                $response["code"] = "C";
+                $response = [
+                    "code" => "C",
+                    "data" => [
+                        "userinfo" => $this->userinfo
+                    ]
+                ];
             }
             else {
                 $response = [

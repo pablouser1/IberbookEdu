@@ -1,8 +1,8 @@
 <?php
 // Gets random banner, used in home page
-require_once("functions.php");
-require_once("headers.php");
-require_once("classes/yearbooks.php");
+require_once("../functions.php");
+require_once("../headers.php");
+require_once("../classes/yearbooks.php");
 
 $yearbooks = new Yearbooks;
 

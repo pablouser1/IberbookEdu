@@ -28,21 +28,30 @@ var users = {
     `
     <div class="columns is-centered is-multiline is-vcentered fade-in">
         <div v-for="user in users" class="column is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
-            <article class="media">
-                <div class="media-content">
-                    <p>
-                        <strong>{{user.fullname}}</strong>
-                        <figure @click="$root.videoWatching = user" class="image user-images">
-                            <img :src="'users/' + user.id + '/' + user.photo">
-                        </figure>
-                        <q v-if="user.quote" v-html="user.quote"></q>
-                        <br>
-                        <i><small>{{user.date}}</small></i>
-                    </p>
-                    <a v-if="user.link" :href="user.link">Link</a>
-                    <span v-if="user.type == 'teachers'" class="tag">{{user.subject}}</span>
+            <div class="card">
+                <div class="card-image">
+                    <figure @click="$root.videoWatching = user" class="image user-images">
+                        <img :src="'users/' + user.id + '/' + user.photo">
+                    </figure>
                 </div>
-            </article>
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-content has-text-centered">
+                            <p class="title is-4">{{ user.name }}</p>
+                            <p class="subtitle is-6" v-if="user.type === 'teachers'">{{ user.subject }}</p>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <p>
+                            <q v-if="user.quote" v-html="user.quote"></q>
+                        </p>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a @click="$root.videoWatching = user" class="card-footer-item">Video</a>
+                    <a v-if="user.link" :href="user.link" target="_blank" class="card-footer-item">Link</a>
+              </footer>
+            </div>
         </div>
     </div>
     `
@@ -118,24 +127,23 @@ var main = new Vue({
                     break;
                 default:
                     alert("No easter eggs in here")
-                    break;
             }
         }
     },
     created() {
-        if (!this.ybinfo.banner) {
-            document.getElementById("banner").classList.replace("has-bg-img", "is-primary")
-        }
-        else {
+        if (this.ybinfo.banner) {
             document.getElementById("banner").style.background = `url(assets/${this.ybinfo.banner})center center`
             document.getElementById("banner").style.backgroundSize = "cover"
+        }
+        else {
+            document.getElementById("banner").classList.replace("has-bg-img", "is-primary")
         }
         document.title = `Yearbook ${this.ybinfo.year}`
     },
     mounted() {
         document.onreadystatechange = () => {
             let splashscreen = document.getElementById("splashscreen")
-            splashscreen.classList.add("animate__animated", "scale-out-center")
+            splashscreen.classList.add("scale-out-center")
             splashscreen.addEventListener("animationend", () => {
                 this.splashscreen = false
             })

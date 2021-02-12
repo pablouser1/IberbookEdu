@@ -27,7 +27,7 @@ class GenYB {
         $this->gallery = new Gallery;
         $this->themesMng = new Themes;
         $this->profileinfo = $profileinfo;
-        $this->acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+        $this->acyear = Utils::getAcYear();
     }
 
     // Check if theme is valid
@@ -151,14 +151,7 @@ class GenYB {
         if($tmpFilePath != "") {
             $uploadName = $banner;
             $ext = pathinfo($uploadName, PATHINFO_EXTENSION);
-            if (!in_array($ext, ["jpg", "jpeg", "png", "gif"])) {
-                $response = [
-                    "code" => "E",
-                    "description" => L::yearbooks_banner
-                ];
-                Utils::sendJSON($response);
-            }
-            else {
+            if (in_array($ext, ["jpg", "jpeg", "png", "gif"])) {
                 move_uploaded_file($tmpFilePath, "$this->baseurl/assets/$banner");
             }
         }

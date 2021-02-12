@@ -11,7 +11,7 @@ $userinfo = $auth->isUserLoggedin();
 $profileinfo = $auth->isProfileLoggedin();
 if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
     // Get academic year (2020-2021 for example)
-    $acyear = date("Y",strtotime("-1 year"))."-".date("Y");
+    $acyear = Utils::getAcYear();
     // Get yearbook id
     $stmt = $db->prepare("SELECT id FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
     $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
@@ -21,11 +21,11 @@ if ($userinfo && $profileinfo && $auth->isUserAdmin($userinfo)) {
     $stmt->close();
 
     // Delete yearbook
-    $stmt = $db->prepare("DELETE FROM yearbooks WHERE schoolid=? and schoolyear=? and acyear=?");
+    $stmt = $db->prepare("DELETE FROM yearbooks WHERE schoolid=? AND schoolyear=? AND acyear=?");
     $stmt->bind_param("iss", $profileinfo["schoolid"], $profileinfo["year"], $acyear);
     $stmt->execute();
     $stmt->close();
-    Utils::recursiveRemove("/../../yearbooks/".$ybid);
+    Utils::recursiveRemove("../../yearbooks/".$ybid);
     $response = [
         "code" => "C"
     ];

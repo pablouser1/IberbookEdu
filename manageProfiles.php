@@ -15,27 +15,38 @@ if ($userinfo = $auth->isUserLoggedin()) {
                     // Get school and group index
                     $schoolindex = $_POST["schoolindex"];
                     $groupindex = $_POST["groupindex"];
-
+                    $school = false;
+                    $group = false;
                     // Get arrays
-                    $school = (array) $userinfo["schools"][$schoolindex];
-                    $group = (array) $school["groups"][$groupindex];
-
+                    if (isset($userinfo["schools"][$schoolindex])) {
+                        $school = (array) $userinfo["schools"][$schoolindex];
+                        if (isset($school["groups"][$groupindex])) {
+                            $group = (array) $school["groups"][$groupindex];
+                        }
+                    }
+                    
                     // If both exists, change profile
                     if ($school && $group) {
                         $profile = $profilesMng->changeProfile($userinfo["id"], $school, $group);
-                    }
-                    if ($profile) {
-                        $response = [
-                            "code" => "C",
-                            "data" => [
-                                "profileinfo" => $profile
-                            ]
-                        ];
+                        if ($profile) {
+                            $response = [
+                                "code" => "C",
+                                "data" => [
+                                    "profileinfo" => $profile
+                                ]
+                            ];
+                        }
+                        else {
+                            $response = [
+                                "code" => "E",
+                                "error" => "Unknown error while changing profile"
+                            ];
+                        }
                     }
                     else {
                         $response = [
                             "code" => "E",
-                            "error" => "Unknown error while changing profile"
+                            "error" => "Invalid data provided"
                         ];
                     }
                 }

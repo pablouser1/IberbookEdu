@@ -51,9 +51,33 @@ class ManageUsers {
         foreach ($csvfile as $user) {
             $users[] = [
                 "username" => $user[0],
-                "type" => $user[1],
                 "fullname" => $user[2],
+                "type" => $user[1],
                 "schools" => $user[3]
+            ];
+        }
+        return $users;
+    }
+
+    public function sanitizeInput($tempUsers) {
+        $users = [];
+        foreach ($tempUsers as $tempUser) {
+            $schools = [
+                [
+                    "id" => (int)$tempUser["schoolid"],
+                    "groups" => [
+                        [
+                            "name" => $tempUser["schoolyear"]
+                        ]
+                    ]
+                ]
+            ];
+            $schoolsString = json_encode($schools);
+            $users[] = [
+                "username" => $tempUser["username"],
+                "fullname" => $tempUser["fullname"],
+                "type" => $tempUser["type"],
+                "schools" => $schoolsString
             ];
         }
         return $users;
@@ -84,7 +108,7 @@ if (isset($_GET["action"])) {
         $users = $mngUsers->checkCSV($_FILES["csv"]);
     }
     elseif (isset($_POST["users"])) {
-        $users = $_POST["users"];
+        $users = $mngUsers->sanitizeInput($_POST["users"]);
     }
     else {
         $response = [

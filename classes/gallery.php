@@ -52,9 +52,6 @@ class Gallery {
                 header('Content-Type: ' . finfo_file($finfo, $filepath));
                 finfo_close($finfo);
                 header('Content-Disposition: inline; filename="'.basename($filepath).'"');
-                header('Expires: 0');
-                header('Cache-Control: must-revalidate');
-                header('Pragma: public');
                 header('Content-Length: ' . filesize($filepath));
                 readfile($filepath);
                 exit;

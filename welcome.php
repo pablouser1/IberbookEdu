@@ -18,5 +18,5 @@ $response = [
         "loggedin" => $loggedin
     ]
 ];
-sendJSON($response);
+Utils::sendJSON($response);
 ?>

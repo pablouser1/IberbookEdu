@@ -1,11 +1,11 @@
 <?php
-require_once("functions.php");
-require_once("headers.php");
+require_once("../functions.php");
+require_once("../headers.php");
 
-require_once("auth.php");
+require_once("../auth.php");
 
-require_once("lang/lang.php");
-require_once("classes/yearbooks.php");
+require_once("../lang/lang.php");
+require_once("../classes/yearbooks.php");
 
 $auth = new Auth;
 $yearbook = new Yearbooks;

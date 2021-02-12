@@ -32,6 +32,10 @@ class Utils {
         }
         rmdir($directory);
     }
+
+    static public function getAcYear() {
+        return date("Y",strtotime("-1 year"))."-".date("Y");
+    }
 }
 
 // DEPRECATED, TO BE REMOVED LATER

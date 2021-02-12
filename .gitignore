@@ -6,17 +6,21 @@ composer.phar
 .vscode
 
 # Default yearbook and upload dir
-/yearbooks
+/yearbooks/*
+!/yearbooks/getBanner.php
+!/yearbooks/getYearbooks.php
+
+# Upload dir
 /uploads
 
 # User generated info about instance
-/config/*
+/config
 
 # Lang cache
-/lang/cache/*
+/lang/cache
 
 # Ignore all custom themes, allow default, common and getThemes
-themes/*
-!themes/common
-!themes/default
-!themes/getThemes.php
+/themes/*
+!/themes/common
+!/themes/default
+!/themes/getThemes.php

@@ -1,6 +1,6 @@
 <?php
-if (!extension_loaded('mysqli') || !extension_loaded('zip') || !extension_loaded('curl')) {
-    die("This app needs the following plugins to work: php-mysqli, php-zip y php-curl");
+if (!extension_loaded('mysqli') || !extension_loaded('zip')) {
+    die("This app needs the following plugins to work: php-mysqli and php-zip");
 }
 
 // Default values
@@ -18,57 +18,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // DB connection info
     $db_file = '
-    <?php
-    $db_name = "'.$db_config["name"].'";
-    $db_host = "'.$db_config["host"].'";
-    $db_port = '.(int)$db_config["port"].';
-    $db_username = "'.$db_config["username"].'";
-    $db_password = "'.$db_config["password"].'";
-    ?>';
+<?php
+$db_name = "'.$db_config["name"].'";
+$db_host = "'.$db_config["host"].'";
+$db_port = '.(int)$db_config["port"].';
+$db_username = "'.$db_config["username"].'";
+$db_password = "'.$db_config["password"].'";
+?>';
+    mkdir("config", 0750, true);
     file_put_contents("config/dbconf.php", $db_file);
 
     // Config info
     switch ($global_config["login"]) { // Login system used
-        case "andalucia":
-            $login = "ced";
-            $base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/";
-            $ssloptions = 'array(
-                // The cafile is necessary only in Andalucia
-                CURLOPT_CAINFO => __DIR__."/cert/juntadeandalucia-es-chain.pem",
-                CURLOPT_SSL_VERIFYPEER => true
-            );';
-        break;
-        case "madrid":
-            $login = "ced";
-            $base_url = "https://raices.madrid.org/raiz_app/jsp/";
-            $ssloptions = '
-            array(
-                CURLOPT_SSL_VERIFYPEER => true
-            );';
-        break;
         case "local":
             $login = "local";
         break;
         default:
-        die("Has elegido un sistema de login incorrecto");
+        die("Incorrect login system");
     }
     // Frontends setup
-    $filtered_frontends = [];
-    foreach ($frontends as $frontend) {
+    $filtered_frontends = "";
+    $amountFrontends = count($frontends);
+    foreach ($frontends as $i => $frontend) {
         if (filter_var($frontend, FILTER_VALIDATE_URL)) {
-            array_push($filtered_frontends, $frontend);
+            $filtered_frontends .= "'{$frontend}'";
         }
     }
     $global_config_file =
 '<?php
 // General
 $login = "'.$login.'"; // Login system used
-$base_url = "'.$base_url.'"; // Remote server url
 $uploadpath = "'.$global_config["uploaddir"].'"; // Uploads dir
-$frontends = '.$filtered_frontends.';
+$frontends = ['.$filtered_frontends.'];
 $token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHARE <--
-// Api
-$ssloptions = '.$ssloptions.';
 ?>';
     // Add global config file
     file_put_contents("config/config.php", $global_config_file);
@@ -86,15 +68,6 @@ $ssloptions = '.$ssloptions.';
             fullname varchar(255) NOT NULL,
             schools TEXT NOT NULL,
             email varchar(255),
-            voted int,
-            primary key(id)
-            )";
-    }
-    elseif ($login == "ced") {
-        $sql = "CREATE TABLE users(
-            id varchar(9) NOT NULL,
-            `type` varchar(12) NOT NULL,
-            fullname varchar(255) NOT NULL,
             voted int,
             primary key(id)
             )";
@@ -164,7 +137,7 @@ $ssloptions = '.$ssloptions.';
 
     // Schools
     $sql = "CREATE TABLE `schools` (
-        `id` int NOT NULL UNIQUE,
+        `id` int NOT NULL AUTO_INCREMENT,
         `name` varchar(128) NOT NULL,
         primary key(id)
         )";
@@ -195,15 +168,15 @@ $ssloptions = '.$ssloptions.';
 
     // School info
     // First we need to get the school's name
-    $stmt = $db->prepare("INSERT INTO schools (id. `name`) VALUES (?, ?)");
-    $stmt->bind_param("is", $schoolinfo["id"], $schoolinfo["name"]);
+    $stmt = $db->prepare("INSERT INTO schools (`name`) VALUES (?)");
+    $stmt->bind_param("s", $schoolinfo["name"]);
     if ($stmt->execute() !== true) {
         die("Error writing school");
     }
     
     // Owner info
     $owner_password = password_hash($owner["password"], PASSWORD_DEFAULT);
-    $stmt = $db->prepare("INSERT INTO staff (username, password, permissions) VALUES (?, ?, 'owner')");
+    $stmt = $db->prepare("INSERT INTO staff (username, `password`, `permissions`) VALUES (?, ?, 'owner')");
     $stmt->bind_param("ss", $owner["username"], $owner_password);
     if ($stmt->execute() !== true) {
         die("Error writing owner");
@@ -215,7 +188,7 @@ $ssloptions = '.$ssloptions.';
         die("Error writing theme");
     }
 
-    mkdir($global_config["uploaddir"], 0755);
+    mkdir($global_config["uploaddir"], 0550);
     // Delete setup
     unlink("assets/scripts/setup.js");
     unlink("setup.php");

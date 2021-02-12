@@ -3,6 +3,7 @@ require_once("config/config.php");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Max-Age: 86400");
 
 if (isset($_SERVER['HTTP_ORIGIN'])) {
     $origin = $_SERVER['HTTP_ORIGIN'];
@@ -12,9 +13,8 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
     }
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
     exit;
-};
+}
 ?>

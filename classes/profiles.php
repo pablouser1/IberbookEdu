@@ -95,9 +95,6 @@ class Profiles {
             $start = 0; // Start byte
             $end = $size - 1; // End byte
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            //header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-            //header("Cache-Control: post-check=0, pre-check=0", false);
-            //header("Pragma: no-cache");
             header('Content-Type: ' . finfo_file($finfo, $filepath));
             finfo_close($finfo);
             header('Content-Disposition: inline; filename="'.basename($filepath).'"');

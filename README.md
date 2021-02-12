@@ -1,17 +1,9 @@
 # IberbookEdu Backend
-
 Official backend of IberbookEdu using PHP, for the official frontend click [here](https://github.com/pablouser1/IberbookEdu-frontend)
 
-Generate yearbooks easily using info from local database or the following educational platforms:
-
-* PASEN/SÉNECA (Andalucía, Spain)
-
-* ROBLE (Madrid, Spain) (Sin verificar su funcionamiento)
-
-Este programa funciona para 2º de Bachillerato, 4º ESO y 6º Primaria (FP planeado)
+Generate yearbooks easily using info from local database
 
 # Features
-
 * Multilanguage yearbook (english, spanish, french).
 * Works both in mobile phones and desktop.
 * Generates a ZIP ready to be downloaded by the users.
@@ -27,24 +19,23 @@ Este programa funciona para 2º de Bachillerato, 4º ESO y 6º Primaria (FP plan
 * Voting system
 
 # Installation
-
 You will need the following programs to make IberBookEdu work:
 * PHP5.5 (PHP7 recommended)
-* Extensions: php-mysqli, php-zip, php-curl
+* Extensions: php-mysqli, php-zip
 * Database server MySQL 5.7.8 or higher / MariaDB
 
 Once you finished installing everything and you had already copied the project to your server you can start the installation starting the script named "setup.php"
 
 # TODO
-
-* Agregar soporte para Formación Profesional (CED API)
-* Local API
-* Fix, better upload error handling
+* Rework setup
+* Add server name and description input to setup
+* Add chunked uploads to gallery items
+* (Owner) Remove users
+* (Owner) Better UI for adding users
 * Maintenance mode
 * Refresh token
 
 # Credits
-
 This project wouldn't be possible without the help of the following projects:
 
 ## PHP Libraries

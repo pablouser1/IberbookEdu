@@ -105,7 +105,7 @@ if ($userinfo && $profileinfo) {
             else {
                 $response = [
                     "code" => "E",
-                    "error" => "Not valid"
+                    "error" => L::vote_notValid
                 ];
             }
         }
