@@ -68,43 +68,48 @@ class Auth {
             }
         }
         catch (\Firebase\JWT\SignatureInvalidException $th) {
-            return null;
+            return false;
         }
     }
 
-    // Set JWT token
+    // -- SET JWT TOKENS -- //
     public function setUserToken($userinfo) {
-        $key = $GLOBALS["token_secret"];
-        $issuedAt = time();
-        $payload = array(
-            "iss" => $_SERVER["HTTP_HOST"],
-            "iat" => $issuedAt,
-            "data" => [
-                "userinfo" => $userinfo
-            ]
-        );
-        $jwt = JWT::encode($payload, $key);
+        $data = [
+            "userinfo" => $userinfo
+        ];
 
-        setcookie("user", $jwt, [
-            'expires' => time()+86400,
-            'httponly' => true,
-            'secure' => true
-        ]);
+        $token = $this->setToken($data);
+
+        $this->setCookie("user", $token);
     }
     
     public function setProfileToken($profileinfo) {
+        $data = [
+            "profileinfo" => $profileinfo
+        ];
+
+        $token = $this->setToken($data);
+
+        $this->setCookie("profile", $token);
+    }
+
+    // -- Helpers -- //
+    private function setToken($data) {
         $key = $GLOBALS["token_secret"];
         $issuedAt = time();
         $payload = array(
             "iss" => $_SERVER["HTTP_HOST"],
             "iat" => $issuedAt,
-            "data" => [
-                "profileinfo" => $profileinfo
-            ]
+            "exp" => $issuedAt+86400,
+            "nbf" => $issuedAt-5,
+            "data" => $data
         );
         $jwt = JWT::encode($payload, $key);
+        return $jwt;
+    }
 
-        setcookie("profile", $jwt, [
+    private function setCookie($name, $token) {
+        setcookie($name, $token, [
             'expires' => time()+86400,
             'httponly' => true,
             'secure' => true

@@ -22,8 +22,8 @@ class ManageUsers {
         foreach ($users as $user) {
             $password = $this->random_password(10);
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $this->db->prepare("INSERT INTO users (username, `password`, `type`, fullname, schools) VALUES(?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssss", $user["username"], $hashedPassword, $user["type"], $user["fullname"], $user["schools"]);
+            $stmt = $this->db->prepare("INSERT INTO users (username, `password`, `type`, `name`, surname, schools) VALUES(?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $user["username"], $hashedPassword, $user["type"], $user["name"], $user["surname"], $user["schools"]);
             if ($stmt->execute()) {
                 $user["password"] = $password;
                 array_push($generatedUsers, $user);
@@ -37,12 +37,16 @@ class ManageUsers {
         $errors = [];
         foreach ($users as $user) {
             $stmt = $this->db->prepare("DELETE FROM users WHERE id=?");
-            $stmt->bind_param("i", $user["id"]);
+            $stmt->bind_param("i", $user);
             if (!$stmt->execute()) {
-                array_push($errors, $user["id"]);
+                array_push($errors, $user);
             }
             $stmt->close();
         }
+        if (empty($errors)) {
+            return true;
+        }
+        return false;
     }
 
     public function checkCSV($csvPOST) {
@@ -51,9 +55,10 @@ class ManageUsers {
         foreach ($csvfile as $user) {
             $users[] = [
                 "username" => $user[0],
-                "fullname" => $user[2],
-                "type" => $user[1],
-                "schools" => $user[3]
+                "name" => $user[1],
+                "surname" => $user[2],
+                "type" => $user[3],
+                "schools" => $user[4]
             ];
         }
         return $users;
@@ -75,7 +80,8 @@ class ManageUsers {
             $schoolsString = json_encode($schools);
             $users[] = [
                 "username" => $tempUser["username"],
-                "fullname" => $tempUser["fullname"],
+                "name" => $tempUser["name"],
+                "surname" => $tempUser["surname"],
                 "type" => $tempUser["type"],
                 "schools" => $schoolsString
             ];
@@ -108,7 +114,12 @@ if (isset($_GET["action"])) {
         $users = $mngUsers->checkCSV($_FILES["csv"]);
     }
     elseif (isset($_POST["users"])) {
-        $users = $mngUsers->sanitizeInput($_POST["users"]);
+        if ($_GET["action"] === "add") {
+            $users = $mngUsers->sanitizeInput($_POST["users"]);
+        }
+        else {
+            $users = $_POST["users"];
+        }
     }
     else {
         $response = [

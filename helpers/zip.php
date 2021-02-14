@@ -46,16 +46,5 @@ class Zip
     self::folderToZip($sourcePath, $z, strlen("$sourcePath"));
     $z->close();
   }
-
-  public static function unZip($file) {
-    $zip = new ZipArchive;
-    $res = $zip->open($file);
-    if ($res) {
-      // TODO
-    }
-    else {
-      // TODO
-    }
-  }
 }
 ?>

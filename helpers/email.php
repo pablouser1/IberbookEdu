@@ -51,7 +51,7 @@ class Email {
         $stmt->close();
 
         foreach ($users as $user) {
-            $stmt = $this->db->prepare("SELECT fullname, email FROM users WHERE id=?");
+            $stmt = $this->db->prepare("SELECT CONCAT(`name` , ' ' , surname) AS fullname, email FROM users WHERE id=?");
             $stmt->bind_param("i", $user["userid"]);
             $stmt->execute();
             $result = $stmt->get_result();

@@ -9,7 +9,7 @@ class Staff {
     public function getStaff() {
         $staff = [];
         // Get all staff members
-        $sql = "SELECT id, username, permissions FROM staff";
+        $sql = "SELECT id, username, `permissions` FROM staff";
         $result = $this->db->query($sql);
         while ($row = mysqli_fetch_assoc($result)) {
             $staff[] = [

@@ -5,6 +5,7 @@ class Schools {
     function __construct() {
         $this->db = new DB;
     }
+    
     public function getSchools() {
         $schools = [];
         // Get all schools
@@ -14,15 +15,6 @@ class Schools {
             $schools[] = $row;
         }
         return $schools;
-    }
-
-    public function isAllowed($schoolid) {
-        $sql = "SELECT `id` FROM `schools` WHERE id=$schoolid";
-        $result = $this->db->query($sql);
-        if ($result && $result->num_rows === 1) {
-            return true;
-        }
-        return false;
     }
 }
 ?>

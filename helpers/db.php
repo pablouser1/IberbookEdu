@@ -34,5 +34,4 @@ class DB {
     return $this->conn->prepare($sql);
   }
 }
-
 ?>

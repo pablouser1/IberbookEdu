@@ -28,14 +28,6 @@ $db_password = "'.$db_config["password"].'";
     mkdir("config", 0750, true);
     file_put_contents("config/dbconf.php", $db_file);
 
-    // Config info
-    switch ($global_config["login"]) { // Login system used
-        case "local":
-            $login = "local";
-        break;
-        default:
-        die("Incorrect login system");
-    }
     // Frontends setup
     $filtered_frontends = "";
     $amountFrontends = count($frontends);
@@ -47,10 +39,13 @@ $db_password = "'.$db_config["password"].'";
     $global_config_file =
 '<?php
 // General
-$login = "'.$login.'"; // Login system used
 $uploadpath = "'.$global_config["uploaddir"].'"; // Uploads dir
 $frontends = ['.$filtered_frontends.'];
-$token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHARE <--
+$token_secret = "'.bin2hex(openssl_random_pseudo_bytes(32)).'"; // SECRET KEY, --> DO NOT SHARE <--
+// Email
+$email = [
+    "enabled" => false
+];
 ?>';
     // Add global config file
     file_put_contents("config/config.php", $global_config_file);
@@ -59,19 +54,18 @@ $token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHA
     $db = new DB;
     // Creating tables
     // Users
-    if ($login == "local") {
-        $sql = "CREATE TABLE users(
-            id INT NOT NULL AUTO_INCREMENT,
-            username varchar(24) NOT NULL,
-            `password` varchar(255) NOT NULL,
-            `type` varchar(12) NOT NULL,
-            fullname varchar(255) NOT NULL,
-            schools TEXT NOT NULL,
-            email varchar(255),
-            voted int,
-            primary key(id)
-            )";
-    }
+    $sql = "CREATE TABLE users(
+        id INT NOT NULL AUTO_INCREMENT,
+        username varchar(24) NOT NULL,
+        `password` varchar(255) NOT NULL,
+        `type` varchar(12) NOT NULL,
+        `name` varchar(64) NOT NULL,
+        `surname` VARCHAR(64) NOT NULL,
+        schools TEXT NOT NULL,
+        email varchar(255),
+        voted int,
+        primary key(id)
+        )";
     if ($db->query($sql) !== TRUE) {
         die("Error creating users");
     }
@@ -164,6 +158,18 @@ $token_secret = "'.md5(uniqid(rand(), true)).'"; // TOKEN SECRET, --> DO NOT SHA
     if ($db->query($sql) !== TRUE) {
         die("Error creating themes");
     }
+
+    // Messages
+    $sql = "CREATE TABLE `messages` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `from` INT NOT NULL,
+        `to` INT NOT NULL,
+        `content` TEXT NOT NULL,
+        `read` TINYINT(1) NOT NULL DEFAULT '0',
+        `sent` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY(id)
+        )";
+    
     // Writes data to DB
 
     // School info

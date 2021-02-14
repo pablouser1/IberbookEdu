@@ -60,9 +60,10 @@
                     <div class="box has-text-centered">
                         <p class="title has-text-black">
                             <i class="fas fa-graduation-cap"></i>
-                            <span>{{ lang.banner.title }} {{ ybinfo.year }}</span>
+                            <span>{{ lang.banner.title }}</span>
+                            <span>{{ ybinfo.year }}</span>
                         </p>
-                        <h2 class="subtitle has-text-black">{{ ybinfo.acyear }}</h2>
+                        <h2 class="subtitle has-text-black">{{ ybinfo.acyear }} - {{ ybinfo.schoolname }}</h2>
                         <h2 v-if="longtimeago" class="subtitle has-text-black">{{ lang.misc.longtime }}</h2>
                         <button id="enterButton" v-on:click="enterYearbook" type="button" class="button is-primary">Start</button>
                     </div>
@@ -72,11 +73,11 @@
         <!-- Navigation tabs -->
         <nav id="navbar" v-if="ready" class="navbar is-success" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
-                <a target="_blank" class="navbar-item">
+                <a v-on:click="showNav = false" href="#yearbook" class="navbar-item">
                     <span class="icon">
-                        <i class="fas fa-school"></i>
+                        <i class="fas fa-book-open"></i>
                     </span>
-                    <span>{{ ybinfo.schoolname }}</span>
+                    <span>Yearbook</span>
                 </a>
                 <a class="navbar-burger" :class="{ 'is-active': showNav }" @click="showNav = !showNav" role="button"
                     aria-label="menu" aria-expanded="false">
@@ -87,12 +88,6 @@
             </div>
             <div class="navbar-menu" :class="{ 'is-active': showNav }">
                 <div class="navbar-start">
-                    <a v-on:click="showNav = false" href="#yearbook" class="navbar-item">
-                        <span class="icon">
-                            <i class="fas fa-book-open"></i>
-                        </span>
-                        <span>Yearbook</span>
-                    </a>
                     <a v-on:click="showNav = false" href="#gallery" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-photo-video"></i>

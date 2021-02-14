@@ -97,26 +97,11 @@ Vue.component("server", {
             type: Object
         }
     },
-    data() {
-        return {
-            loginSystem: "local"
-        }
-    },
     template:
     `
     <div class="section">
         <h1 class="title">Server details</h1>
         <h2 class="title">Options</h2>
-        <div class="field">
-            <label class="label">Choose your login system</label>
-            <div class="control">
-                <div class="select">
-                    <select v-model="loginSystem" name="global[login]">
-                        <option value="local">Local Database</option>
-                    </select>
-                </div>
-            </div>
-        </div>
         <div class="field">
             <label class="label">Uploads directory</label>
             <div class="control">

@@ -29,9 +29,15 @@ function appendAddUserCard() {
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Full name</label>
+                    <label class="label">Name</label>
                     <div class="control">
-                        <input name="users[${user_i}][fullname]" class="input" type="text" required autocomplete="off">
+                        <input name="users[${user_i}][name]" class="input" type="text" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Surname</label>
+                    <div class="control">
+                        <input name="users[${user_i}][surname]" class="input" type="text" required autocomplete="off">
                     </div>
                 </div>
                 <div class="field">

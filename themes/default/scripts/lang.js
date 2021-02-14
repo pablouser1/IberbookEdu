@@ -65,7 +65,7 @@ const translations = {
             attribution: `Este proyecto no sería posible sin la ayuda de los siguientes proyectos
             distribuidos bajo <a href="licenses/externalProjects.html" target="_blank">las siguientes licencias</a>:<br>
             ${translate_common.external}`,
-            credits: `Este yearbook fue generado usando
+            credits: `Esta orla fue generada usando
             <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
             distribuido bajo la <a href="licenses/IberbookEdu.html" target="_blank">licencia AGPLv3</a>`
         },

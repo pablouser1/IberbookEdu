@@ -106,9 +106,16 @@ $schools = $schoolsClass->getSchools();
         </section>
     </section>
     <section id="remove" class="section is-hidden tab">
-        <form>
-            <div id="remove_columns"></div>
-            <button type="submit" class="button is-dangeer">Delete</button>
+        <form id="remove_form">
+            <div class="field">
+                <label class="label">Select users</label>
+                <div class="control">
+                    <div id="select_container" class="select is-multiple">
+                        <select id="remove_select" name="users[]" multiple></select>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="button is-danger">Delete</button>
         </form>
     </section>
     <footer class="footer">
@@ -142,7 +149,7 @@ $schools = $schoolsClass->getSchools();
         </nav>
     </footer>
     <script src="../../assets/scripts/owner/users/addUsers.js"></script>
-    <!-- <script src="../../assets/scripts/owner/users/removeUsers.js"></script> -->
+    <script src="../../assets/scripts/owner/users/removeUsers.js"></script>
     <script src="../../assets/scripts/owner/users/users.js"></script>
 </body>
 
