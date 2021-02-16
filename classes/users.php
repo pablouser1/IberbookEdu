@@ -14,7 +14,7 @@ class Users {
      */
     public function getUser($userid) {
         $stmt = $this->db->prepare("SELECT id, `type`, CONCAT(`name` , ' ' , surname) AS fullname
-                                    FROM users WHERE id=? LIMIT 1");
+                                    FROM users WHERE id=?");
 
         $stmt->bind_param("i", $userid);
         $stmt->execute();
@@ -31,7 +31,7 @@ class Users {
 
     public function getName($userid) {
         $stmt = $this->db->prepare("SELECT CONCAT(`name` , ' ' , surname) AS fullname
-                                    FROM users WHERE id=? LIMIT 1");
+                                    FROM users WHERE id=?");
 
         $stmt->bind_param("i", $userid);
         $stmt->execute();
@@ -53,6 +53,48 @@ class Users {
             ];
         }
         return $users;
+    }
+
+    // -- Accounts auth -- //
+    public function checkPassword($id, $password) {
+        $stmt = $this->db->prepare("SELECT `password` FROM users WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($dbPassword);
+            $stmt->fetch();
+            if (password_verify($password, $dbPassword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check if password has some requierements
+    public function isPasswordValid($password) {
+        $uppercase = preg_match('@[A-Z]@', $password);
+        $lowercase = preg_match('@[a-z]@', $password);
+        $number = preg_match('@[0-9]@', $password);
+        $specialChars = preg_match('@[^\w]@', $password);
+        if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+            return false;
+        }
+        return true;
+    }
+
+    public function changePassword($id, $oldPassword, $newPassword) {
+        if ($this->isPasswordValid($newPassword)) {
+            if ($this->checkPassword($id, $oldPassword)) {
+                $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+                $stmt = $this->db->prepare("UPDATE users SET password=? WHERE id=?");
+                $stmt->bind_param("si", $hashedPassword, $id);
+                if ($stmt->execute()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 ?>
