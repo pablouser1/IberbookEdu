@@ -33,7 +33,7 @@ $db_password = "'.$db_config["password"].'";
     $amountFrontends = count($frontends);
     foreach ($frontends as $i => $frontend) {
         if (filter_var($frontend, FILTER_VALIDATE_URL)) {
-            $filtered_frontends .= "'{$frontend}'";
+            $filtered_frontends .= "'{$frontend}',";
         }
     }
     $global_config_file =
@@ -94,7 +94,6 @@ $email = [
         name varchar(255) not null,
         schoolid varchar(10) not null,
         schoolyear varchar(10) not null,
-        description varchar(255),
         type varchar(8) not null,
         primary key(id)
         )";
@@ -106,11 +105,12 @@ $email = [
     $sql = "CREATE TABLE `yearbooks` (
         `id` int NOT NULL AUTO_INCREMENT,
         `schoolid` varchar(32) NOT NULL,
+        `schoolname` VARCHAR(128) NOT NULL,
         `schoolyear` varchar(32) NOT NULL,
         `generated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `acyear` varchar(16) NOT NULL,
         `banner` varchar(30),
-        `voted` int DEFAULT '0',
+        `votes` int DEFAULT '0',
         primary key(id)
         )";
     if ($db->query($sql) !== TRUE) {
@@ -165,7 +165,6 @@ $email = [
         `from` INT NOT NULL,
         `to` INT NOT NULL,
         `content` TEXT NOT NULL,
-        `read` TINYINT(1) NOT NULL DEFAULT '0',
         `sent` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY(id)
         )";

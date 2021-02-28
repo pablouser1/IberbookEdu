@@ -4,15 +4,9 @@ if (!isset($_SESSION["owner"])){
     header("Location: ../login.php");
     exit;
 }
-require_once("../../config/config.php");
 require_once("../../classes/groups.php");
 require_once("../../classes/users.php");
 require_once("../../classes/schools.php");
-
-if ($login !== "local") {
-    echo("This page is only available for local DB api");
-    exit;
-}
 
 $groupsClass = new Groups;
 $usersClass = new Users;

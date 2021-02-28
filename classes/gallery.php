@@ -9,7 +9,7 @@ class Gallery {
 
     public function getItems($schoolid, $year) {
         $gallery = [];
-        $stmt = $this->db->prepare("SELECT id, name, description, type FROM gallery where schoolid=? and schoolyear=?");
+        $stmt = $this->db->prepare("SELECT id, name, type FROM gallery where schoolid=? and schoolyear=?");
         $stmt->bind_param("is", $schoolid, $year);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -17,7 +17,6 @@ class Gallery {
             $gallery[] = [
                 "id" => $row["id"],
                 "name" => $row["name"],
-                "description" => $row["description"],
                 "type" => $row["type"]
             ];
         }
@@ -26,7 +25,8 @@ class Gallery {
     }
 
     public function getItem($id, $schoolid, $year) {
-        $stmt = $this->db->prepare("SELECT id, `name` FROM gallery WHERE id=? AND schoolid=? AND schoolyear=? LIMIT 1");
+        // We check for schoolid and schoolyear so the user can't get info from other group's gallery
+        $stmt = $this->db->prepare("SELECT id, `name` FROM gallery WHERE id=? AND schoolid=? AND schoolyear=?");
         $stmt->bind_param("iis", $id, $schoolid, $year);
         $stmt->execute();
         $stmt->store_result();

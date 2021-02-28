@@ -78,6 +78,9 @@ $users = $usersClass->getAllUsers();
                     <ul class="menu-list">
                         <li><a :class="{'is-active': tab === 'themes'}" @click="changeTab('themes')">Themes</a></li>
                     </ul>
+                    <ul class="menu-list">
+                        <li><a :class="{'is-active': tab === 'clear'}" @click="changeTab('clear')">Clear</a></li>
+                    </ul>
                 </aside>
             </div>
             <div class="column is-9">
@@ -86,6 +89,8 @@ $users = $usersClass->getAllUsers();
                     <mainmenu v-if="tab === 'mainmenu'" :staff="staff" :schools="schools" :groups="groups" :users="users"></mainmenu>
                     <!-- Themes -->
                     <themes v-if="tab === 'themes'" v-bind:themes="themes"></themes>
+                    <!-- Clear -->
+                    <clear v-if="tab === 'clear'"></clear>
                 </section>
             </div>
         </div>
@@ -93,6 +98,7 @@ $users = $usersClass->getAllUsers();
     <script src="../../assets/scripts/owner/dashboard/modals.js"></script>
     <script src="../../assets/scripts/owner/dashboard/mainmenu.js"></script>
     <script src="../../assets/scripts/owner/dashboard/themes.js"></script>
+    <script src="../../assets/scripts/owner/dashboard/clear.js"></script>
     <script src="../../assets/scripts/owner/dashboard/dashboard.js"></script>
 </body>
 

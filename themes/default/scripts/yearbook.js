@@ -57,36 +57,6 @@ var users = {
     `
 }
 
-// Gallery
-var gallery = {
-    props: {
-        "gallery": {
-            type: Array,
-            required: false
-        }
-    },
-    template: 
-    `
-    <div class="columns is-centered is-multiline is-vcentered fade-in">
-        <div v-for="(item) in gallery" class='column is-one-third-tablet is-one-third-desktop is-one-quarter-widescreen is-one-fifth-fullhd'>
-            <article class="media">
-                <div class="media-content">
-                    <a v-if="item.type == 'picture'" :href="item.path" target="_blank">
-                        <figure class="image">
-                            <img :src="'gallery/' + item.name">
-                        </figure>
-                    </a>
-                    <video v-else preload="metadata" controls>
-                        <source :src="'gallery/' + item.name"></source>
-                    </video>
-                    <p>{{ item.description }}</p>
-                </div>
-            </article>
-        </div>
-    </div>
-    `
-}
-
 // Vue root
 var main = new Vue({
     el: '#main',
