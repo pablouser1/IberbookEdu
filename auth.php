@@ -10,7 +10,7 @@ class Auth {
     }
 
     public function isUserAdmin($userinfo) {
-        if ($userinfo["rank"] == "admin") {
+        if ($userinfo["rank"] === "admin") {
             return true;
         }
         else {

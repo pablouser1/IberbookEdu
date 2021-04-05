@@ -134,3 +134,7 @@ https://codepen.io/leonidboykov/pen/Edvvpm */
 .user-images:hover {
     transform: scale(1.25);
 }
+
+#videoStories {
+    height: 100%;
+}

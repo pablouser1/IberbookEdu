@@ -22,7 +22,7 @@ require_once("lang/lang.php");
             <?php echo($server["description"]); ?>
           </h2>
           <p><?php echo L::index_explanation; ?></p>
-          <a class="button is-info" href="https://iberbookedu.onrender.com"><?php echo L::index_moreinfo ?></a>
+          <a class="button is-info" href="https://github.com/pablouser1/Iberbookedu-backend"><?php echo L::index_moreinfo ?></a>
         </div>
       </div>
     </section>

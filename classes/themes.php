@@ -17,8 +17,8 @@ class Themes {
                     "id" => (int) $row["id"],
                     "name" => $row["name"],
                     "description" => $themeDetails["description"],
-                    "zip" => (boolean) $themeDetails["zip"],
-                    "banner" => (boolean) $themeDetails["banner"]
+                    "zip" => $themeDetails["zip"],
+                    "banner" => $themeDetails["banner"]
                 ];
             }
             return $themes;
@@ -40,8 +40,8 @@ class Themes {
                 "id" => (int) $row["id"],
                 "name" => $row["name"],
                 "description" => $themeDetails["description"],
-                "zip" => (boolean) $themeDetails["zip"],
-                "banner" => (boolean) $themeDetails["banner"]
+                "zip" => $themeDetails["zip"],
+                "banner" => $themeDetails["banner"]
             ];
             return $theme;
         }

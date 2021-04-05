@@ -89,20 +89,25 @@ class UploadMedia {
         }
       }
     }
+    $stmt->close();
     return $remain;
   }
 
   private function deleteMedia($element) {
+    // Get file name
     $stmt = $this->db->prepare("SELECT $element from profiles where id=?");
     $stmt->bind_param("i", $this->profileinfo["id"]);
     $stmt->execute();
     $stmt->bind_result($name);
     $stmt->fetch();
-
     $stmt->close();
+
+    // Remove file from database
     $stmt = $this->db->prepare("UPDATE profiles SET $element = NULL WHERE id=?");
     $stmt->bind_param("i", $this->profileinfo["id"]);
     $stmt->execute();
+    $stmt->close();
+
     // Delete from file system
     unlink($this->baseurl.$name);
   }
