@@ -1,0 +1,6 @@
+{
+    "name": "default",
+    "description": "IberbookEdu's default template",
+    "zip": false,
+    "banner" : true
+}

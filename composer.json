@@ -1,7 +1,14 @@
 {
+    "name": "IberbookEdu",
+    "description": "Create your yearbooks easily",
+    "license": "AGPLv3",
     "require": {
-        "phpmailer/phpmailer": "^6.1",
-        "firebase/php-jwt": "^5.2",
-        "philipp15b/php-i18n": "^4.0"
+        "doctrine/dbal": "^2.9",
+        "leafs/leaf": "^2.4",
+        "vlucas/phpdotenv": "^3.6"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": false
     }
 }

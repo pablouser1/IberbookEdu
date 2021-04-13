@@ -1,30 +1,86 @@
 <?php
-require_once("config/config.php");
-require_once("lang/lang.php");
-?>
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader
+| for our application. We just need to utilize it! We'll require it
+| into the script here so that we do not have to worry about the
+| loading of any our classes "manually". Feels great to relax.
+|
+*/
+require_once __DIR__ . '/vendor/autoload.php';
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo L::index_instance ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-  </head>
-  <body>
-    <section class="hero is-fullheight">
-      <div class="hero-body">
-        <div class="container">
-          <h1 class="title">
-          <?php echo( L::index_title . " " . $server["name"] ); ?>
-          </h1>
-          <h2 class="subtitle">
-            <?php echo($server["description"]); ?>
-          </h2>
-          <p><?php echo L::index_explanation; ?></p>
-          <a class="button is-info" href="https://github.com/pablouser1/Iberbookedu-backend"><?php echo L::index_moreinfo ?></a>
-        </div>
-      </div>
-    </section>
-  </body>
-</html>
+/*
+|--------------------------------------------------------------------------
+| Bring in (env)
+|--------------------------------------------------------------------------
+|
+| Quickly use our environment variables
+|
+*/
+\Dotenv\Dotenv::create(__DIR__)->load();
+
+/*
+|--------------------------------------------------------------------------
+| Register The Leaf Auto Loader
+|--------------------------------------------------------------------------
+|
+| Require all Leaf API's Files
+|
+*/
+require __DIR__. "/Config/bootstrap.php";
+
+/*
+|--------------------------------------------------------------------------
+| Initialise Leaf Core
+|--------------------------------------------------------------------------
+|
+| Plant a seed, grow the stem and return Leaf🤷‍
+|
+*/
+$app = new Leaf\App;
+
+/*
+|--------------------------------------------------------------------------
+| Error Configuration
+|--------------------------------------------------------------------------
+|
+| Show or hide errors  for easy debugging
+| You might want to set this to false for production
+|
+*/
+Config\App::error_debug(true);
+
+/*
+|--------------------------------------------------------------------------
+| Initialise Shortcut Functions
+|--------------------------------------------------------------------------
+|
+| Simple functions you can call from anywhere in your application.
+| This is not a core feature, you can remove it and your app would still
+| work fine.
+|
+*/
+require __DIR__ . "/Config/functions.php";
+
+/*
+|--------------------------------------------------------------------------
+| Route Config
+|--------------------------------------------------------------------------
+|
+| Require app routes.
+|
+*/
+require __DIR__. "/App/Routes/main.php";
+
+/*
+|--------------------------------------------------------------------------
+| Run Leaf Application
+|--------------------------------------------------------------------------
+|
+| Require app routes
+|
+*/
+$app->run();

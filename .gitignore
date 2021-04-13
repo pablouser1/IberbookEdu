@@ -1,26 +1,9 @@
-# Composer
-composer.phar
-/vendor/
-
-# IDE
+vendor
+.env
+node_modules
+build
+dist
+compiled
+.idea
 .vscode
-
-# Default yearbook and upload dir
-/yearbooks/*
-!/yearbooks/getBanner.php
-!/yearbooks/getYearbooks.php
-
-# Upload dir
-/uploads
-
-# User generated info about instance
-/config
-
-# Lang cache
-/lang/cache
-
-# Ignore all custom themes, allow default, common and getThemes
-/themes/*
-!/themes/common
-!/themes/default
-!/themes/getThemes.php
+.setupDone
