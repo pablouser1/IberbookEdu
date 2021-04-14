@@ -21,7 +21,7 @@ class UserController extends \Leaf\ApiController
             $user = User::findOrFail($id);
             response($user);
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             throwErr("User not found", 404);
         }
     }
@@ -49,6 +49,7 @@ class UserController extends \Leaf\ApiController
                 $newUser->username = $user["username"];
                 $newUser->password = $hashed_password;
                 $newUser->type = $user["type"];
+                $newUser->role = $user["role"];
                 $newUser->name = $user["name"];
                 $newUser->surname = $user["surname"];
                 $newUser->save();

@@ -41,7 +41,7 @@ class Auth {
             self::setToken($data, "iberbookedu_profile", time()+86400);
             return $profile;
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             return false;
         }
     }
@@ -116,7 +116,7 @@ class Auth {
                     $user = User::findOrFail($userid);
                     return $user;
                 }
-                catch (ModelNotFoundException) {
+                catch (ModelNotFoundException $e) {
                     return false;
                 }
             }
@@ -126,7 +126,7 @@ class Auth {
                     $profile = Profile::findOrFail($profileid);
                     return $profile;
                 }
-                catch (ModelNotFoundException) {
+                catch (ModelNotFoundException $e) {
                     return false;
                 }
             }

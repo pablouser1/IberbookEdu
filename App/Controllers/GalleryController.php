@@ -82,7 +82,7 @@ class GalleryController extends \Leaf\ApiController
             $streamer = new Streamer($path);
             $streamer->start();
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             throwErr("Not found", 404);
         }
     }

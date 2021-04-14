@@ -22,7 +22,7 @@ class ProfileController extends \Leaf\ApiController
             $profile = Profile::findOrFail($id);
             response($profile);
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             throwErr("Profile not found", 404);
         }
         $profile = Profile::findOrFail($id);

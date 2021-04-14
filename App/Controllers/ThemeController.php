@@ -17,7 +17,7 @@ class ThemeController extends \Leaf\ApiController
             $theme = Theme::findOrFail($id);
             response($theme);
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             throwErr("Theme not found", 404);
         }
     }

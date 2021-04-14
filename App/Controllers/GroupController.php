@@ -19,7 +19,7 @@ class GroupController extends \Leaf\ApiController
             $group = Group::findOrFail($id);
             response($group);
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             throwErr("Group not found", 404);
         }
     }

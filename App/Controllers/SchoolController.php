@@ -18,7 +18,7 @@ class SchoolController extends \Leaf\ApiController
             $group = School::findOrFail($id);
             response($group);
         }
-        catch (ModelNotFoundException) {
+        catch (ModelNotFoundException $e) {
             throwErr("School not found", 404);
         }
     }

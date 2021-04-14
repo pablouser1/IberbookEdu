@@ -74,6 +74,17 @@ function addUserCard() {
                         </div>
                     </div>
                 </div>
+                <div class="field">
+                    <label class="label">Role</label>
+                    <div class="control">
+                        <div class="select">
+                            <select name="users[${user_i}][role]" requiered>
+                                <option value="user">User</option>
+                                <option value="mod">Moderator</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -102,9 +113,7 @@ document.getElementById("add_form").addEventListener("submit", async (event) => 
             method: 'POST',
             body : formData
         })
-        console.log(res)
         const res_json = await res.json()
-        console.log(res_json)
         generateTXT(res_json)
     }
     catch (badRes) {
@@ -122,9 +131,7 @@ document.getElementById("jsonsend").addEventListener("click", async (event) => {
             method: 'POST',
             body : formData
         })
-        console.log(res)
         const res_json = await res.json()
-        console.log(res_json)
         generateTXT(res_json)
     }
     catch (badRes) {

@@ -119,7 +119,7 @@ class YearbookController extends \Leaf\ApiController
         try {
             $yearbook = Yearbook::findOrFail($id);
         }
-        catch(ModelNotFoundException) {
+        catch(ModelNotFoundException $e) {
             throwErr("Yearbook not found", 404);
         }
         // If already voted, replace with new one
