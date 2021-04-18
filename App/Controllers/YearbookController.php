@@ -35,7 +35,7 @@ class YearbookController extends \Leaf\ApiController
             response($yearbook);
         }
         else {
-            throwErr("No yearbooks available", 404);
+            json($yearbook, 204);
         }
     }
 
