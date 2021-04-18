@@ -6,26 +6,9 @@ use App\Helpers\Auth;
 use App\Helpers\Misc;
 use App\Models\Profile;
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends \Leaf\ApiController
 {
-	public function all()
-	{
-        $users = User::all();
-        response($users);
-	}
-
-    public function one($id) {
-        try {
-            $user = User::findOrFail($id);
-            response($user);
-        }
-        catch (ModelNotFoundException $e) {
-            throwErr("User not found", 404);
-        }
-    }
-
     public function me() {
         $user = Auth::isUserLoggedin();
         response ($user);
@@ -44,9 +27,11 @@ class UserController extends \Leaf\ApiController
             $response = [];
             foreach ($users as $user) {
                 $newUser = new User;
-                $password = Misc::random_password(12);
+                $birthday = date("Y-m-d", strtotime($user["birthday"]));
+                $username = Misc::generate_username($user["name"], $user["surname"], $birthday);
+                $password = Misc::generate_password($user["surname"], $birthday);
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $newUser->username = $user["username"];
+                $newUser->username = $username;
                 $newUser->password = $hashed_password;
                 $newUser->type = $user["type"];
                 $newUser->role = $user["role"];
@@ -56,11 +41,11 @@ class UserController extends \Leaf\ApiController
                 foreach ($user["groups"] as $group) {
                     $newProfile = new Profile;
                     $newProfile->user_id = $newUser->id;
-                    $newProfile->group_id = $group;
+                    $newProfile->group_id = (int) $group;
                     $newProfile->save();
                 }
                 $response[] = [
-                    "username" => $user["username"],
+                    "username" => $username,
                     "password" => $password,
                     "fullname" => $newUser->fullname
                 ];

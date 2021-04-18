@@ -9,8 +9,7 @@ use App\Models\Yearbook;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class YearbookController extends \Leaf\ApiController
 {
-	public function all()
-	{
+	public function all() {
         $data = requestData(["sort", "count"]);
         if (!isset($data["sort"])) {
             $data["sort"] = "votes";
@@ -125,20 +124,17 @@ class YearbookController extends \Leaf\ApiController
         // If already voted, replace with new one
         if ($user->voted) {
             $oldYearbook = Yearbook::where("id", "=", $user->voted)->first();
-            if (!$oldYearbook) {
-                $oldYearbook->votes = $oldYearbook->votes -1;
-                $oldYearbook->save();
+            if ($oldYearbook) {
+                // Check first if user is trying to vote the same yearbook twice
+                if ($user->voted === $oldYearbook->id) {
+                    throwErr("You can't vote the same yearbook twice", 400);
+                }
             }
-            // Check first if user is trying to vote the same yearbook twice
-            if ($user->voted === $oldYearbook->id) {
-                throwErr("You can't vote the same yearbook twice", 400);
-            }
-            $user->voted = null;
-            $user->save();
         }
-
+        // Add new vote to yearbook
         $yearbook->votes = $yearbook->votes + 1;
         $yearbook->save();
+        // Set vote to user
         $user->voted = $yearbook->id;
         $user->save();
         json([

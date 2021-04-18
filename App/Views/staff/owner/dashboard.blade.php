@@ -123,9 +123,6 @@
             </div>
         </section>
     </div>
-    <footer class="footer has-text-centered">
-        <a>Logout</a>
-    </footer>
     <!-- Modals -->
 
     <!-- Staff -->

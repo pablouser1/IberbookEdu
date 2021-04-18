@@ -93,14 +93,19 @@ class Auth {
         }
     }
 
-    public static function isStaffLoggedin() {
+    public static function isStaffLoggedin(bool $throwError = true) {
         if (isset($_COOKIE["iberbookedu_staff"]) && !empty($_COOKIE["iberbookedu_staff"])) {
             $token = $_COOKIE["iberbookedu_staff"];
             if ($staffinfo = self::authJWT($token)) {
                 return $staffinfo;
             }
         }
-        throwErr("You are not logged in", 401);
+        if ($throwError) {
+            throwErr("You are not logged in", 401);
+        }
+        else {
+            return false;
+        }
     }
 
     public static function authJWT($token) {
@@ -146,7 +151,7 @@ class Auth {
         $payload = array(
             "iss" => $_SERVER["HTTP_HOST"],
             "iat" => $issuedAt,
-            "exp" => $issuedAt+86400,
+            "exp" => $time,
             "nbf" => $issuedAt-5,
             "data" => $data
         );
@@ -168,16 +173,20 @@ class Auth {
     public static function logout() {
         unset($_COOKIE["iberbookedu_user"]);
         unset($_COOKIE["iberbookedu_profile"]);
+        unset($_COOKIE["iberbookedu_staff"]);
         self::setCookie("iberbookedu_user", "", time()-86400);
         self::setCookie("iberbookedu_profile", "", time()-86400);
+        self::setCookie("iberbookedu_staff", "", time()-86400);
     }
 
     public static function amIAllowed($role, $myProfile, $externalProfile) {
+        // Is the same profile
         if ($myProfile->id === $externalProfile->id) {
             return true;
         }
 
-        if ($role === "mod" && $myProfile->group === $externalProfile->group) {
+        // Is mod of the same group
+        if ($role === "mod" && $myProfile->group_id === $externalProfile->group_id) {
             return true;
         }
         return false;

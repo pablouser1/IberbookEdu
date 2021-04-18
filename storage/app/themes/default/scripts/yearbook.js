@@ -37,13 +37,15 @@ var users = {
                 <div class="card-content">
                     <div class="media">
                         <div class="media-content has-text-centered">
-                            <p class="title is-4">{{ user.name }}</p>
+                            <p class="title is-4">
+                                <span>{{ user.name }}</span>
+                                <span class="tag is-info" v-if="user.type === 'teachers'">{{ user.subject }}</span>
+                            </p>
                             <p class="subtitle is-6" >{{ user.surname }}</p>
                         </div>
                     </div>
                     <div class="content">
                         <p>
-                            <span class="tag is-info" v-if="user.type === 'teachers'">{{ user.subject }}</span>
                             <q v-if="user.quote" v-html="user.quote"></q>
                         </p>
                     </div>

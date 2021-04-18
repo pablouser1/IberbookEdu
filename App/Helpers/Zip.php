@@ -41,9 +41,6 @@ class Zip
    */
   public static function zipDir($sourcePath, $outZipPath)
   {
-    $pathInfo = pathInfo($sourcePath);
-    $dirName = $pathInfo['basename'];
-
     $z = new ZipArchive();
     $z->open($outZipPath, ZIPARCHIVE::CREATE);
     self::folderToZip($sourcePath, $z, strlen("$sourcePath"));

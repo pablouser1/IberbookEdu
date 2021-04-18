@@ -7,8 +7,7 @@ use App\Models\Staff;
 
 class StaffController extends \Leaf\ApiController
 {
-	public function create()
-	{
+	public function create() {
         $staff = Auth::isStaffLoggedin();
         $newStaff = $_POST["staff"];
         $dbStaff = new Staff;

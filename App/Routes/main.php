@@ -39,15 +39,19 @@ $app->get("/", function () {
 });
 
 $app->get("/instance", function () {
-    $loggedIn = false;
     $user = Auth::isUserLoggedin(false);
+    $profile = Auth::isProfileLoggedin(false);
     if ($user) {
-        $loggedIn = true;
+        $user = true;
+    }
+    if ($profile) {
+        $profile = true;
     }
     return response([
         "name" => getenv("INSTANCE_NAME"),
         "description" => getenv("INSTANCE_DESCRIPTION"),
-        "loggedin" => $loggedIn
+        "user" => $user,
+        "profile" => $profile
     ]);
 });
 
@@ -64,7 +68,7 @@ $app->mount('/login', function() use ($app) {
     $app->post("/profile/(\d+)", "AccountController@profile");
 });
 
-Route("GET|POST", "/logout", "AccountController@logout");
+Route("POST", "/logout", "AccountController@logout");
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +81,6 @@ Route("GET|POST", "/logout", "AccountController@logout");
 $app->mount('/users', function() use ($app) {
     $app->get("/me", "UserController@me"); // Get me
     $app->post("/me/password", "UserController@password"); // Change password
-    $app->get("/(\d+)", "UserController@one"); // Get one
     $app->post("/", "UserController@create"); // Create user
 });
 
@@ -90,10 +93,8 @@ $app->mount('/users', function() use ($app) {
 |
 */
 $app->mount('/profiles', function() use ($app) {
-    $app->post('/', "ProfileController@create");
-    $app->get('/me', "ProfileController@me");
+    $app->get('/me', "ProfileController@me"); // Get all profiles of current user
     $app->get("/me/current", "ProfileController@current"); // Get profile in use
-    $app->get("/(\d+)", "ProfileController@one"); // Get one
     $app->get("/(\d+)/photo", "ProfileController@photo"); // Get photo stream
     $app->get("/(\d+)/video", "ProfileController@video"); // Get video stream
     $app->post("/me/photo", "ProfileController@uploadMedia"); // Send photo

@@ -7,7 +7,6 @@ use App\Models\Profile;
 use App\Helpers\Streamer;
 use App\Helpers\UploadMedia;
 use App\Helpers\UploadMisc;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProfileController extends \Leaf\ApiController
 {
@@ -17,23 +16,11 @@ class ProfileController extends \Leaf\ApiController
         response($profiles);
 	}
 
-    public function one($id) {
-        try {
-            $profile = Profile::findOrFail($id);
-            response($profile);
-        }
-        catch (ModelNotFoundException $e) {
-            throwErr("Profile not found", 404);
-        }
-        $profile = Profile::findOrFail($id);
-        response($profile);
-    }
-
     public function me() {
         $user = Auth::isUserLoggedin();
         $profiles = Profile::all()->where("user_id", "=", $user->id);
         if ($profiles->isEmpty()) {
-            throwErr("No profiles found", 404);
+            throwErr("No profiles found, pleas contact the web owner", 404);
         }
         response($profiles);
     }
@@ -137,7 +124,7 @@ class ProfileController extends \Leaf\ApiController
                     }
                 }
                 $profile->save();
-                json("Deleted succesfully");
+                response("Deleted succesfully");
             }
             else {
                 throwErr("You are not allowed", 403);

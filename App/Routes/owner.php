@@ -18,7 +18,13 @@ use App\Models\Theme;
 use App\Models\User;
 
 Route("GET", "/staff/login", function () {
-    render("staff/login");
+    $owner = Auth::isStaffLoggedin(false);
+    if ($owner) {
+        response()->redirect("owner/dashboard");
+    }
+    else {
+        render("staff/login");
+    }
 });
 
 Route("POST", "/staff/login", "AccountController@staff");

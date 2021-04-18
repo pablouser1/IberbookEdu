@@ -38,12 +38,6 @@ function addUserCard() {
             </header>
             <div class="card-content">
                 <div class="field">
-                    <label class="label">Username</label>
-                    <div class="control">
-                        <input name="users[${user_i}][username]" class="input" type="text" required autocomplete="off">
-                    </div>
-                </div>
-                <div class="field">
                     <label class="label">Name</label>
                     <div class="control">
                         <input name="users[${user_i}][name]" class="input" type="text" required autocomplete="off">
@@ -53,6 +47,12 @@ function addUserCard() {
                     <label class="label">Surname</label>
                     <div class="control">
                         <input name="users[${user_i}][surname]" class="input" type="text" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Birthday</label>
+                    <div class="control">
+                        <input type="date" name="users[${user_i}][birthday]">
                     </div>
                 </div>
                 <div class="field">
@@ -107,7 +107,7 @@ jsoninput.onchange = () => {
 // FORM UPLOAD
 document.getElementById("add_form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const formData = new FormData(this);
+    const formData = new FormData(document.getElementById("add_form"));
     try {
         const res = await fetch("../../users", {
             method: 'POST',

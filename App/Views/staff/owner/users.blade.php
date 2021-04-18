@@ -114,14 +114,6 @@
                         <span>Back to control panel</span>
                     </a>
                 </li>
-                <li>
-                    <a href="../logout.php">
-                        <span class="icon is-small">
-                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-                        </span>
-                        <span>Logout</span>
-                    </a>
-                </li>
             </ul>
         </nav>
     </footer>
