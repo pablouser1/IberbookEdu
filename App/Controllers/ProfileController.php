@@ -64,7 +64,7 @@ class ProfileController extends \Leaf\ApiController
         $result = $upload->startUpload($_FILES);
         if ($result) {
           if ($upload->chunk->hasAllChunks()) {
-            $upload->chunk->merge();
+            $upload->chunk->merge($upload->baseurl);
             $upload->setToDB($result);
             response([
                 "code" => "C"

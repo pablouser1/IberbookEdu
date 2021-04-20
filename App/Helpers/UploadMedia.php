@@ -8,13 +8,15 @@ use App\Models\Profile;
 class UploadMedia
 {
     private $profileinfo;
-    private $baseurl;
+    public $temp_dir;
+    public $baseurl;
     public $chunk;
 
     function __construct($profileinfo) {
         $this->chunk = new Chunk;
         $this->profileinfo = $profileinfo;
         $this->baseurl = storage_path("app/uploads/") . $this->profileinfo->group_id . "/users/" . $this->profileinfo->id . "/";
+        $this->temp_dir = sys_get_temp_dir()."/".$this->profileinfo->id;
     }
 
     public function startUpload($files) {
@@ -36,7 +38,7 @@ class UploadMedia
             $ext = pathinfo($files["photo"]["name"], PATHINFO_EXTENSION);
             // If the extension is not in the array create error message
             if (in_array($ext, $allowed_pic)) {
-                $result = $this->chunk->uploadChunk($this->baseurl, $files["photo"]);
+                $result = $this->chunk->uploadChunk($this->temp_dir, $files["photo"]);
             }
         }
         // Video
@@ -49,7 +51,7 @@ class UploadMedia
             $ext = pathinfo($files["video"]["name"], PATHINFO_EXTENSION);
             // If the extension is not in the array create error message
             if (in_array($ext, $allowed_vid)) {
-                $result = $this->chunk->uploadChunk($this->baseurl, $files["video"]);
+                $result = $this->chunk->uploadChunk($this->temp_dir, $files["video"]);
             }
         }
         return $result;
@@ -58,6 +60,9 @@ class UploadMedia
     private function createDirs() {
         if (!is_dir($this->baseurl)) {
             mkdir($this->baseurl, 0755, true);
+        }
+        if (!is_dir($this->temp_dir)) {
+            mkdir($this->temp_dir, 0755, true);
         }
     }
 
