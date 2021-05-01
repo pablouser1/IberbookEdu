@@ -150,12 +150,8 @@ if (!function_exists('plural')) {
 }
 
 if (!function_exists('render')) {
-	function render(string $view, array $data = [], array $mergeData = [])
+	function render(string $view, array $data = [])
 	{
-		if (viewConfig("view_engine") === \Leaf\Blade::class) {
-			return markup(view($view, $data, $mergeData));
-		}
-
 		return viewConfig("render")($view, $data);
 	}
 }
@@ -281,21 +277,6 @@ if (!function_exists('throwErr')) {
 	function throwErr($error, int $code = 500, bool $useMessage = false)
 	{
 		app()->response()->throwErr($error, $code, $useMessage);
-	}
-}
-
-if (!function_exists('view')) {
-	/**
-	 * Return a blade view
-	 *
-	 * @param string $view The view to return
-	 * @param array $data Data to pass into app
-	 * @param array $mergeData
-	 */
-	function view(string $view, array $data = [], array $mergeData = [])
-	{
-		$blade = new Blade(viewConfig("views_path"), viewConfig("cache_path"));
-		return $blade->render($view, $data, $mergeData);
 	}
 }
 

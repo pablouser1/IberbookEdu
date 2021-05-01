@@ -34,6 +34,7 @@ $app->get("/instance", function () {
     return response([
         "name" => getenv("INSTANCE_NAME"),
         "description" => getenv("INSTANCE_DESCRIPTION"),
+        "version" => Leaf\Config::get('app.version'),
         "user" => $user,
         "profile" => $profile
     ]);

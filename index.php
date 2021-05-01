@@ -44,7 +44,9 @@ require __DIR__. "/Config/bootstrap.php";
 | Plant a seed, grow the stem and return Leaf🤷‍
 |
 */
-$app = new Leaf\App();
+$app = new Leaf\App([
+    'app.version' => '1.2.0'
+]);
 
 // CORS
 $app->add(new CORS);
