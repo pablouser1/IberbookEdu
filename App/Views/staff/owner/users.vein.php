@@ -8,7 +8,10 @@
     <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <script>
-    const groups = {!! json_encode($groups) !!}
+    const groups =
+    {autoescape="off"}
+        {$groups}
+    {/autoescape}
     </script>
 </head>
 
@@ -79,21 +82,19 @@
         </section>
     </section>
     <section id="remove" class="section is-hidden tab">
-        <form id="remove_form">
-            <div class="field">
-                <label class="label">Select users</label>
-                <div class="control">
-                    <div id="select_container" class="select is-multiple">
-                        <select id="remove_select" name="users[]" multiple>
-                            @foreach ($users as $tempUser)
-                                <option value="{{ $tempUser->id }}">{{ $tempUser->fullname }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+        <div class="field">
+            <label class="label">Select user</label>
+            <div class="control">
+                <div id="select_container" class="select">
+                    <select id="remove_select" name="user">
+                        {loop="$users" as $tempUser}
+                            <option value="{$tempUser->id}">{$tempUser->fullname}</option>
+                        {/loop}
+                    </select>
                 </div>
             </div>
-            <button type="submit" class="button is-danger">Delete</button>
-        </form>
+        </div>
+        <button id="remove_button" class="button is-danger">Delete</button>
     </section>
     <footer class="footer">
         <nav class="breadcrumb is-centered" aria-label="breadcrumbs">

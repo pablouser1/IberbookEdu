@@ -4,11 +4,6 @@
     </IfModule>
 
     RewriteEngine On
-
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
@@ -20,13 +15,13 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-#PROTECT ENV FILE
+# PROTECT ENV FILE
 <Files .env>
 order allow,deny
 Deny from all
 </Files>
 
-#PROTECT ENV FILE
+# PROTECT HTACCESS FILE
 <Files .htaccess>
 order allow,deny
 Deny from all

@@ -17,7 +17,7 @@ use App\Models\Staff;
 use App\Models\Theme;
 use App\Models\User;
 
-Route("GET", "/staff/login", function () {
+$app->get("/staff/login", function () {
     $owner = Auth::isStaffLoggedin(false);
     if ($owner) {
         response()->redirect("owner/dashboard");
@@ -27,9 +27,9 @@ Route("GET", "/staff/login", function () {
     }
 });
 
-Route("POST", "/staff/login", "AccountController@staff");
+$app->post("/staff/login", "AccountController@staff");
 
-Route("GET", "/staff/owner/dashboard", function () {
+$app->get("/staff/owner/dashboard", function () {
     $user = Auth::isStaffLoggedin();
 
     // Staff
@@ -54,13 +54,13 @@ Route("GET", "/staff/owner/dashboard", function () {
     ]);
 });
 
-Route("GET", "/staff/owner/users", function () {
+$app->get("/staff/owner/users", function () {
     $user = Auth::isStaffLoggedin();
 
     // Staff
     $users = User::all();
     $profiles = Profile::all();
-    $groups = Group::all();
+    $groups = json_encode(Group::all());
 
     render("staff/owner/users",
     [

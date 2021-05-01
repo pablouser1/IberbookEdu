@@ -10,8 +10,8 @@
     <section class="hero is-fullheight">
       <div class="hero-body">
         <div class="container">
-          <h1 class="title">{{ $name }}</h1>
-          <h2 class="subtitle">{{ $description }}</h2>
+          <h1 class="title">{$name}</h1>
+          <h2 class="subtitle">{$description}</h2>
           <p>This is an IberbookEdu instance, you can get more info below</p>
           <a class="button is-info" href="https://github.com/pablouser1/Iberbookedu-backend">More info</a>
         </div>

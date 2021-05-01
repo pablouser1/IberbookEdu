@@ -1,22 +1,6 @@
 <?php
 use App\Helpers\Auth;
 
-use App\Middleware\CORS;
-
-/*
-|--------------------------------------------------------------------------
-| Set up 404 handler
-|--------------------------------------------------------------------------
-|
-| Create a handler for 404 errors
-|
-*/
-
-$app->set404();
-
-// MIDDLEWARE ON ALL PATHS
-$app->add(new CORS);
-
 /*
 |--------------------------------------------------------------------------
 | Set up Controller namespace
@@ -63,12 +47,12 @@ $app->get("/instance", function () {
 | Login, Logout
 |
 */
-$app->mount('/login', function() use ($app) {
+$app->group('/login', function() use ($app) {
     $app->post("/user", "AccountController@user");
     $app->post("/profile/(\d+)", "AccountController@profile");
 });
 
-Route("POST", "/logout", "AccountController@logout");
+$app->post("/logout", "AccountController@logout");
 
 /*
 |--------------------------------------------------------------------------
@@ -78,10 +62,11 @@ Route("POST", "/logout", "AccountController@logout");
 | Manage users
 |
 */
-$app->mount('/users', function() use ($app) {
+$app->group('/users', function() use ($app) {
     $app->get("/me", "UserController@me"); // Get me
     $app->post("/me/password", "UserController@password"); // Change password
-    $app->post("/", "UserController@create"); // Create user
+    $app->post("/", "UserController@create"); // Create user(s)
+    $app->delete("/(\d+)","UserController@delete"); // Delete user
 });
 
 /*
@@ -92,7 +77,7 @@ $app->mount('/users', function() use ($app) {
 | Manage profiles
 |
 */
-$app->mount('/profiles', function() use ($app) {
+$app->group('/profiles', function() use ($app) {
     $app->get('/me', "ProfileController@me"); // Get all profiles of current user
     $app->get("/me/current", "ProfileController@current"); // Get profile in use
     $app->get("/(\d+)/photo", "ProfileController@photo"); // Get photo stream
@@ -111,7 +96,7 @@ $app->mount('/profiles', function() use ($app) {
 | Manage gallery
 |
 */
-$app->mount('/gallery', function() use ($app) {
+$app->group('/gallery', function() use ($app) {
     $app->get("/", "GalleryController@all"); // Get all
     $app->post("/", "GalleryController@upload"); // Upload new
     $app->delete("/", "GalleryController@delete"); // Delete
@@ -126,7 +111,7 @@ $app->mount('/gallery', function() use ($app) {
 | Manage yearbooks
 |
 */
-$app->mount('/yearbooks', function() use ($app) {
+$app->group('/yearbooks', function() use ($app) {
     $app->get("/", "YearbookController@all");
     $app->get("/(\d+)", "YearbookController@one");
     $app->get("/random", "YearbookController@random");
@@ -145,7 +130,7 @@ $app->mount('/yearbooks', function() use ($app) {
 | Manage groups
 |
 */
-$app->mount('/groups', function() use ($app) {
+$app->group('/groups', function() use ($app) {
     $app->get("/", "GroupController@all");
     $app->get("/me/members", "GroupController@members");
     $app->get("/(\d+)", "GroupController@one");
@@ -161,7 +146,7 @@ $app->mount('/groups', function() use ($app) {
 | Manage schools
 |
 */
-$app->mount('/schools', function() use ($app) {
+$app->group('/schools', function() use ($app) {
     $app->get("/", "SchoolController@all");
     $app->get("/(\d+)", "SchoolController@one");
     $app->post("/", "SchoolController@create"); // Create new school
@@ -176,7 +161,7 @@ $app->mount('/schools', function() use ($app) {
 | Manage themes
 |
 */
-$app->mount('/themes', function() use ($app) {
+$app->group('/themes', function() use ($app) {
     $app->get("/", "ThemeController@all");
     $app->get("/(\d+)", "ThemeController@one");
 });
@@ -189,7 +174,7 @@ $app->mount('/themes', function() use ($app) {
 | Manage staff
 |
 */
-$app->mount('/staff', function() use ($app) {
+$app->group('/staff', function() use ($app) {
     $app->post("/", "StaffController@create");
     $app->delete("/(\d+)", "StaffController@delete");
 });

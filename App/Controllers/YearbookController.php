@@ -25,8 +25,13 @@ class YearbookController extends \Leaf\ApiController
 	}
 
     public function one($id) {
-        $yearbook = Yearbook::findOrFail($id);
-        response($yearbook);
+        $yearbook = Yearbook::where("id", "=", $id)->first();
+        if ($yearbook) {
+            json($yearbook);
+        }
+        else {
+            throwErr("Yearbook not found", 404);
+        }
     }
 
     public function random() {

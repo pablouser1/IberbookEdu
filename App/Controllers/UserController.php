@@ -57,8 +57,16 @@ class UserController extends \Leaf\ApiController
         }
     }
 
-    public function delete() {
-
+    public function delete($id) {
+        $owner = Auth::isStaffLoggedin();
+        $deletedUser = User::where("id", "=", $id)->first();
+        if ($deletedUser) {
+            $deletedUser->delete();
+            json("Deleted successfully");
+        }
+        else {
+            throwErr("Error while deleting user, does not exist");
+        }
     }
 
     public function password() {

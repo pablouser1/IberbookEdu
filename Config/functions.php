@@ -1,4 +1,7 @@
 <?php
+
+use Leaf\Blade;
+
 if (!function_exists('app')) {
 	/**
 	 * Return the Leaf instance
@@ -291,8 +294,8 @@ if (!function_exists('view')) {
 	 */
 	function view(string $view, array $data = [], array $mergeData = [])
 	{
-		app()->blade->configure(viewConfig("views_path"), viewConfig("cache_path"));
-		return app()->blade->render($view, $data, $mergeData);
+		$blade = new Blade(viewConfig("views_path"), viewConfig("cache_path"));
+		return $blade->render($view, $data, $mergeData);
 	}
 }
 
@@ -333,7 +336,7 @@ function app_paths($path = null, bool $slash = false)
 /**
  * Views directory path
  */
-function views_path($path = null, bool $slash = true)
+function views_path($path = null, bool $slash = false)
 {
 	return app_paths("views_path", $slash) . "/$path";
 }

@@ -34,7 +34,7 @@ return [
     | you need. As such, you can decide which view engine to use.
     |
     */
-    "view_engine" => \Leaf\Blade::class,
+    "view_engine" => \Leaf\Veins::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -45,17 +45,15 @@ return [
     | in your app if you're using a custom view engine.
     |
     */
-    /*
     "render" => function(string $view, array $data = []) {
         $veins = new \Leaf\Veins\Template;
         $veins->configure([
-            "veins_dir" => views_path(null, false),
+            "veins_dir" => views_path(),
             "cache_dir" => storage_path('framework/views/'),
         ]);
         $veins->set($data);
         $veins->render($view);
 
         // This example is what veins would look like
-    },
-    */
+    }
 ];

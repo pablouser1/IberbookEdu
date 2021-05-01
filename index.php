@@ -10,6 +10,9 @@
 | loading of any our classes "manually". Feels great to relax.
 |
 */
+
+use App\Middleware\CORS;
+
 require_once __DIR__ . '/vendor/autoload.php';
 
 /*
@@ -41,7 +44,15 @@ require __DIR__. "/Config/bootstrap.php";
 | Plant a seed, grow the stem and return Leaf🤷‍
 |
 */
-$app = new Leaf\App;
+$app = new Leaf\App();
+
+// CORS
+$app->add(new CORS);
+
+// Response if
+$app->setDown(function () {
+    throwErr("Down for mantenience, please check later", 503);
+});
 
 /*
 |--------------------------------------------------------------------------

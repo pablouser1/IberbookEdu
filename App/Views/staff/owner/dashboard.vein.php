@@ -15,7 +15,7 @@
             <div class="hero-body">
                 <div class="container">
                     <h1 class="title has-text-centered">
-                        Welcome: {{ $user->username }}
+                        Welcome: {$user->username}
                     </h1>
                 </div>
             </div>
@@ -36,13 +36,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($staff as $staff_user)
+                            {loop="$staff" as $staff_user}
                                 <tr>
-                                    <td>{{ $staff_user->id }}</td>
-                                    <td>{{ $staff_user->username }}</td>
-                                    <td>{{ $staff_user->role }}</td>
+                                    <td>{$staff_user->id}</td>
+                                    <td>{$staff_user->username}</td>
+                                    <td>{$staff_user->role}</td>
                                 </tr>
-                            @endforeach
+                            {/loop}
                         </tbody>
                     </table>
                     <button id="staff_button" class="button is-info">
@@ -66,12 +66,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($schools as $school)
+                            {loop="$schools" as $school}
                                 <tr>
-                                    <td>{{ $school->id }}</td>
-                                    <td>{{ $school->name }}</td>
+                                    <td>{$school->id}</td>
+                                    <td>{$school->name}</td>
                                 </tr>
-                            @endforeach
+                            {/loop}
                         </tbody>
                     </table>
                     <button id="schools_button" type="button" class="button is-info">
@@ -96,13 +96,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($groups as $group)
+                            {loop="$groups" as $group}
                                 <tr>
-                                    <td>{{ $group->id }}</td>
-                                    <td>{{ $group->name }}</td>
-                                    <td>{{ $group->school_id }}</td>
+                                    <td>{$group->id}</td>
+                                    <td>{$group->name}</td>
+                                    <td>{$group->school_id}</td>
                                 </tr>
-                            @endforeach
+                            {/loop}
                         </tbody>
                     </table>
                     <button id="groups_button" type="button" class="button is-info">

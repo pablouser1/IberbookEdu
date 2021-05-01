@@ -140,6 +140,21 @@ document.getElementById("jsonsend").addEventListener("click", async (event) => {
     }
 })
 
+document.getElementById("remove_button").addEventListener("click", async () => {
+    const user = document.getElementById("remove_select").value
+    try {
+        const res = await fetch(`../../users/${user}`, {
+            method: 'DELETE'
+        })
+        const res_json = await res.json()
+        alert(res_json)
+    }
+    catch (badRes) {
+        console.log(badRes)
+        alert(badRes.error)
+    }
+})
+
 // Download txt with changes
 function generateTXT(users_json) {
     let passwords = ""
