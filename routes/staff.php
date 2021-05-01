@@ -1,5 +1,13 @@
 <?php
 
+use Helpers\Auth;
+use Models\Group;
+use Models\Profile;
+use Models\School;
+use Models\Staff;
+use Models\Theme;
+use Models\User;
+
 /**@var Leaf\App $app */
 
 $app->group('/staff', function() use ($app) {
