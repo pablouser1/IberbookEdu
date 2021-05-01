@@ -64,7 +64,7 @@ return [
     | Hide id field from user object returned in login, register and update
     |
     */
-    "HIDE_ID" => false,
+    "HIDE_ID" => true,
 
     /*
     |--------------------------------------------------------------------------

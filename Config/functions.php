@@ -1,7 +1,4 @@
 <?php
-
-use Leaf\Blade;
-
 if (!function_exists('app')) {
 	/**
 	 * Return the Leaf instance
@@ -89,6 +86,16 @@ if (!function_exists('fs')) {
 	}
 }
 
+if (!function_exists('flash')) {
+    /**
+     * Return Leaf's flash object
+     */
+    function flash()
+    {
+        return \Leaf\Flash::class;
+    }
+}
+
 if (!function_exists('hasAuth')) {
 	/**
 	 * Find out if there's an active sesion
@@ -97,6 +104,19 @@ if (!function_exists('hasAuth')) {
 	{
 		return !!sessionUser();
 	}
+}
+
+if (!function_exists('import')) {
+    /**
+     * Output page as response
+     *
+     * @param string $data The page to output
+     * @param int $code The http status code
+     */
+    function import($data, $code = 200)
+    {
+        app()->response()->page($data, $code);
+    }
 }
 
 if (!function_exists('json')) {
@@ -129,19 +149,6 @@ if (!function_exists('markup')) {
 	}
 }
 
-if (!function_exists('import')) {
-    /**
-     * Output page as response
-     *
-     * @param string $data The page to output
-     * @param int $code The http status code
-     */
-    function import($data, $code = 200)
-    {
-        app()->response()->page($data, $code);
-    }
-}
-
 if (!function_exists('plural')) {
 	function plural($value, $count = 2)
 	{
@@ -152,6 +159,10 @@ if (!function_exists('plural')) {
 if (!function_exists('render')) {
 	function render(string $view, array $data = [])
 	{
+		if (viewConfig("view_engine") === \Leaf\Blade::class) {
+			return markup(view($view, $data));
+		}
+
 		return viewConfig("render")($view, $data);
 	}
 }
@@ -280,6 +291,32 @@ if (!function_exists('throwErr')) {
 	}
 }
 
+if (!function_exists('view')) {
+	/**
+	 * Return a blade view
+	 *
+	 * @param string $view The view to return
+	 * @param array $data Data to pass into app
+	 * @param array $mergeData
+	 */
+	function view(string $view, array $data = [])
+	{
+		app()->template->config(["path" => viewConfig("views_path")]);
+		return app()->template->render($view, $data);
+	}
+}
+
+// App
+
+/**
+ * Get app configuration
+ */
+function AppConfig($setting = null)
+{
+	$config = require __DIR__ . "/app.php";
+	return !$setting ? $config : $config[$setting];
+}
+
 // Auth
 
 /**
@@ -317,7 +354,7 @@ function app_paths($path = null, bool $slash = false)
 /**
  * Views directory path
  */
-function views_path($path = null, bool $slash = false)
+function views_path($path = null, bool $slash = true)
 {
 	return app_paths("views_path", $slash) . "/$path";
 }
@@ -391,7 +428,6 @@ function factories_path($path = null)
  */
 function routes_path($path = null)
 {
-	return "/App/Routes/$path";
 	return app_paths("routes_path") . "/$path";
 }
 
@@ -400,7 +436,6 @@ function routes_path($path = null)
  */
 function helpers_path($path = null)
 {
-	return "/App/Helpers/$path";
 	return app_paths("helpers_path") . "/$path";
 }
 
@@ -418,8 +453,4 @@ function lib_path($path = null)
 function public_path($path = null)
 {
 	return app_paths("public_path") . "/$path";
-}
-
-function acyear() {
-    return date("Y",strtotime("-1 year"))."-".date("Y");
 }

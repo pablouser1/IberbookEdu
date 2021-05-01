@@ -6,7 +6,7 @@
         "doctrine/dbal": "^2.9",
         "leafs/leaf": "^2.4",
         "leafs/veins": "^1.2",
-        "vlucas/phpdotenv": "^5.3"
+        "vlucas/phpdotenv": "^3.6"
     },
     "config": {
         "optimize-autoloader": true,

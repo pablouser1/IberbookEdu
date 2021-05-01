@@ -11,7 +11,7 @@ return [
     | the usual LeafMVC view path has already been registered for you.
     |
     */
-    "views_path" => views_path(),
+    "views_path" => views_path("", false),
 
     /*
     |--------------------------------------------------------------------------
@@ -48,12 +48,12 @@ return [
     "render" => function(string $view, array $data = []) {
         $veins = new \Leaf\Veins\Template;
         $veins->configure([
-            "veins_dir" => views_path(),
+            "veins_dir" => views_path(null, false),
             "cache_dir" => storage_path('framework/views/'),
         ]);
         $veins->set($data);
         $veins->render($view);
 
         // This example is what veins would look like
-    }
+    },
 ];

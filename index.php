@@ -10,9 +10,6 @@
 | loading of any our classes "manually". Feels great to relax.
 |
 */
-
-use App\Middleware\CORS;
-
 require_once __DIR__ . '/vendor/autoload.php';
 
 /*
@@ -23,8 +20,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 | Quickly use our environment variables
 |
 */
-\Dotenv\Dotenv::createImmutable(__DIR__)->load();
-date_default_timezone_set(env("INSTANCE_TIMEZONE", "Etc/UTC"));
+\Dotenv\Dotenv::create(__DIR__)->load();
 
 /*
 |--------------------------------------------------------------------------
@@ -34,38 +30,7 @@ date_default_timezone_set(env("INSTANCE_TIMEZONE", "Etc/UTC"));
 | Require all Leaf API's Files
 |
 */
-require __DIR__. "/Config/bootstrap.php";
-
-/*
-|--------------------------------------------------------------------------
-| Initialise Leaf Core
-|--------------------------------------------------------------------------
-|
-| Plant a seed, grow the stem and return Leaf🤷‍
-|
-*/
-$app = new Leaf\App([
-    'app.version' => '1.2.0'
-]);
-
-// CORS
-$app->add(new CORS);
-
-// Response if
-$app->setDown(function () {
-    throwErr("Down for mantenience, please check later", 503);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Error Configuration
-|--------------------------------------------------------------------------
-|
-| Show or hide errors  for easy debugging
-| You might want to set this to false for production
-|
-*/
-Config\App::error_debug(true);
+require __DIR__ . "/Config/bootstrap.php";
 
 /*
 |--------------------------------------------------------------------------
@@ -81,13 +46,38 @@ require __DIR__ . "/Config/functions.php";
 
 /*
 |--------------------------------------------------------------------------
+| Attach blade view
+|--------------------------------------------------------------------------
+|
+| Since blade no longer ships with Leaf by default, we
+| can attach blade back to Leaf so you can use Skeleton
+| as you've always used it.
+|
+| To do this, run `composer require leafs/blade` and
+| uncomment the line below.
+|
+*/
+// Leaf\View::attach(\Leaf\Blade::class);
+
+/*
+|--------------------------------------------------------------------------
+| Initialise Leaf Core
+|--------------------------------------------------------------------------
+|
+| Plant a seed, grow the stem and return Leaf🤷‍
+|
+*/
+$app = new Leaf\App(AppConfig());
+
+/*
+|--------------------------------------------------------------------------
 | Route Config
 |--------------------------------------------------------------------------
 |
 | Require app routes.
 |
 */
-require __DIR__. "/App/Routes/main.php";
+require __DIR__ . "/routes/index.php";
 
 /*
 |--------------------------------------------------------------------------
