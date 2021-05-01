@@ -23,8 +23,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 | Quickly use our environment variables
 |
 */
-\Dotenv\Dotenv::create(__DIR__)->load();
-date_default_timezone_set(getenv("INSTANCE_TIMEZONE"));
+\Dotenv\Dotenv::createImmutable(__DIR__)->load();
+date_default_timezone_set(env("INSTANCE_TIMEZONE", "Etc/UTC"));
 
 /*
 |--------------------------------------------------------------------------

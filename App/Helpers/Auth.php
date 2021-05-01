@@ -109,9 +109,9 @@ class Auth {
     }
 
     public static function authJWT($token) {
-        $secret_key = getenv("JWT_SECRET");
+        $secret_key = env("JWT_SECRET");
         if ($token && $secret_key) {
-            $payload = Authentication::validate($token, getenv("JWT_SECRET"));
+            $payload = Authentication::validate($token, env("JWT_SECRET"));
             if (!$payload) {
                 response()->throwErr(Authentication::errors());
             }
@@ -146,7 +146,7 @@ class Auth {
     }
     // -- SET JWT TOKENS -- //
     private static function setToken($data, $name, $time) {
-        $key = getenv("JWT_SECRET");
+        $key = env("JWT_SECRET");
         $issuedAt = time();
         $payload = array(
             "iss" => $_SERVER["HTTP_HOST"],

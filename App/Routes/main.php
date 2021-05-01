@@ -17,8 +17,8 @@ include "./App/Routes/setup.php";
 
 $app->get("/", function () {
     render("index", [
-        "name" => getenv("INSTANCE_NAME"),
-        "description" => getenv("INSTANCE_DESCRIPTION")
+        "name" => env("INSTANCE_NAME", "Default"),
+        "description" => env("INSTANCE_DESCRIPTION", "An IberbookEdu Instance")
     ]);
 });
 
@@ -32,8 +32,8 @@ $app->get("/instance", function () {
         $profile = true;
     }
     return response([
-        "name" => getenv("INSTANCE_NAME"),
-        "description" => getenv("INSTANCE_DESCRIPTION"),
+        "name" => env("INSTANCE_NAME", "Default"),
+        "description" => env("INSTANCE_DESCRIPTION", "An IberbookEdu Instance"),
         "version" => Leaf\Config::get('app.version'),
         "user" => $user,
         "profile" => $profile

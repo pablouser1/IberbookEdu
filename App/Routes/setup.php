@@ -23,11 +23,11 @@ $app->post("/setup", function() {
     if (file_exists(".setupDone")) {
         throwErr("Setup already done", 400);
     }
-    $host = getenv("DB_HOST");
-    $port = getenv("DB_PORT");
-    $username = getenv("DB_USERNAME");
-    $password = getenv("DB_PASSWORD");
-    $name = getenv("DB_DATABASE");
+    $host = env("DB_HOST");
+    $port = env("DB_PORT");
+    $username = env("DB_USERNAME");
+    $password = env("DB_PASSWORD");
+    $name = env("DB_DATABASE");
     $db = new mysqli($host, $username, $password, $name, $port);
     $owner = $_POST["owner"];
     $db->query("CREATE TABLE users(

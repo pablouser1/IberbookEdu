@@ -5,9 +5,8 @@
     "require": {
         "doctrine/dbal": "^2.9",
         "leafs/leaf": "^2.4",
-        "vlucas/phpdotenv": "^3.6",
         "leafs/veins": "^1.2",
-        "leafs/aloe": "^1.1"
+        "vlucas/phpdotenv": "^5.3"
     },
     "config": {
         "optimize-autoloader": true,

@@ -3,7 +3,7 @@ namespace App\Middleware;
 use Leaf\Middleware;
 class CORS extends Middleware {
     public function call() {
-        $client = getenv("INSTANCE_FRONTEND");
+        $client = env("INSTANCE_FRONTEND", "*");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
         header("Access-Control-Allow-Credentials: true");
