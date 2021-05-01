@@ -1,4 +1,7 @@
 <?php
+
+use Middleware\CORS;
+
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader
@@ -21,6 +24,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 |
 */
 \Dotenv\Dotenv::create(__DIR__)->load();
+
+date_default_timezone_set(getenv("INSTANCE_TIMEZONE"));
 
 /*
 |--------------------------------------------------------------------------
@@ -46,21 +51,6 @@ require __DIR__ . "/Config/functions.php";
 
 /*
 |--------------------------------------------------------------------------
-| Attach blade view
-|--------------------------------------------------------------------------
-|
-| Since blade no longer ships with Leaf by default, we
-| can attach blade back to Leaf so you can use Skeleton
-| as you've always used it.
-|
-| To do this, run `composer require leafs/blade` and
-| uncomment the line below.
-|
-*/
-// Leaf\View::attach(\Leaf\Blade::class);
-
-/*
-|--------------------------------------------------------------------------
 | Initialise Leaf Core
 |--------------------------------------------------------------------------
 |
@@ -68,6 +58,17 @@ require __DIR__ . "/Config/functions.php";
 |
 */
 $app = new Leaf\App(AppConfig());
+
+// CORS
+$app->add(new CORS);
+
+// Server down response
+$app->setDown(function () {
+    // Workaround, cors is not available here
+    $cors = new CORS;
+    $cors->call();
+    throwErr("Server is in maintenance, please check back later", 503);
+});
 
 /*
 |--------------------------------------------------------------------------

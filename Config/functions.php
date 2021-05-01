@@ -454,3 +454,7 @@ function public_path($path = null)
 {
 	return app_paths("public_path") . "/$path";
 }
+
+function acyear() {
+    return date("Y",strtotime("-1 year"))."-".date("Y");
+}
