@@ -48,7 +48,12 @@ class YearbookController extends \Leaf\ApiController
         $acyear = acyear();
         $profile = Auth::isProfileLoggedin();
         $yearbook = Yearbook::where("group_id", "=", $profile->group_id)->where("acyear", "=", $acyear)->first();
-        response($yearbook);
+        if ($yearbook) {
+            response($yearbook);
+        }
+        else {
+            json($yearbook, 204);
+        }
     }
 
     public function generate() {
