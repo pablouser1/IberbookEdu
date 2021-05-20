@@ -8,10 +8,7 @@
     <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <script>
-    const groups =
-    {autoescape="off"}
-        {$groups}
-    {/autoescape}
+	const groups_string = {$groups}
     </script>
 </head>
 
@@ -87,9 +84,7 @@
             <div class="control">
                 <div id="select_container" class="select">
                     <select id="remove_select" name="user">
-                        {loop="$users" as $tempUser}
-                            <option value="{$tempUser->id}">{$tempUser->fullname}</option>
-                        {/loop}
+                        <option n:foreach="$users as $tempUser" value="{$tempUser->id}">{$tempUser->fullname}</option>
                     </select>
                 </div>
             </div>

@@ -2,8 +2,6 @@
 
 namespace Models;
 
-use Leaf\FS;
-
 class Theme extends Model {
 	protected $table = "themes";
     public $timestamps = false;
@@ -13,7 +11,7 @@ class Theme extends Model {
     ];
 
     public function getDetailsAttribute() {
-        $file = FS::readFile(storage_path("/app/themes/".$this->name."/theme.json"));
+        $file = file_get_contents(get_theme($this->name) . "/theme.json");
         if ($file) {
             $json = json_decode($file, true);
             return [

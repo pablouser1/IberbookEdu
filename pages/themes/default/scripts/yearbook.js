@@ -31,7 +31,7 @@ var users = {
             <div class="card">
                 <div class="card-image">
                     <figure @click="$root.videoWatching = user" class="image user-images">
-                        <img :src="'users/' + user.id + '/' + user.photo">
+                        <img :src="dataUrl + '/users/' + user.id + '/' + user.photo">
                     </figure>
                 </div>
                 <div class="card-content">
@@ -82,7 +82,7 @@ var main = new Vue({
     },
     methods: {
         enterYearbook: function() {
-            let banner = document.getElementById("banner")
+            const banner = document.getElementById("banner")
             banner.classList.replace("is-fullheight", "is-medium")
             document.getElementById("enterButton").remove()
             this.ready = true
@@ -105,7 +105,7 @@ var main = new Vue({
     },
     created() {
         if (this.ybinfo.banner) {
-            document.getElementById("banner").style.background = `url(assets/${this.ybinfo.banner})center center`
+            document.getElementById("banner").style.background = `url(${dataUrl}/${this.ybinfo.banner})center center`
             document.getElementById("banner").style.backgroundSize = "cover"
         }
         else {

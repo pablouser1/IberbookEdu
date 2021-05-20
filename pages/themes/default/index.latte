@@ -18,21 +18,26 @@
     <meta property="og:type" content="website"/>
     <meta property="og:description" content="Yearbook generated using IberbookEdu"/>
     <!-- Favicon -->
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="{$common}/favicon.ico">
     <!-- Scripts -->
-
+    <script>
+    // Constants from backend
+    const dataUrl = {$data}
+    const commonUrl = {$common}
+    const themeUrl = {$theme}
+    </script>
     <!-- Yearbook data -->
-    <script src="scripts/data.js"></script>
+    <script src="{$data}/data.js"></script>
     <!-- Dev Vue -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
-    <script src="scripts/vendor/vue.min.js"></script>
-    <script defer src="scripts/vendor/solid.min.js"></script>
-    <script defer src="scripts/vendor/fontawesome.min.js"></script>
-    <script src="scripts/vendor/confetti.min.js"></script>
+    <script src="{$theme}/scripts/vendor/vue.min.js"></script>
+    <script defer src="{$theme}/scripts/vendor/solid.min.js"></script>
+    <script defer src="{$theme}/scripts/vendor/fontawesome.min.js"></script>
+    <script src="{$theme}/scripts/vendor/confetti.min.js"></script>
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/vendor/bulma.min.css"/>
-    <link rel="stylesheet" href="styles/yearbook.css"/>
-    <link rel="stylesheet" href="styles/animations.css"/>
+    <link rel="stylesheet" href="{$theme}/styles/vendor/bulma.min.css"/>
+    <link rel="stylesheet" href="{$theme}/styles/yearbook.css"/>
+    <link rel="stylesheet" href="{$theme}/styles/animations.css"/>
 </head>
 
 <body>
@@ -103,7 +108,7 @@
                 </div>
             </div>
         </nav>
-        <stories v-if="videoWatching" v-bind:user="videoWatching" @close="videoWatching = null"></stories>
+        <stories v-if="videoWatching" v-bind:user="videoWatching" @close="videoWatching = null" />
         <!-- Yearbook and Gallery (used by Vue.js) -->
         <section id="yearbook" v-show="ready" class="section tab">
             <!-- Teachers -->
@@ -112,7 +117,7 @@
                 <span>{{ lang.yearbook.teachers }}</span>
             </h1>
             <p class="subtitle has-text-centered">Total: {{ teachers.length }}</p>
-            <users v-bind:users="teachers"></users>
+            <users v-bind:users="teachers" />
             <hr>
             <!-- Students -->
             <h1 class="title has-text-centered">
@@ -120,11 +125,11 @@
                 <span>{{ lang.yearbook.students }}</span>
             </h1>
             <p class="subtitle has-text-centered">Total: {{ students.length }}</p>
-            <users v-bind:users="students"></users>
+            <users v-bind:users="students" />
         </section>
         <!-- Gallery -->
         <section id="gallery" class="section is-hidden tab">
-            <gallery v-bind:gallery="gallery"></gallery>
+            <gallery v-bind:gallery="gallery" />
         </section>
         <!-- About section -->
         <section id="about" class="section is-hidden tab">
@@ -151,15 +156,15 @@
         </footer>
     </div>
     <!-- Stories -->
-    <script src="scripts/stories.js"></script>
+    <script src="{$theme}/scripts/stories.js"></script>
     <!-- Multilang manager -->
-    <script src="scripts/lang.js"></script>
+    <script src="{$theme}/scripts/lang.js"></script>
     <!-- Gallery -->
-    <script src="scripts/gallery.js"></script>
+    <script src="{$theme}/scripts/gallery.js"></script>
     <!-- Yearbook -->
-    <script src="scripts/yearbook.js"></script>
+    <script src="{$theme}/scripts/yearbook.js"></script>
     <!-- Misc -->
-    <script src="scripts/misc.js"></script>
+    <script src="{$theme}/scripts/misc.js"></script>
 </body>
 
 </html>

@@ -13,6 +13,11 @@ const translate_common = {
     `
 }
 
+const urls = {
+    external: `${themeUrl}/licenses/externalProjects.html`,
+    project: `"${commonUrl}/licenses/IberbookEdu.html`
+}
+
 const translations = {
     // English
     en: {
@@ -31,12 +36,12 @@ const translations = {
             teachers: "Teachers",
         },
         about: {
-            attribution: `This project wouldn't be possible without the help of the following projects 
-            distributed under <a href="licenses/externalProjects.html" target="_blank">the following licenses</a>:<br>
+            attribution: `This project wouldn't be possible without the help of the following projects
+            distributed under <a href="${urls.external}" target="_blank">the following licenses</a>:<br>
             ${translate_common.external}`,
-            credits: `This yearbook was made using 
+            credits: `This yearbook was made using
             <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, an open source project
-            distributed under the <a href="licenses/IberbookEdu.html" target="_blank">AGPLv3 license</a>`
+            distributed under the <a href="${urls.project}" target="_blank">AGPLv3 license</a>`
         },
         footer: {
             madewith: "Made with <span style='color: #e25555;'> &#9829; </span> using <a href='https://twitter.com/search?q=%23IberbookEdu' target='_blank'>#IberbookEdu</a>"
@@ -63,11 +68,11 @@ const translations = {
         },
         about: {
             attribution: `Este proyecto no sería posible sin la ayuda de los siguientes proyectos
-            distribuidos bajo <a href="licenses/externalProjects.html" target="_blank">las siguientes licencias</a>:<br>
+            distribuidos bajo <a href="${urls.external}" target="_blank">las siguientes licencias</a>:<br>
             ${translate_common.external}`,
             credits: `Esta orla fue generada usando
-            <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, un proyecto de código abierto 
-            distribuido bajo la <a href="licenses/IberbookEdu.html" target="_blank">licencia AGPLv3</a>`
+            <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, un proyecto de código abierto
+            distribuido bajo la <a href="${urls.project}" target="_blank">licencia AGPLv3</a>`
         },
         footer: {
             madewith: "Hecho con <span style='color: #e25555;'> &#9829; </span> usando <a href='https://twitter.com/search?q=%23IberbookEdu' target='_blank'>#IberbookEdu</a>"
@@ -94,11 +99,11 @@ const translations = {
         },
         about: {
             attribution: `Ce projet ne serait pas possible sans l'aide des projets suivants
-            distribués sous <a href="licenses/externalProjects.html">les licences suivantes</a>:<br>
+            distribués sous <a href="${urls.external}">les licences suivantes</a>:<br>
             ${translate_common.external}`,
             credits: `Cet annuaire a été généré en utilisant
             <a href="https://github.com/pablouser1/IberbookEdu-backend" target="_blank">IberbookEdu</a>, un projet open source
-            distribué sous la <a href="licenses/IberbookEdu.html" target="_blank">licence AGPLv3</a>`
+            distribué sous la <a href="${urls.project}" target="_blank">licence AGPLv3</a>`
         },
         footer: {
             madewith: "Fait avec <span style='color: #e25555;'> &#9829; </span> în <a href='https://twitter.com/search?q=%23IberbookEdu' target='_blank'>#IberbookEdu</a>"

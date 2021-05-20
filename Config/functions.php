@@ -10,22 +10,6 @@ if (!function_exists('app')) {
 	}
 }
 
-if (!function_exists('auth')) {
-	/**
-	 * Return Leaf's auth object
-	 */
-	function auth($guard = null)
-	{
-		if (!$guard) return \Leaf\Auth::class;
-
-		if ($guard === 'session') {
-			return \Leaf\Auth::session();
-		}
-
-		return \Leaf\Auth::guard($guard);
-	}
-}
-
 if (!function_exists('d')) {
 	/**
 	 * Return Leaf's date object
@@ -33,46 +17,6 @@ if (!function_exists('d')) {
 	function d()
 	{
 		return app()->date;
-	}
-}
-
-if (!function_exists('dbRow')) {
-	/**
-	 * Return a db row by it's id
-	 *
-	 * @param string $table The table to find row
-	 * @param string|int $row_id The row's id
-	 * @param string $columns The columns to get
-	 *
-	 * @return array|null The database field
-	 */
-	function dbRow($table, $row_id, $columns = "*")
-	{
-		app()->db()->autoConnect();
-		return app()->db()->select($table, $columns)->where("id", $row_id)->fetchAll();
-	}
-}
-
-if (!function_exists('email')) {
-	/**
-	 * Write and send an email
-	 *
-	 * @param array $email The email block to write and send
-	 */
-	function email(array $email)
-	{
-		$mail = new \Leaf\Mail;
-		if (getenv("MAIL_DRIVER") === "smtp") {
-			$mail->smtp_connect(
-				getenv("MAIL_HOST"),
-				getenv("MAIL_PORT"),
-				!getenv("MAIL_USERNAME") ? false : true,
-				getenv("MAIL_USERNAME") ?? null,
-				getenv("MAIL_PASSWORD") ?? null,
-				getenv("MAIL_ENCRYPTION") ?? "STARTTLS"
-			);
-		}
-		$mail->write($email)->send();
 	}
 }
 
@@ -94,16 +38,6 @@ if (!function_exists('flash')) {
     {
         return \Leaf\Flash::class;
     }
-}
-
-if (!function_exists('hasAuth')) {
-	/**
-	 * Find out if there's an active sesion
-	 */
-	function hasAuth()
-	{
-		return !!sessionUser();
-	}
 }
 
 if (!function_exists('import')) {
@@ -149,21 +83,15 @@ if (!function_exists('markup')) {
 	}
 }
 
-if (!function_exists('plural')) {
-	function plural($value, $count = 2)
-	{
-		return Leaf\Str::plural($value, $count);
+if (!function_exists('render')) {
+	function render(string $view, array $data = []) {
+		return viewConfig("render")($view, $data);
 	}
 }
 
-if (!function_exists('render')) {
-	function render(string $view, array $data = [])
-	{
-		if (viewConfig("view_engine") === \Leaf\Blade::class) {
-			return markup(view($view, $data));
-		}
-
-		return viewConfig("render")($view, $data);
+if (!function_exists('render_text')) {
+	function render_text(string $view, array $data = []) {
+		return viewConfig("render")($view, $data, true);
 	}
 }
 
@@ -219,44 +147,6 @@ if (!function_exists('response')) {
 	}
 }
 
-if (!function_exists('Route')) {
-	/**
-	 * @param string The request method(s)
-	 * @param string The route to handle
-	 * @param callable|string The handler for the route
-	 */
-	function Route($methods, $pattern, $fn)
-	{
-		app()->match($methods, $pattern, $fn);
-	}
-}
-
-if (!function_exists('session')) {
-	/**
-	 * Get a session variable or the session object
-	 *
-	 * @param string|null $key The variable to get
-	 */
-	function session($key = null)
-	{
-		if ($key) {
-			return \Leaf\Http\Session::get($key);
-		}
-
-		return (new \Leaf\Http\Session);
-	}
-}
-
-if (!function_exists('sessionUser')) {
-	/**
-	 * Get the currently logged in user
-	 */
-	function sessionUser()
-	{
-		return session('AUTH_USER');
-	}
-}
-
 if (!function_exists('setHeader')) {
 	/**
 	 * Set a response header
@@ -269,13 +159,6 @@ if (!function_exists('setHeader')) {
 	function setHeader($key, $value = "", $replace = true, $code = 200)
 	{
 		app()->headers()->set($key, $value, $replace, $code);
-	}
-}
-
-if (!function_exists('singular')) {
-	function singular($value)
-	{
-		return Leaf\Str::singular($value);
 	}
 }
 
@@ -453,6 +336,43 @@ function lib_path($path = null)
 function public_path($path = null)
 {
 	return app_paths("public_path") . "/$path";
+}
+
+/* Custom functions */
+
+/**
+ * Group uploads folder
+ */
+function group_uploads_path(int $groupid) {
+    return app_paths("uploads_path") . "/" . $groupid . "/";
+}
+
+/**
+ * Profile personal upload folder
+ */
+function profile_uploads_path(int $groupid, int $profileid) {
+    return group_uploads_path($groupid) . "/users/" . $profileid . "/";
+}
+
+/**
+ * Group common gallery folder
+ */
+function group_gallery_path(int $groupid) {
+    return group_uploads_path($groupid) . "/gallery/";
+}
+
+/**
+ * Yearbook
+ */
+function group_yearbook_path(int $yearbookid) {
+    return app_paths("yearbooks_path") . "/". $yearbookid . "/";
+}
+
+/**
+ * Themes path
+ */
+function get_theme(string $theme) {
+    return app_paths("themes_path") . "/" . $theme . "/";
 }
 
 function acyear() {

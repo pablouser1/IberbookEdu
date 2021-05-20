@@ -1,12 +1,14 @@
 <?php
 
 namespace Controllers;
-
 use Helpers\Auth;
 use Helpers\GenYB;
 use Helpers\Misc;
+use Helpers\Zip;
 use Models\Yearbook;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Models\Theme;
+
 class YearbookController extends \Leaf\ApiController
 {
 	public function all() {
@@ -56,49 +58,120 @@ class YearbookController extends \Leaf\ApiController
         }
     }
 
-    public function generate() {
+    public function generate(int $group_id) {
         ignore_user_abort(1);
         set_time_limit(0);
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
-        if ($user->isMod()) {
-            $genyb = new GenYB($profile);
-            if ($genyb->initialCheck($_POST["theme"])) {
-                $banner = null;
-                if ($genyb->theme->details["banner"] && isset($_FILES['banner'])) {
-                    $banner = $_FILES['banner']['name'];
-                }
-                // Write yearbook to DB
-                $ybid = $genyb->writeToDB($banner);
-                // Get info
-                $users = $genyb->getUsers();
-                $students = $users["students"];
-                $teachers = $users["teachers"];
-                $gallery = $genyb->getGallery();
-                // Create dirs
-                $genyb->createDirs();
-                // Copy all files to working dir
-                $genyb->copyFiles();
-                // Create and copy config files
-                $genyb->setConfig($students, $teachers, $gallery, $banner);
-                // Zip Yearbook
-                if ($genyb->theme->details["zip"]) {
-                    $genyb->zipYearbook();
-                }
-                // Everyting went OK
-                json([
-                    "id" => $ybid,
-                    "message" => "Yearbook sent successfully"
-                ]);
+        if ($user->isMod() && $profile->group_id === $group_id) {
+            $genyb = new GenYB($profile->group_id, $profile->group->name, $profile->group->school->name);
+            $banner = null;
+            if (isset($_FILES['banner'])) {
+                $banner = $_FILES['banner']['name'];
             }
-            else {
-                throwErr("Invalid theme", 400);
-            }
+            // Write yearbook to DB
+            $ybid = $genyb->writeToDB($banner);
+            // Get info
+            $users = $genyb->getUsers();
+            $students = $users["students"];
+            $teachers = $users["teachers"];
+            $gallery = $genyb->getGallery();
+            // Create dirs
+            $genyb->createDirs();
+            // Copy all files to working dir
+            $genyb->copyFiles();
+            // Create and copy config files
+            $genyb->setConfig($students, $teachers, $gallery, $banner);
+            // Everyting went OK
+            json([
+                "id" => $ybid,
+                "message" => "Yearbook sent successfully"
+            ]);
         }
         else {
             throwErr("You are not a mod", 403);
         }
 
+    }
+
+    public function view($id) {
+        if (Yearbook::where("id", "=", $id)->exists()) {
+            $themeName = requestData("theme");
+            if (!empty($themeName)) {
+                $theme = Theme::where("name", "=", $themeName)->first();
+                if ($theme) {
+                    $url = getenv("APP_URL") . "/";
+                    $themeDir = $url . get_theme($theme->name);
+                    $common = $url . "/pages/themes/common/";
+                    $data = $url . group_yearbook_path($id);
+                    render("themes/{$theme->name}/index", [
+                        "common" => $common,
+                        "theme" => $themeDir,
+                        "data" => $data
+                    ]);
+                }
+                else {
+                    response()->markup("Invalid theme", 400);
+                }
+            }
+            else {
+                response()->markup("You need to send a theme", 400);
+            }
+        }
+        else {
+            response()->markup("This yearbook doesn't exist", 404);
+        }
+    }
+
+    // Creates zip of yearbook
+    public function download($id) {
+        set_time_limit(300);
+        $yearbook = Yearbook::where("id", "=", $id)->first();
+        if ($yearbook) {
+            $themeName = requestData("theme");
+            if (!empty($themeName)) {
+                $theme = Theme::where("name", "=", $themeName)->first();
+                if ($theme && $theme->details["zip"]) {
+                    $url = getenv("APP_URL") . "/";
+                    $zipName = "yearbook_{$id}_{$theme->name}.zip";
+                    $zipPath = storage_path("framework/zips") . "/" . $zipName;
+                    if (file_exists($zipPath)) {
+                        // Zip already exists, skip zipping and redirect to download
+                        response()->redirect($url . $zipPath);
+                    }
+                    else {
+                        // Zip doesn't exist, create one
+                        // Using relative paths, user will download this into one single zip file
+                        $html = render_text("themes/default/index", [
+                            "common" => "./",
+                            "theme" => "./",
+                            "data" => "./"
+                        ]);
+                        $yearbookDir = group_yearbook_path($id);
+                        $themeDir = get_theme($theme->name);
+                        $commonDir = get_theme("common");
+                        $zipPath = storage_path("framework/zips") . "/" . $zipName;
+                        // Zipping all elements of yearbook
+                        Zip::zipDir($yearbookDir, $zipPath);
+                        Zip::zipDir($themeDir, $zipPath, [
+                            "index.latte", "theme.json"
+                        ]);
+                        Zip::zipDir($commonDir, $zipPath);
+                        Zip::zipString($html, "index.html", $zipPath);
+                        response()->redirect($url . $zipPath);
+                    }
+                }
+                else {
+                    response()->markup("Theme not valid or can't be zipped", 400);
+                }
+            }
+            else {
+                response()->markup("You need to send a theme", 400);
+            }
+        }
+        else {
+            response()->markup("This yearbook doesn't exist", 404);
+        }
     }
 
     public function delete($id) {
@@ -108,8 +181,19 @@ class YearbookController extends \Leaf\ApiController
         $yearbook = Yearbook::where("id", "=", $id)->first();
         if ($yearbook) {
             if ($user->isMod() && $profile->group_id === $yearbook->group_id && $acyear === $yearbook->acyear) {
+                $zipDir = storage_path("framework/zips");
+                // Delete zips (if any)
+                $zips = glob($zipDir . "/yearbook_" . $yearbook->id . "_*.zip");
+                if ($zips) {
+                    foreach ($zips as $zip) {
+                        unlink($zip);
+                    }
+                }
+                // Delete from database
                 $yearbook->delete();
-                Misc::recursiveRemove(storage_path("app/yearbooks/".$id));
+                // Delete files
+                Misc::recursiveRemove(group_yearbook_path($id));
+                // Delete zips (if any)
                 response([
                     "message" => "Deleted successfully"
                 ]);
@@ -119,7 +203,7 @@ class YearbookController extends \Leaf\ApiController
             }
         }
         else {
-            throwErr("You don't have a yearbook", 404);
+            throwErr("Yearbook not found", 404);
         }
     }
 

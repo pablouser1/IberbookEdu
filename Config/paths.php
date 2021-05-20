@@ -26,4 +26,10 @@ return [
 	"lib_path" => "Lib",
 
 	"public_path" => ".",
+
+    "yearbooks_path" => "storage/app/yearbooks",
+
+    "uploads_path" => "storage/app/uploads",
+
+    "themes_path" => "pages/themes"
 ];

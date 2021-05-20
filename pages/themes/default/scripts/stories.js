@@ -22,7 +22,7 @@ var stories = {
         <div class="modal-background" @click="stopVideo"></div>
         <div id="videoModal" class="modal-content fade-in has-text-centered" style="overflow: hidden;">
             <video id="videoStories" @ended="stopVideo" controls>
-                <source :src="'users/' + user.id + '/' + user.video">
+                <source :src="dataUrl + '/users/' + user.id + '/' + user.video">
             </video>
         </div>
         <button class="modal-close" @click="stopVideo"></button>

@@ -1,5 +1,6 @@
 <?php
 namespace Helpers;
+
 class Misc {
     static public function recursiveRemove($dir) {
         foreach(glob("{$dir}/*") as $file) {

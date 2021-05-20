@@ -16,7 +16,7 @@ class UploadGallery {
     public $chunk;
     function __construct($profile) {
         $this->profile = $profile;
-        $this->baseurl = storage_path("app/uploads/".$this->profile->group_id."/gallery/");
+        $this->baseurl = group_gallery_path($this->profile->group_id);
         $this->chunk = new Chunk;
     }
 
@@ -66,31 +66,37 @@ class UploadGallery {
 
 class GalleryController extends \Leaf\ApiController
 {
-	public function all()
-	{
+	public function all(int $group_id) {
         $profile = Auth::isProfileLoggedin();
-        $gallery = Gallery::all()->where("group_id", "=", $profile->group_id);
-        response($gallery);
+        if ($profile->group_id === $group_id) {
+            $gallery = Gallery::all()->where("group_id", "=", $profile->group_id);
+            response($gallery);
+        }
+        else {
+            throwErr("You don't have permissions to access this gallery", 403);
+        }
 	}
 
     // Stream item
-    public function one($id) {
+    public function one(int $group_id, int $item_id) {
         $profile = Auth::isProfileLoggedin();
-        try {
-            $gallery = Gallery::findOrFail($id);
-            $path = storage_path()."/app/uploads/".$profile->group_id."/gallery/".$gallery->name;
-            $streamer = new Streamer($path);
-            $streamer->start();
-        }
-        catch (ModelNotFoundException $e) {
-            throwErr("Not found", 404);
+        if ($profile->group_id === $group_id) {
+            try {
+                $gallery = Gallery::findOrFail($item_id);
+                $path = group_gallery_path($group_id)."/".$gallery->name;
+                $streamer = new Streamer($path);
+                $streamer->start();
+            }
+            catch (ModelNotFoundException $e) {
+                throwErr("Not found", 404);
+            }
         }
     }
 
-    public function upload() {
+    public function upload(int $group_id) {
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
-        if ($user->isMod()) {
+        if ($user->isMod() && $profile->group_id === $group_id) {
             $upload = new UploadGallery($profile);
             $result = $upload->startUpload($_FILES);
             if ($result) {
@@ -125,10 +131,10 @@ class GalleryController extends \Leaf\ApiController
         }
     }
 
-    public function delete() {
+    public function delete($group_id) {
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
-        if ($user->isMod()) {
+        if ($user->isMod() && $profile->group_id === $group_id) {
             $gallery = Gallery::all()->where("group_id", "=", $profile->group_id);
             foreach ($gallery as $item) {
                 $item->delete();
@@ -140,7 +146,7 @@ class GalleryController extends \Leaf\ApiController
             ]);
         }
         else {
-            throwErr("You don't have permissions", 401);
+            throwErr("You don't have permissions", 403);
         }
     }
 }

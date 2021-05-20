@@ -7,16 +7,16 @@ use Models\Profile;
 
 class UploadMedia
 {
-    private $profileinfo;
+    private $profile;
     public $temp_dir;
     public $baseurl;
     public $chunk;
 
     function __construct($profileinfo) {
         $this->chunk = new Chunk;
-        $this->profileinfo = $profileinfo;
-        $this->baseurl = storage_path("app/uploads/") . $this->profileinfo->group_id . "/users/" . $this->profileinfo->id . "/";
-        $this->temp_dir = sys_get_temp_dir()."/".$this->profileinfo->id;
+        $this->profile = $profileinfo;
+        $this->baseurl = profile_uploads_path($this->profile->group_id, $this->profile->id);
+        $this->temp_dir = sys_get_temp_dir()."/".$this->profile->id;
     }
 
     public function startUpload($files) {
@@ -68,32 +68,32 @@ class UploadMedia
 
     public function setToDB($filename) {
         if ($this->type === "video") {
-            $this->profileinfo->video = $filename;
+            $this->profile->video = $filename;
         }
         elseif($this->type === "photo") {
-            $this->profileinfo->photo = $filename;
+            $this->profile->photo = $filename;
         }
-        $this->profileinfo->save();
+        $this->profile->save();
     }
 
     // Get elements not uploaded yet
     private function getNotUploaded() {
-        $remain = Profile::select("photo", "video")->where("id", "=", $this->profileinfo->id)->first();
+        $remain = Profile::select("photo", "video")->where("id", "=", $this->profile->id)->first();
         return $remain;
     }
 
     public function deleteMedia() {
         $name = null;
         if ($this->type === "video") {
-            $name = $this->profileinfo->video;
-            $this->profileinfo->video = null;
+            $name = $this->profile->video;
+            $this->profile->video = null;
         }
         elseif($this->type === "photo") {
-            $name = $this->profileinfo->photo;
-            $this->profileinfo->photo = null;
+            $name = $this->profile->photo;
+            $this->profile->photo = null;
         }
 
-        $this->profileinfo->save();
+        $this->profile->save();
 
         unlink($this->baseurl . $name);
     }

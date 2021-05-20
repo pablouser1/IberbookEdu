@@ -3,8 +3,8 @@
 /**@var Leaf\App $app */
 
 $app->group('/gallery', function() use ($app) {
-    $app->get("/", "GalleryController@all"); // Get all
-    $app->post("/", "GalleryController@upload"); // Upload new
-    $app->delete("/", "GalleryController@delete"); // Delete
-    $app->get("/(\d+)", "GalleryController@one"); // Get one
+    $app->get("/(\d+)", "GalleryController@all"); // Get all items
+    $app->post("/(\d+)", "GalleryController@upload"); // Upload new item
+    $app->delete("/(\d+)", "GalleryController@delete"); // Delete gallery
+    $app->get("/(\d+)/items/(\d+)", "GalleryController@one"); // Stream item
 });

@@ -9,6 +9,9 @@ function hashchange() {
     old_tab.classList.add("is-hidden")
     new_tab.classList.remove("is-hidden")
 }
+
+const groups = JSON.parse(groups_string)
+
 // -- Common -- //
 window.addEventListener("hashchange", hashchange)
 hashchange()

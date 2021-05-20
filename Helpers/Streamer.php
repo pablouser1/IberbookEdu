@@ -1,30 +1,28 @@
 <?php
 namespace Helpers;
+
 /**
  * Description of Streamer, modified accepting all files
  *
  * @author Rana
  * @link http://codesamplez.com/programming/php-html5-video-streaming-tutorial
  */
-class Streamer
-{
+class Streamer {
     private $path = "";
     private $stream = "";
     private $buffer = 102400;
-    private $start  = -1;
-    private $end    = -1;
-    private $size   = 0;
+    private $start = -1;
+    private $end = -1;
+    private $size = 0;
 
-    function __construct($filePath)
-    {
+    function __construct($filePath) {
         $this->path = $filePath;
     }
 
     /**
      * Open stream
      */
-    private function open()
-    {
+    private function open() {
         if (!($this->stream = fopen($this->path, 'rb'))) {
             die('Could not open stream for reading');
         }
@@ -34,8 +32,7 @@ class Streamer
     /**
      * Set proper header to serve the video content
      */
-    private function setHeader()
-    {
+    private function setHeader() {
         ob_get_clean();
         $name = basename($this->path);
         $mime = mime_content_type($this->path);
@@ -82,8 +79,7 @@ class Streamer
             header("Content-Length: ".$length);
             header("Content-Range: bytes $this->start-$this->end/".$this->size);
         }
-        else
-        {
+        else {
             header("Content-Length: ".$this->size);
         }
 
@@ -92,8 +88,7 @@ class Streamer
     /**
      * close curretly opened stream
      */
-    private function end()
-    {
+    private function end() {
         fclose($this->stream);
         exit;
     }
@@ -101,8 +96,7 @@ class Streamer
     /**
      * perform the streaming of calculated range
      */
-    private function stream()
-    {
+    private function stream() {
         $i = $this->start;
         set_time_limit(0);
         while(!feof($this->stream) && $i <= $this->end) {
@@ -120,8 +114,7 @@ class Streamer
     /**
      * Start streaming video content
      */
-    function start()
-    {
+    function start() {
         $this->open();
         $this->setHeader();
         $this->stream();

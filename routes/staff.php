@@ -27,44 +27,47 @@ $app->get("/staff/login", function () {
 
 $app->post("/staff/login", "AccountController@staff");
 
-$app->get("/staff/owner/dashboard", function () {
-    $user = Auth::isStaffLoggedin();
+$app->group("/staff/owner", function () use($app) {
+    $app->get("/dashboard", function () {
+        $user = Auth::isStaffLoggedin();
 
-    // Staff
-    $staff = Staff::all();
+        // Staff
+        $staff = Staff::all();
 
-    // Schools
-    $schools = School::all();
+        // Schools
+        $schools = School::all();
 
-    // Groups
-    $groups = Group::all();
+        // Groups
+        $groups = Group::all();
 
-    // Themes
-    $themes = Theme::all();
+        // Themes
+        $themes = Theme::all();
 
-    render("staff/owner/dashboard",
-    [
-        "user" => $user,
-        "schools" => $schools,
-        "staff" => $staff,
-        "groups" => $groups,
-        "themes" => $themes
-    ]);
-});
+        render("staff/owner/dashboard",
+        [
+            "user" => $user,
+            "schools" => $schools,
+            "staff" => $staff,
+            "groups" => $groups,
+            "themes" => $themes
+        ]);
+    });
 
-$app->get("/staff/owner/users", function () {
-    $user = Auth::isStaffLoggedin();
+    $app->get("/users", function () {
+        $user = Auth::isStaffLoggedin();
 
-    // Staff
-    $users = User::all();
-    $profiles = Profile::all();
-    $groups = json_encode(Group::all());
+        // Staff
+        $users = User::all();
+        $profiles = Profile::all();
+        $groups = json_encode(Group::all());
 
-    render("staff/owner/users",
-    [
-        "user" => $user,
-        "users" => $users,
-        "profiles" => $profiles,
-        "groups" => $groups
-    ]);
+        render("staff/owner/users",
+        [
+            "user" => $user,
+            "users" => $users,
+            "profiles" => $profiles,
+            "groups" => $groups
+        ]);
+    });
+
 });

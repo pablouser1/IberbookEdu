@@ -61,3 +61,4 @@ require __DIR__ . "/themes.php";
 require __DIR__ . "/users.php";
 require __DIR__ . "/yearbooks.php";
 require __DIR__ . "/staff.php";
+require __DIR__ . "/setup.php";

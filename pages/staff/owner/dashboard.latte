@@ -36,13 +36,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {loop="$staff" as $staff_user}
-                                <tr>
-                                    <td>{$staff_user->id}</td>
-                                    <td>{$staff_user->username}</td>
-                                    <td>{$staff_user->role}</td>
-                                </tr>
-                            {/loop}
+                            <tr n:foreach="$staff as $staff_user">
+                                <td>{$staff_user->id}</td>
+                                <td>{$staff_user->username}</td>
+                                <td>{$staff_user->role}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <button id="staff_button" class="button is-info">
@@ -66,12 +64,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {loop="$schools" as $school}
-                                <tr>
-                                    <td>{$school->id}</td>
-                                    <td>{$school->name}</td>
-                                </tr>
-                            {/loop}
+                            <tr n:foreach="$schools as $school">
+                                <td>{$school->id}</td>
+                                <td>{$school->name}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <button id="schools_button" type="button" class="button is-info">
@@ -96,13 +92,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {loop="$groups" as $group}
+                            <tr n:foreach="$groups as $group">
                                 <tr>
                                     <td>{$group->id}</td>
                                     <td>{$group->name}</td>
                                     <td>{$group->school_id}</td>
                                 </tr>
-                            {/loop}
+                            </tr>
                         </tbody>
                     </table>
                     <button id="groups_button" type="button" class="button is-info">

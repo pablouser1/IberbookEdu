@@ -34,7 +34,7 @@ return [
     | you need. As such, you can decide which view engine to use.
     |
     */
-    "view_engine" => \Leaf\Veins::class,
+    "view_engine" => \Latte::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -45,15 +45,19 @@ return [
     | in your app if you're using a custom view engine.
     |
     */
-    "render" => function(string $view, array $data = []) {
-        $veins = new \Leaf\Veins\Template;
-        $veins->configure([
-            "veins_dir" => views_path(null, false),
-            "cache_dir" => storage_path('framework/views/'),
-        ]);
-        $veins->set($data);
-        $veins->render($view);
+    "render" => function(string $view, array $data = [], bool $text = false) {
+        $latte = new Latte\Engine;
 
-        // This example is what veins would look like
+        $latte->setTempDirectory(storage_path('framework/views/'));
+        $file = views_path(null, false) . $view . ".latte";
+        // render to output
+        if (!$text) {
+            $latte->render($file, $data);
+        }
+        // Render to string
+        else {
+            $html = $latte->renderToString($file, $data);
+            return $html;
+        }
     },
 ];

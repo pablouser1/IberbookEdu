@@ -1,45 +1,32 @@
 <?php
 namespace Helpers;
 use Helpers\FullUser;
-use Helpers\Zip;
 use Models\Gallery;
-use Models\Theme;
 use Models\Yearbook;
 use Leaf\FS;
-class GenYB {
-    private $profile;
-    public $theme;
-    private $acyear;
-    private $themedir;
-    private $themeCommon;
-    private $yearbookdir;
-    private $upload;
-    function __construct($profile) {
-        $this->profile = $profile;
-        $this->acyear = acyear();
-        $this->upload = storage_path("app/uploads/".$profile->group_id);
-        $this->themeCommon = storage_path("app/themes/common");
-    }
 
-    // Check if theme is valid
-    public function initialCheck($id) {
-        $theme = Theme::where("id", "=", $id)->first();
-        if ($theme) {
-            $this->theme = $theme;
-            $this->themedir = storage_path("app/themes/".$theme->name);
-            return true;
-        }
-        return false;
+class GenYB {
+    private $groupId;
+    private $groupName;
+    private $acyear;
+    private $dataDir;
+    private $upload;
+    function __construct(int $groupId, string $groupName, string $schoolName) {
+        $this->groupId = $groupId;
+        $this->groupName = $groupName;
+        $this->schoolName = $schoolName;
+        $this->acyear = acyear();
+        $this->upload = group_uploads_path($this->groupId);
     }
 
     // Write yearbook to database
     public function writeToDB($banner) {
         $yearbook = new Yearbook;
-        $yearbook->group_id = $this->profile->group_id;
+        $yearbook->group_id = $this->groupId;
         $yearbook->acyear = $this->acyear;
         $yearbook->banner = $banner;
         $yearbook->save();
-        $this->yearbookdir = storage_path("app/yearbooks/".$yearbook->id);
+        $this->dataDir = group_yearbook_path($yearbook->id);
         return $yearbook->id;
     }
 
@@ -49,7 +36,7 @@ class GenYB {
             "students" => [],
             "teachers" => []
         ];
-        $tempUsers = FullUser::full($this->profile->group_id);
+        $tempUsers = FullUser::full($this->groupId);
         foreach ($tempUsers as $tempUser) {
             // Users need to have at least a photo and a video
             if ($tempUser["photo"] && $tempUser["video"]) {
@@ -66,15 +53,14 @@ class GenYB {
 
     // Get gallery from DB
     public function getGallery() {
-        $items = Gallery::all()->where("group_id", "=", $this->profile->group_id);
+        $items = Gallery::all()->where("group_id", "=", $this->groupId);
         return $items;
     }
 
     // Create yearbook dir if it doesn't exist
     public function createDirs() {
-        if(!is_dir($this->yearbookdir)) {
-            mkdir($this->yearbookdir, 0755, true);
-            mkdir($this->yearbookdir."/assets", 0755, true);
+        if(!is_dir($this->dataDir)) {
+            mkdir($this->dataDir, 0755, true);
         }
     }
 
@@ -82,14 +68,7 @@ class GenYB {
     public function copyFiles() {
         // Copy all user uploaded files
         $source = $this->upload;
-        FS::superCopy($source, $this->yearbookdir);
-
-        $source = $this->themedir;
-        FS::superCopy($source, $this->yearbookdir);
-
-        // Copy all common assets
-        $source = $this->themeCommon;
-        FS::superCopy($source, $this->yearbookdir);
+        FS::superCopy($source, $this->dataDir);
     }
 
     // Save yearbook config as .js file
@@ -103,8 +82,8 @@ class GenYB {
         // Yearbook info
         $dt = d();
         $ybinfo = [
-            "schoolname" => $this->profile->group->school->name,
-            "year" => $this->profile->group->name,
+            "schoolname" => $this->schoolName,
+            "year" => $this->groupName,
             "acyear" => $this->acyear,
             "ybdate" => $dt->now()
         ];
@@ -127,7 +106,7 @@ class GenYB {
         // Yearbook info
         const ybinfo_js = {$ybinfo_js};
         ";
-        file_put_contents("{$this->yearbookdir}/scripts/data.js", $data);
+        file_put_contents("{$this->dataDir}/data.js", $data);
     }
 
     // Upload banner if given
@@ -139,14 +118,8 @@ class GenYB {
             $uploadName = $banner;
             $ext = pathinfo($uploadName, PATHINFO_EXTENSION);
             if (in_array($ext, ["jpg", "jpeg", "png", "gif"])) {
-                move_uploaded_file($tmpFilePath, "$this->yearbookdir/assets/$banner");
+                move_uploaded_file($tmpFilePath, $this->dataDir . "/" . $banner);
             }
         }
-    }
-
-    // Zip Yearbook
-    public function zipYearbook() {
-        // Zip yearbook
-        Zip::zipDir($this->yearbookdir, $this->yearbookdir."/yearbook.zip");
     }
 }

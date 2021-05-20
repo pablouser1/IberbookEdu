@@ -43,7 +43,7 @@ class ProfileController extends \Leaf\ApiController
     public function photo($id) {
         $profile = self::prepareStream($id);
         if ($profile) {
-            $baseurl = storage_path()."/app/uploads/". $profile->group_id . "/users/" . $profile->id . "/" . $profile->photo;
+            $baseurl = profile_uploads_path($profile->group_id, $profile->id) . "/" . $profile->photo;
             $streamer = new Streamer($baseurl);
             $streamer->start();
         }
@@ -52,7 +52,7 @@ class ProfileController extends \Leaf\ApiController
     public function video($id) {
         $profile = self::prepareStream($id);
         if ($profile) {
-            $baseurl = storage_path()."/app/uploads/". $profile->group_id . "/users/" . $profile->id . "/" . $profile->video;
+            $baseurl = profile_uploads_path($profile->group_id, $profile->id) . "/" . $profile->video;
             $streamer = new Streamer($baseurl);
             $streamer->start();
         }
@@ -106,12 +106,12 @@ class ProfileController extends \Leaf\ApiController
                 foreach ($elements as $element) {
                     switch ($element) {
                         case "photo":
-                            $file = storage_path("app/uploads/".$profile->group_id."/users/".$profile->id."/".$profile->photo);
+                            $file = profile_uploads_path($profile->group_id, $profile->id) . "/" . $profile->photo;
                             $profile->photo = null;
                             unlink($file);
                             break;
                         case "video":
-                            $file = storage_path("app/uploads/".$profile->group_id."/users/".$profile->id."/".$profile->video);
+                            $file = profile_uploads_path($profile->group_id, $profile->id) . "/" . $profile->video;
                             $profile->video = null;
                             unlink($file);
                             break;

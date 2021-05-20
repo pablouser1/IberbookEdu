@@ -1,6 +1,7 @@
 {
     "name": "default",
     "description": "IberbookEdu's default template",
-    "zip": false,
+    "type": "web",
+    "zip": true,
     "banner" : true
 }
