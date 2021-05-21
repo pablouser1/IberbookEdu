@@ -69,12 +69,15 @@ class YearbookController extends \Leaf\ApiController
             if (isset($_FILES['banner'])) {
                 $banner = $_FILES['banner']['name'];
             }
-            // Write yearbook to DB
-            $ybid = $genyb->writeToDB($banner);
             // Get info
             $users = $genyb->getUsers();
             $students = $users["students"];
             $teachers = $users["teachers"];
+            if (empty($students) && empty($students)) {
+                throwErr("Not enough users, at least one student or one teacher with image and video");
+            }
+            // Write yearbook to DB
+            $ybid = $genyb->writeToDB($banner);
             $gallery = $genyb->getGallery();
             // Create dirs
             $genyb->createDirs();

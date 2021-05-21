@@ -1,6 +1,8 @@
 <?php
 
 use Helpers\Auth;
+use Helpers\Misc;
+use Models\Gallery;
 use Models\Group;
 use Models\Profile;
 use Models\School;
@@ -70,4 +72,23 @@ $app->group("/staff/owner", function () use($app) {
         ]);
     });
 
+    $app->delete("/clear", function() {
+        $owner = Auth::isStaffLoggedin();
+        $password = requestData("password");
+        if ($password) {
+            $owner->makeVisible(['password']);
+            // Valid password, delete
+            if (password_verify($password, $owner->password)) {
+                $uploadsDir = app_paths("uploads_path");
+                $dirs = glob($uploadsDir . "/*", GLOB_ONLYDIR);
+                foreach ($dirs as $dir) {
+                    Misc::recursiveRemove($dir);
+                }
+                User::truncate();
+                Profile::truncate();
+                Gallery::truncate();
+                response("Reseted successfully");
+            }
+        }
+    });
 });

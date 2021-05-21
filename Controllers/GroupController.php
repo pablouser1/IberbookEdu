@@ -44,18 +44,23 @@ class GroupController extends \Leaf\ApiController
         $group->name = $newGroup["name"];
         $group->school_id = $newGroup["school"];
         $group->save();
-        response()->redirect("../staff/owner/dashboard");
+        response("Group created successfully");
     }
 
-    public function delete($id) {
+    public function delete() {
         $staff = Auth::isStaffLoggedin();
-        $group = Group::where("id", "=", $id)->first();
-        if ($group) {
-            $group->delete();
-            response("Success");
+        $groups = requestData("groups");
+        if ($groups && !empty($groups)) {
+            foreach ($groups as $group) {
+                $tempGroup = Group::where("id", "=", $group)->first();
+                if ($tempGroup) {
+                    $tempGroup->delete();
+                }
+            }
         }
         else {
-            throwErr("That group doesn't exist", 400);
+            throwErr("No groups sent", 400);
         }
+        response("Finished");
     }
 }

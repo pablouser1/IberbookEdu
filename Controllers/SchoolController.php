@@ -29,18 +29,23 @@ class SchoolController extends \Leaf\ApiController
         $school = new School;
         $school->name = $newSchool;
         $school->save();
-        response()->redirect("staff/owner/dashboard");
+        response("School created successfully");
     }
 
     public function delete($id) {
         $staff = Auth::isStaffLoggedin();
-        $school = School::where("id", "=", $id)->first();
-        if ($school) {
-            $school->delete();
-            response("Success");
+        $schools = requestData("schools");
+        if ($schools && !empty($schools)) {
+            foreach ($schools as $school) {
+                $tempGroup = School::where("id", "=", $school)->first();
+                if ($tempGroup) {
+                    $tempGroup->delete();
+                }
+            }
         }
         else {
-            throwErr("That school doesn't exist", 400);
+            throwErr("No groups sent", 400);
         }
+        response("Finished");
     }
 }

@@ -53,9 +53,15 @@ function addUserCard() {
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Birthday</label>
+                    <label class="label">Username</label>
                     <div class="control">
-                        <input type="date" name="users[${user_i}][birthday]">
+                        <input name="users[${user_i}][username]" class="input" type="text" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input name="users[${user_i}][password]" class="input" type="text" autocomplete="off">
                     </div>
                 </div>
                 <div class="field">
@@ -110,7 +116,7 @@ jsoninput.onchange = () => {
 // FORM UPLOAD
 document.getElementById("add_form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const formData = new FormData(document.getElementById("add_form"));
+    const formData = new FormData(event.target);
     try {
         const res = await fetch("../../users", {
             method: 'POST',
@@ -126,6 +132,7 @@ document.getElementById("add_form").addEventListener("submit", async (event) => 
 })
 
 document.getElementById("jsonsend").addEventListener("click", async (event) => {
+    document.getElementById("jsonsend").classList.add("is-loading")
     event.preventDefault();
     const formData = new FormData;
     formData.append("json", jsoninput.files[0])
@@ -141,6 +148,7 @@ document.getElementById("jsonsend").addEventListener("click", async (event) => {
         console.log(badRes)
         alert("Error while generating users")
     }
+    document.getElementById("jsonsend").classList.remove("is-loading")
 })
 
 document.getElementById("remove_button").addEventListener("click", async () => {

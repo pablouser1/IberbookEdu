@@ -5,8 +5,7 @@ namespace Controllers;
 use Models\Theme;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class ThemeController extends \Leaf\ApiController
-{
+class ThemeController extends \Leaf\ApiController {
 	public function all() {
         $themes = Theme::all();
         response($themes);

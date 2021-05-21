@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Owner Dashboard - IberbookEdu</title>
-    <script defer src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.15.3/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
 </head>
 
@@ -22,7 +22,8 @@
         </section>
         <section id="items" class="section">
             <div>
-                <div>
+                <!-- Staff table and buttons -->
+                <div id="staff">
                     <p class="title is-4">
                         <i class="fas fa-user-shield"></i>
                         <span>Staff</span>
@@ -43,14 +44,23 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button id="staff_button" class="button is-info">
-                        <span class="icon">
-                            <i class="fas fa-user-friends"></i>
-                        </span>
-                        <span>Add staff</span>
-                    </a>
+                    <div class="buttons">
+                        <button id="staff_add_button" class="button is-info">
+                            <span class="icon">
+                                <i class="fas fa-user-friends"></i>
+                            </span>
+                            <span>Add staff</span>
+                        </button>
+                        <button id="staff_remove_button" class="button is-danger">
+                            <span class="icon">
+                                <i class="fas fa-user-friends"></i>
+                            </span>
+                            <span>Remove staff</span>
+                        </button>
+                    </div>
                 </div>
                 <hr>
+                <!-- Schools table and buttons -->
                 <div>
                     <p class="title is-4">
                         <i class="fas fa-school"></i>
@@ -70,14 +80,22 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button id="schools_button" type="button" class="button is-info">
-                        <span class="icon">
-                            <i class="fas fa-school"></i>
-                        </span>
-                        <span>Add schools</span>
-                    </button>
-                </div>
+                    <div class="buttons">
+                        <button id="schools_add_button" type="button" class="button is-info">
+                            <span class="icon">
+                                <i class="fas fa-school"></i>
+                            </span>
+                            <span>Add schools</span>
+                        </button>
+                        <button id="schools_remove_button" type="button" class="button is-danger">
+                            <span class="icon">
+                                <i class="fas fa-school"></i>
+                            </span>
+                            <span>Remove schools</span>
+                        </button>
+                    </div>
                 <hr>
+                <!-- Groups table and buttons -->
                 <div>
                     <p class="title is-4">
                         <i class="fas fa-school"></i>
@@ -101,12 +119,20 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button id="groups_button" type="button" class="button is-info">
-                        <span class="icon">
-                            <i class="fas fa-users"></i>
-                        </span>
-                        <span>Add groups</span>
-                    </button>
+                    <div class="buttons">
+                        <button id="groups_add_button" type="button" class="button is-info">
+                            <span class="icon">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <span>Add groups</span>
+                        </button>
+                        <button id="groups_remove_button" type="button" class="button is-danger">
+                            <span class="icon">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <span>Remove groups</span>
+                        </button>
+                    </div>
                 </div>
                 <hr>
                 <div>
@@ -122,8 +148,35 @@
     <!-- Modals -->
 
     <!-- Staff -->
-    <div class="modal" id="staff_modal">
-        <form action="../../staff" method="POST">
+    <div class="modal" id="staff_add_modal">
+        <form id="staff_add_form">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Staff</p>
+                    <button class="delete" aria-label="close" data-bulma-modal="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field">
+                        <div class="control">
+                            <input name="Staff[username]" class="input" placeholder="Username" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <input name="staff[password]" class="input" type="password" placeholder="Password" />
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-success">Send</button>
+                    <button class="button" data-bulma-modal="close">Cancel</button>
+                </footer>
+            </div>
+        </form>
+    </div>
+    <div class="modal" id="staff_remove_modal">
+        <form id="staff_add_form">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
@@ -150,8 +203,30 @@
         </form>
     </div>
     <!-- Schools -->
-    <div class="modal" id="schools_modal">
-        <form action="../../schools" method="POST">
+    <div class="modal" id="schools_add_modal">
+        <form id="schools_add_form">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Schools</p>
+                    <button class="delete" aria-label="close" data-bulma-modal="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field">
+                        <div class="control">
+                            <input name="school" class="input" placeholder="School name" />
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-success">Send</button>
+                    <button class="button" data-bulma-modal="close">Cancel</button>
+                </footer>
+            </div>
+        </form>
+    </div>
+    <div class="modal" id="schools_remove_modal">
+        <form id="schools_remove_form">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
@@ -174,8 +249,8 @@
     </div>
 
     <!-- Groups -->
-    <div class="modal" id="groups_modal">
-        <form action="../../groups" method="POST">
+    <div id="groups_add_modal" class="modal">
+        <form id="groups_add_form">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
@@ -201,6 +276,34 @@
             </div>
         </form>
     </div>
+    <div id="groups_remove_modal" class="modal">
+        <form id="groups_remove_form">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Groups</p>
+                    <button class="delete" aria-label="close" data-bulma-modal="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field">
+                        <div class="control">
+                            <div class="select is-multiple">
+                                <select name="groups[]" multiple size="{count($groups)}">
+                                    <option n:foreach="$groups as $group" value="{$group->id}">{$group->name}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-danger">Remove</button>
+                    <button class="button" data-bulma-modal="close">Cancel</button>
+                </footer>
+            </div>
+        </form>
+    </div>
+
+    <script src="../../pages/js/requests.js"></script>
     <script src="../../pages/js/modal.js"></script>
     <script src="../../pages/js/dashboard.js"></script>
 </body>

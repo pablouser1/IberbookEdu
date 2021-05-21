@@ -93,7 +93,7 @@
             </div>
             <div class="navbar-menu" :class="{ 'is-active': showNav }">
                 <div class="navbar-start">
-                    <a v-on:click="showNav = false" href="#gallery" class="navbar-item">
+                    <a v-if="gallery.length" v-on:click="showNav = false" href="#gallery" class="navbar-item">
                         <span class="icon">
                             <i class="fas fa-photo-video"></i>
                         </span>

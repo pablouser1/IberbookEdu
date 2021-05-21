@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UploadGallery {
     private $profile;
-    private $baseurl;
+    public $baseurl;
     private $type;
     public $chunk;
     function __construct($profile) {

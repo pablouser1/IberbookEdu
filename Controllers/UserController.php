@@ -27,9 +27,8 @@ class UserController extends \Leaf\ApiController
             $response = [];
             foreach ($users as $user) {
                 $newUser = new User;
-                $birthday = date("Y-m-d", strtotime($user["birthday"]));
-                $username = Misc::generate_username($user["name"], $user["surname"], $birthday);
-                $password = Misc::generate_password($user["surname"], $birthday);
+                $username = $user["username"];
+                $password = isset($user["password"]) && !empty($user["password"]) ? $user["password"] : Misc::random_password(10);
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 $newUser->username = $username;
                 $newUser->password = $hashed_password;
@@ -61,6 +60,12 @@ class UserController extends \Leaf\ApiController
         $owner = Auth::isStaffLoggedin();
         $deletedUser = User::where("id", "=", $id)->first();
         if ($deletedUser) {
+            $profiles = Profile::where("user_id", "=", $id)->get();
+            foreach ($profiles as $profile) {
+                $upload_path = profile_uploads_path($profile->group_id, $profile->id);
+                Misc::recursiveRemove($upload_path);
+                $profile->delete();
+            }
             $deletedUser->delete();
             json("Deleted successfully");
         }
