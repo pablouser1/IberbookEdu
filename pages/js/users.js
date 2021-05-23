@@ -117,17 +117,12 @@ jsoninput.onchange = () => {
 document.getElementById("add_form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    try {
-        const res = await fetch("../../users", {
-            method: 'POST',
-            body : formData
-        })
-        const res_json = await res.json()
-        generateTXT(res_json)
+    const res = await requests("../../users", "POST", formData)
+    if (res) {
+        generateTXT(res)
     }
-    catch (badRes) {
-        console.log(badRes)
-        alert("Error while generating users")
+    else {
+        alert("Error")
     }
 })
 
@@ -136,17 +131,12 @@ document.getElementById("jsonsend").addEventListener("click", async (event) => {
     event.preventDefault();
     const formData = new FormData;
     formData.append("json", jsoninput.files[0])
-    try {
-        const res = await fetch("../../users", {
-            method: 'POST',
-            body : formData
-        })
-        const res_json = await res.json()
-        generateTXT(res_json)
+    const res = await requests("../../users", "POST", formData)
+    if (res) {
+        generateTXT(res)
     }
-    catch (badRes) {
-        console.log(badRes)
-        alert("Error while generating users")
+    else {
+        alert("Error")
     }
     document.getElementById("jsonsend").classList.remove("is-loading")
 })

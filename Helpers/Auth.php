@@ -136,8 +136,14 @@ class Auth {
                 }
             }
             elseif (isset($payload->data->staff)) {
-                $staff = $payload->data->staff;
-                return $staff;
+                $staffid = $payload->data->staff->id;
+                try {
+                    $staff = Staff::findOrFail($staffid);
+                    return $staff;
+                }
+                catch (ModelNotFoundException $e) {
+                    return false;
+                }
             }
             else {
                 return false;

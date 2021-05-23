@@ -13,8 +13,8 @@ use Models\User;
 /**@var Leaf\App $app */
 
 $app->group('/staff', function() use ($app) {
-    $app->post("/", "StaffController@create");
-    $app->delete("/(\d+)", "StaffController@delete");
+    $app->post("/", "StaffController@create"); // Create staff(s)
+    $app->post("/delete", "StaffController@delete"); // Delete staff(s)
 });
 
 $app->get("/staff/login", function () {
@@ -72,23 +72,29 @@ $app->group("/staff/owner", function () use($app) {
         ]);
     });
 
-    $app->delete("/clear", function() {
+    $app->post("/clear", function() {
         $owner = Auth::isStaffLoggedin();
         $password = requestData("password");
         if ($password) {
             $owner->makeVisible(['password']);
             // Valid password, delete
             if (password_verify($password, $owner->password)) {
+                User::truncate();
+                Profile::truncate();
+                Gallery::truncate();
                 $uploadsDir = app_paths("uploads_path");
                 $dirs = glob($uploadsDir . "/*", GLOB_ONLYDIR);
                 foreach ($dirs as $dir) {
                     Misc::recursiveRemove($dir);
                 }
-                User::truncate();
-                Profile::truncate();
-                Gallery::truncate();
                 response("Reseted successfully");
             }
+            else {
+                throwErr("Invalid password", 400);
+            }
+        }
+        else {
+            throwErr("No password sent", 400);
         }
     });
 });

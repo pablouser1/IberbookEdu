@@ -26,7 +26,7 @@ staff_remove_button.addEventListener("click", () => {
 staff_remove_form.addEventListener('submit', async (e) => {
     e.preventDefault()
     const form = new FormData(e.target)
-    const res = await requests('../../staff', 'DELETE', form)
+    const res = await requests('../../staff/delete', 'POST', form)
     alert(res)
 })
 
@@ -58,7 +58,7 @@ schools_remove_button.addEventListener("click", () => {
 schools_remove_form.addEventListener('submit', async (e) => {
     e.preventDefault()
     const form = new FormData(e.target)
-    const res = await requests('../../schools', 'DELETE', form)
+    const res = await requests('../../schools/delete', 'POST', form)
     alert(res)
 })
 
@@ -90,6 +90,15 @@ groups_remove_button.addEventListener("click", () => {
 groups_remove_form.addEventListener('submit', async (e) => {
     e.preventDefault()
     const form = new FormData(e.target)
-    const res = await requests('../../groups', 'DELETE', form)
+    const res = await requests('../../groups/delete', 'POST', form)
+    alert(res)
+})
+
+// CLEAR //
+const clear_form = document.getElementById("clear_form")
+clear_form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const form = new FormData(e.target)
+    const res = await requests('../../staff/owner/clear', 'POST', form)
     alert(res)
 })

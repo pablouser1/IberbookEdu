@@ -6,5 +6,5 @@ $app->group('/schools', function() use ($app) {
     $app->get("/", "SchoolController@all");
     $app->get("/(\d+)", "SchoolController@one");
     $app->post("/", "SchoolController@create"); // Create new school
-    $app->delete("/", "SchoolController@delete"); // Delete school(s)
+    $app->post("/delete", "SchoolController@delete"); // Delete school(s)
 });

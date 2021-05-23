@@ -32,7 +32,7 @@ class SchoolController extends \Leaf\ApiController
         response("School created successfully");
     }
 
-    public function delete($id) {
+    public function delete() {
         $staff = Auth::isStaffLoggedin();
         $schools = requestData("schools");
         if ($schools && !empty($schools)) {
@@ -41,11 +41,14 @@ class SchoolController extends \Leaf\ApiController
                 if ($tempGroup) {
                     $tempGroup->delete();
                 }
+                else {
+                    throwErr("School not found");
+                }
             }
+            response("Schools deleted successfully");
         }
         else {
             throwErr("No groups sent", 400);
         }
-        response("Finished");
     }
 }

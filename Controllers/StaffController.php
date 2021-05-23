@@ -22,15 +22,23 @@ class StaffController extends \Leaf\ApiController {
         }
 	}
 
-    public function delete($id) {
+    public function delete() {
         $staff = Auth::isStaffLoggedin();
-        $deleteStaff = Staff::where("id", "=", $id)->first();
-        if ($deleteStaff) {
-            $deleteStaff->delete();
-            response("Success");
+        $users = requestData("staff");
+        if ($users && !empty($users)) {
+            foreach ($users as $user) {
+                $deleteStaff = Staff::where("id", "=", $user)->first();
+                if ($deleteStaff) {
+                    $deleteStaff->delete();
+                }
+                else {
+                    throwErr("Staff not found", 400);
+                }
+            }
+            response("Staff deleted successfully");
         }
         else {
-            throwErr("Staff not found", 400);
+            throwErr("Staff not sent", 400);
         }
     }
 }

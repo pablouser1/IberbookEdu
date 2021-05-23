@@ -8,5 +8,5 @@ $app->group('/groups', function() use ($app) {
     $app->get("/(\d+)", "GroupController@one");
     $app->post("/(\d+)/yearbook", "YearbookController@generate"); // Generate yearbook of group
     $app->post("/", "GroupController@create"); // Create new group
-    $app->delete("/", "GroupController@delete"); // Delete group(s)
+    $app->post("/delete", "GroupController@delete"); // Delete group(s)
 });

@@ -56,11 +56,14 @@ class GroupController extends \Leaf\ApiController
                 if ($tempGroup) {
                     $tempGroup->delete();
                 }
+                else {
+                    throwErr("Group not found", 400);
+                }
             }
+            response("Schools deleted successfully");
         }
         else {
             throwErr("No groups sent", 400);
         }
-        response("Finished");
     }
 }

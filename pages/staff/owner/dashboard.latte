@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Owner Dashboard - IberbookEdu</title>
+    <script src="../../pages/js/requests.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.15.3/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
 </head>
@@ -145,6 +146,25 @@
             </div>
         </section>
     </div>
+    <hr />
+    <section id="clear" class="section">
+        <div>
+            <p class="title">Clear</p>
+            <p>WARNING: This will clear all the data from the users, profiles and gallery. To continue, please type your password</p>
+            <form id="clear_form">
+                <div class="field">
+                    <div class="control">
+                        <input name="password" class="input" type="password" placeholder="Password" />
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-danger" type="submit">Delete</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
     <!-- Modals -->
 
     <!-- Staff -->
@@ -159,7 +179,7 @@
                 <section class="modal-card-body">
                     <div class="field">
                         <div class="control">
-                            <input name="Staff[username]" class="input" placeholder="Username" />
+                            <input name="staff[username]" class="input" placeholder="Username" />
                         </div>
                     </div>
                     <div class="field">
@@ -176,7 +196,7 @@
         </form>
     </div>
     <div class="modal" id="staff_remove_modal">
-        <form id="staff_add_form">
+        <form id="staff_remove_form">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
@@ -186,17 +206,16 @@
                 <section class="modal-card-body">
                     <div class="field">
                         <div class="control">
-                            <input name="Staff[username]" class="input" placeholder="Username" />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <input name="staff[password]" class="input" type="password" placeholder="Password" />
+                            <div class="select is-multiple">
+                                <select name="staff[]" multiple size="{count($staff)}">
+                                    <option n:foreach="$staff as $staffUser" value="{$staffUser->id}">{$staffUser->username}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button type="submit" class="button is-success">Send</button>
+                    <button type="submit" class="button is-danger">Delete</button>
                     <button class="button" data-bulma-modal="close">Cancel</button>
                 </footer>
             </div>
@@ -236,12 +255,16 @@
                 <section class="modal-card-body">
                     <div class="field">
                         <div class="control">
-                            <input name="school" class="input" placeholder="School name" />
+                            <div class="select is-multiple">
+                                <select name="schools[]" multiple size="{count($schools)}">
+                                    <option n:foreach="$schools as $school" value="{$school->id}">{$school->name}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button type="submit" class="button is-success">Send</button>
+                    <button type="submit" class="button is-danger">Delete</button>
                     <button class="button" data-bulma-modal="close">Cancel</button>
                 </footer>
             </div>
@@ -303,7 +326,6 @@
         </form>
     </div>
 
-    <script src="../../pages/js/requests.js"></script>
     <script src="../../pages/js/modal.js"></script>
     <script src="../../pages/js/dashboard.js"></script>
 </body>

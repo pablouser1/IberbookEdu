@@ -31,6 +31,8 @@ You can start the setup on the /setup endpoint
 
 # TODO
 * (Owner) Add remove options to frontend
+* (Owner) Add and remove themes from dashboard
+
 
 # Credits
 This project wouldn't be possible without the help of the following projects:
