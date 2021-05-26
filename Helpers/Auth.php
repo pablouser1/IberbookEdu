@@ -93,19 +93,20 @@ class Auth {
         }
     }
 
-    public static function isStaffLoggedin(bool $throwError = true) {
+    public static function isStaffLoggedin(string $type, bool $throwError = true) {
         if (isset($_COOKIE["iberbookedu_staff"]) && !empty($_COOKIE["iberbookedu_staff"])) {
             $token = $_COOKIE["iberbookedu_staff"];
             if ($staffinfo = self::authJWT($token)) {
-                return $staffinfo;
+                if ($staffinfo->role === $type) {
+                    return $staffinfo;
+                }
+                throwErr("Invalid staff type", 400);
             }
         }
         if ($throwError) {
             throwErr("You are not logged in", 401);
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     public static function authJWT($token) {

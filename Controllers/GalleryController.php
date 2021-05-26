@@ -25,24 +25,19 @@ class UploadGallery {
         // Create necessary dirs first
         $this->createDirs();
 
-        // Photo
-        if (isset($files['photo'])) {
+        if (isset($files['gallery']) && !empty($files['gallery'])) {
             $this->type = "photo";
             $allowed_pic = array('gif', 'png', 'jpg', 'jpeg');
-            $ext = pathinfo($files["photo"]["name"], PATHINFO_EXTENSION);
+            $allowed_vid = array('mp4', 'webm');
+            $ext = pathinfo($files["gallery"]["name"], PATHINFO_EXTENSION);
             // If the extension is not in the array skip
             if (in_array($ext, $allowed_pic)) {
-                $result = $this->chunk->uploadChunk($this->baseurl, $files["photo"]);
+                $this->type = "photo";
+                $result = $this->chunk->uploadChunk($this->baseurl, $files["gallery"]);
             }
-        }
-        // Video
-        elseif (isset($files['video'])) {
-            $this->type = "video";
-            $allowed_vid = array('mp4', 'webm');
-            $ext = pathinfo($files["video"]["name"], PATHINFO_EXTENSION);
-            // If the extension is not in the array skip
-            if (in_array($ext, $allowed_vid)) {
-                $result = $this->chunk->uploadChunk($this->baseurl, $files["video"]);
+            elseif(in_array($ext, $allowed_vid)) {
+                $this->type = "video";
+                $result = $this->chunk->uploadChunk($this->baseurl, $files["gallery"]);
             }
         }
         return $result;
@@ -116,7 +111,7 @@ class GalleryController extends \Leaf\ApiController
                         json([
                             "code" => "E",
                             "error" => "Unable to write item to database"
-                        ]);
+                        ], 500);
                     }
                 }
                 else {
@@ -130,12 +125,12 @@ class GalleryController extends \Leaf\ApiController
                 json([
                     "code" => "E",
                     "error" => "Error uploading gallery"
-                ]);
+                ], 500);
             }
         }
     }
 
-    public function delete($group_id) {
+    public function delete(int $group_id) {
         $logger = app()->logger();
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();

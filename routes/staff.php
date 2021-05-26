@@ -31,7 +31,7 @@ $app->post("/staff/login", "AccountController@staff");
 
 $app->group("/staff/owner", function () use($app) {
     $app->get("/dashboard", function () {
-        $user = Auth::isStaffLoggedin();
+        $user = Auth::isStaffLoggedin("owner");
 
         // Staff
         $staff = Staff::all();
@@ -56,7 +56,7 @@ $app->group("/staff/owner", function () use($app) {
     });
 
     $app->get("/users", function () {
-        $user = Auth::isStaffLoggedin();
+        $user = Auth::isStaffLoggedin("owner");
 
         // Staff
         $users = User::all();
@@ -71,9 +71,16 @@ $app->group("/staff/owner", function () use($app) {
             "groups" => $groups
         ]);
     });
-
+    $app->get("/log", function() {
+        $owner = Auth::isStaffLoggedin("owner");
+        $log = \Leaf\Config::get("log.dir") . \Leaf\Config::get("log.file");
+        if (is_file($log)) {
+            response()->header("Content-type", "text/plain");
+            echo(file_get_contents($log));
+        }
+    });
     $app->post("/clear", function() {
-        $owner = Auth::isStaffLoggedin();
+        $owner = Auth::isStaffLoggedin("owner");
         $password = requestData("password");
         if ($password) {
             $owner->makeVisible(['password']);
