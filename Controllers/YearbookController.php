@@ -9,8 +9,7 @@ use Models\Yearbook;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Models\Theme;
 
-class YearbookController extends \Leaf\ApiController
-{
+class YearbookController extends \Leaf\ApiController {
 	public function all() {
         $data = requestData(["sort", "count"]);
         if (!isset($data["sort"])) {
@@ -61,6 +60,7 @@ class YearbookController extends \Leaf\ApiController
     public function generate(int $group_id) {
         ignore_user_abort(1);
         set_time_limit(0);
+        $logger = app()->logger();
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
         if ($user->isMod() && $profile->group_id === $group_id) {
@@ -86,6 +86,7 @@ class YearbookController extends \Leaf\ApiController
             // Create and copy config files
             $genyb->setConfig($students, $teachers, $gallery, $banner);
             // Everyting went OK
+            $logger->info("Yearbook of group {$group_id} created by {$user->username}");
             json([
                 "id" => $ybid,
                 "message" => "Yearbook sent successfully"
@@ -211,6 +212,7 @@ class YearbookController extends \Leaf\ApiController
     }
 
     public function vote($id) {
+        $logger = app()->logger();
         $user = Auth::isUserLoggedin();
         try {
             $yearbook = Yearbook::findOrFail($id);
@@ -234,6 +236,7 @@ class YearbookController extends \Leaf\ApiController
         // Set vote to user
         $user->voted = $yearbook->id;
         $user->save();
+        $logger->info("User {$user->username} voted for yearbook {$yearbook->id}");
         json([
             "message" => "Voted sucessfully"
         ]);

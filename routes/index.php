@@ -1,4 +1,5 @@
 <?php
+/**@var Leaf\App $app */
 
 use Helpers\Auth;
 

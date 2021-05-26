@@ -89,12 +89,6 @@ if (!function_exists('render')) {
 	}
 }
 
-if (!function_exists('render_text')) {
-	function render_text(string $view, array $data = []) {
-		return viewConfig("render")($view, $data, true);
-	}
-}
-
 if (!function_exists('request')) {
 	/**
 	 * Return request or request data
@@ -377,4 +371,9 @@ function get_theme(string $theme) {
 
 function acyear() {
     return date("Y",strtotime("-1 year"))."-".date("Y");
+}
+
+// Get string from rendered html
+function render_text(string $view, array $data = []) {
+	return viewConfig("render")($view, $data, true);
 }

@@ -8,10 +8,8 @@ use Helpers\Streamer;
 use Helpers\UploadMedia;
 use Helpers\UploadMisc;
 
-class ProfileController extends \Leaf\ApiController
-{
-	public function all()
-	{
+class ProfileController extends \Leaf\ApiController {
+	public function all() {
         $profiles = Profile::all();
         response($profiles);
 	}
@@ -59,6 +57,8 @@ class ProfileController extends \Leaf\ApiController
     }
 
     public function uploadMedia() {
+        $logger = app()->logger();
+        $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
         $upload = new UploadMedia($profile);
         $result = $upload->startUpload($_FILES);
@@ -66,6 +66,7 @@ class ProfileController extends \Leaf\ApiController
           if ($upload->chunk->hasAllChunks()) {
             $upload->chunk->merge($upload->baseurl);
             $upload->setToDB($result);
+            $logger->info("User {$user->id} successfully uploaded media for profile {$profile->id}");
             response([
                 "code" => "C"
             ]);
@@ -77,26 +78,32 @@ class ProfileController extends \Leaf\ApiController
           }
         }
         else {
+            $logger->error("Error uploading media by user {$user->id} for profile {$profile->id}");
             response([
                 "code" => "E",
-                "error" => "Error uploading file"
+                "error" => "Error uploading media"
             ]);
         }
     }
 
     public function uploadMisc() {
+        $logger = app()->logger();
+        $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
         $upload = new UploadMisc($profile);
         $uploadResult = $upload->startUpload();
         if ($uploadResult) {
+            $logger->info("User {$user->id} successfully uploaded misc items for profile {$profile->id}");
             response("Uploaded successfully");
         }
         else {
+            $logger->error("Error uploading misc items by user {$user->id} for profile {$profile->id}");
             throwErr("Error while uploading", 500);
         }
     }
 
     public function deleteItems($id) {
+        $logger = app()->logger();
         $elements = $_POST["elements"];
         $user = Auth::isUserLoggedin();
         $myProfile = Auth::isProfileLoggedin();
@@ -124,6 +131,7 @@ class ProfileController extends \Leaf\ApiController
                     }
                 }
                 $profile->save();
+                $logger->info("User {$user->id} deleted elements from profile {$profile->id}");
                 response("Deleted succesfully");
             }
             else {

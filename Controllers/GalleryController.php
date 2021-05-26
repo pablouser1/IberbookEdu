@@ -94,6 +94,7 @@ class GalleryController extends \Leaf\ApiController
     }
 
     public function upload(int $group_id) {
+        $logger = app()->logger();
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
         if ($user->isMod() && $profile->group_id === $group_id) {
@@ -104,12 +105,14 @@ class GalleryController extends \Leaf\ApiController
                     $upload->chunk->merge($upload->baseurl);
                     $id = $upload->setToDB($result);
                     if ($id) {
+                        $logger->info("Item uploaded to gallery of group {$group_id} by {$user->username}");
                         json([
                             "code" => "C",
                             "id" => $id
                         ]);
                     }
                     else {
+                        $logger->error("Error writing item to database of group {$group_id} by {$user->username}");
                         json([
                             "code" => "E",
                             "error" => "Unable to write item to database"
@@ -123,6 +126,7 @@ class GalleryController extends \Leaf\ApiController
                 }
             }
             else {
+                $logger->error("Error uploading item chunk of group {$group_id} by {$user->username}");
                 json([
                     "code" => "E",
                     "error" => "Error uploading gallery"
@@ -132,6 +136,7 @@ class GalleryController extends \Leaf\ApiController
     }
 
     public function delete($group_id) {
+        $logger = app()->logger();
         $user = Auth::isUserLoggedin();
         $profile = Auth::isProfileLoggedin();
         if ($user->isMod() && $profile->group_id === $group_id) {
@@ -141,6 +146,7 @@ class GalleryController extends \Leaf\ApiController
             }
             $dir = storage_path("app/uploads/".$profile->group_id."/gallery");
             Misc::recursiveRemove($dir);
+            $logger->info("Gallery of group {$group_id} wiped by {$user->username}");
             json([
                 "message" => "Deleted successfully"
             ]);

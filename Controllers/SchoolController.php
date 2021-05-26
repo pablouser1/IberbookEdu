@@ -6,8 +6,7 @@ use Helpers\Auth;
 use Models\School;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class SchoolController extends \Leaf\ApiController
-{
+class SchoolController extends \Leaf\ApiController {
     public function all() {
         $groups = School::all();
         response($groups);

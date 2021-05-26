@@ -7,8 +7,7 @@ use Models\Group;
 use Helpers\FullUser;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class GroupController extends \Leaf\ApiController
-{
+class GroupController extends \Leaf\ApiController {
     public function all() {
         $groups = Group::all();
         response($groups);

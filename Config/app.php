@@ -1,6 +1,6 @@
 <?php
 return [
-    "app.version" => "1.3.1",
+    "app.version" => "1.3.2",
     /*
     |--------------------------------------------------------------------------
     | Place app in maintainance mode

@@ -5,8 +5,7 @@ namespace Helpers;
 use Helpers\Chunk;
 use Models\Profile;
 
-class UploadMedia
-{
+class UploadMedia {
     private $profile;
     public $temp_dir;
     public $baseurl;

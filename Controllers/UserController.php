@@ -7,8 +7,7 @@ use Helpers\Misc;
 use Models\Profile;
 use Models\User;
 
-class UserController extends \Leaf\ApiController
-{
+class UserController extends \Leaf\ApiController {
     public function me() {
         $user = Auth::isUserLoggedin();
         response ($user);
